@@ -10,7 +10,7 @@ class UserIdPassword(db.Model):
 	user_id = db.Column(db.String, primary_key = True)
 	password = db.Column(db.String, nullable= False)
 	# user_details = db.relationship('UserDetails', foreign_key = ['user_details.user_id'], backref='user_id_password', lazy=True)
-	user_details = db.relationship('UserDetails', backref='user_id_password', lazy=True)
+	user_details = db.relationship('UserDetails', backref='user_id_password', cascade="all, delete-orphan", lazy=True)
 
 
 class UserDetails(db.Model):
@@ -53,7 +53,8 @@ class PostId(db.Model):
 	# int_count = db.Column(db.Integer, autoincrement=True, primary_key= True) # for error resolution
 	user_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False, primary_key= True)
 	post_id = db.Column(db.String, primary_key = True)
-	post_content = db.relationship('PostContent', backref='PostContent', lazy=True)
+	post_content = db.relationship('PostContent', backref='post_content', cascade="all, delete-orphan", lazy=True)
+	post_interaction = db.relationship('PostIneraction', backref='post_interaction', cascade="all, delete-orphan", lazy= True)
 
 class PostContent(db.Model):
 	__tablename__ = "post_content"
@@ -69,6 +70,9 @@ class PostInteraction(db.Model):
 	likes = db.Column(db.Integer, default= 0)
 	flags = db.Column(db.Integer, default= 0)
 	post_comment_id = db.Column(db.String, unique= True, nullable= False)
+	post_commet_data = db.relationship('PostCommentTable', 'post_comments', cascade="all, delete-orphan", lazy= True)
+	post_like_data = db.relationship('PostLikeTable', 'post_likes', cascade="all, delete-orphan", lazy= True)
+	post_flag_data = db.relationship('PostFlagTable', 'post_flags', cascade="all, delete-orphan", lazy= True)
 	# post_like_id = db.Column(db.String, unique=True, nullable= False)
 
 class PostCommentTable(db.Model):
