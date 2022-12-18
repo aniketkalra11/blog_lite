@@ -22,15 +22,17 @@ def login():
 	print(request)
 	if request.method == "POST":
 		form_data = request.form
+		print('printing form data', form_data)
 		is_success, reason = c_login_validation(form_data['user_id'], form_data['password'])
 		if is_success:
 			print('validatio complete redirecting to welcome page')
-			user_name = form_data['user_id']
-			return redirect(url_for('user_home_page'), user_name = user_name)
+			user_name_g = form_data['user_id']
+			return redirect( url_for('user_home_page', user_name = str(user_name_g)))
 		else:
 			print('user validatio failed')
 			print(reason)
-			redirect(url_for('login'))
+			# redirect(url_for('login'))
+			return url_for('no_user_found')
 
 	elif request.method == 'GET':
 		return render_template('login.html')
@@ -53,12 +55,11 @@ def user_sign_up():
 			print('redirecting again to singup page')
 			return redirect(url_for('user_sign_up'))
 
-
-
-
 @app.route('/user/no_user_found', methods=['GET'])
 def no_user_found():
 	return c_no_user_found()
+# user business logic complete
+
 
 
 if __name__ == "__main__":

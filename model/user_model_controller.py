@@ -71,7 +71,9 @@ class UserModelManager():
 		return True if user_data  else False
 
 	def is_user_pwd_correct(self, userId:str, password:str) -> bool:
-		user_data = db.session.query(UserDetails).filter(UserIdPassword.user_id == userId and UserIdPassword.password == password).first()
+		print('for password validation userId receiving as:', userId, 'password as:', password)
+		# user_data = db.session.query(UserIdPassword).filter(UserIdPassword.user_id == userId and UserIdPassword.password == password).first()
+		user_data = UserIdPassword.query.filter_by(user_id = userId, password= password).first()
 		print('user data and password retrived as: ', user_data)
 		return True if user_data else False
 

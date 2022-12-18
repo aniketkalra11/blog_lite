@@ -3,13 +3,15 @@ from database.database import db
 NOT_AVAILABLE = "NOT_AVAILABLE"
 USER = "USER"
 ADMIN = "ADMIN"
-
+#* Adding one to many relation
 class UserIdPassword(db.Model):
 	__tablename__ = 'user_id_password'
 	seq_no = db.Column(db.Integer, autoincrement=True)
 	user_id = db.Column(db.String, primary_key = True)
 	password = db.Column(db.String, nullable= False)
-	user_details = db.relationship('UserDetails', foreign_key = ['user_details.user_id'], backref='user_id_password', lazy=True)
+	# user_details = db.relationship('UserDetails', foreign_key = ['user_details.user_id'], backref='user_id_password', lazy=True)
+	user_details = db.relationship('UserDetails', backref='user_id_password', lazy=True)
+
 
 class UserDetails(db.Model):
 	__tablename__ = "user_details"
