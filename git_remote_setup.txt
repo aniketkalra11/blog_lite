@@ -1,0 +1,13 @@
+Please follow these steps to complete setup git 
+we can follow this link for further information '' https://docs.github.com/en/authentication/connecting-to-github-with-ssh ''
+
+Step 1:- generate ssh-key using ssh-keygen -t ed25519 -C "your_email@example.com"
+(press enter till u see this message ''' 
+Generating public/private ALGORITHM key pair.
+''')
+setp 2:-  evaluate ur agentId ( eval "$(ssh-agent -s)")
+step 3:- "ssh-add ~/.ssh/id_ed25519" edXX can be vary please check accordingly
+setp 4:- now add your ssh key into your github account steps are mentioned and available on google
+step 5:- **essential step please prefer this before proceding 
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection
+Complet document can be found on above link
