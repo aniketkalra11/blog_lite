@@ -54,7 +54,7 @@ class PostId(db.Model):
 	user_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False, primary_key= True)
 	post_id = db.Column(db.String, primary_key = True)
 	post_content = db.relationship('PostContent', backref='post_content', cascade="all, delete-orphan", lazy=True)
-	post_interaction = db.relationship('PostIneraction', backref='post_interaction', cascade="all, delete-orphan", lazy= True)
+	post_interaction = db.relationship('PostInteraction', backref='post_interaction', cascade="all, delete-orphan", lazy= True)
 
 class PostContent(db.Model):
 	__tablename__ = "post_content"
@@ -70,9 +70,9 @@ class PostInteraction(db.Model):
 	likes = db.Column(db.Integer, default= 0)
 	flags = db.Column(db.Integer, default= 0)
 	post_comment_id = db.Column(db.String, unique= True, nullable= False)
-	post_commet_data = db.relationship('PostCommentTable', 'post_comments', cascade="all, delete-orphan", lazy= True)
-	post_like_data = db.relationship('PostLikeTable', 'post_likes', cascade="all, delete-orphan", lazy= True)
-	post_flag_data = db.relationship('PostFlagTable', 'post_flags', cascade="all, delete-orphan", lazy= True)
+	post_commet_data = db.relationship('PostCommentTable', backref='post_comments', cascade="all, delete-orphan", lazy= True, primaryjoin="PostInteraction.post_comment_id == PostCommentTable.post_comment_id")
+	post_like_data = db.relationship('PostLikeTable', backref='post_likes', cascade="all, delete-orphan", lazy= True, primaryjoin= 'PostInteraction.post_id == PostLikeTable.post_id')
+	post_flag_data = db.relationship('PostFlagTable', backref='post_flags', cascade="all, delete-orphan", lazy= True, primaryjoin="PostInteraction.post_id == PostFlagTable.post_id")
 	# post_like_id = db.Column(db.String, unique=True, nullable= False)
 
 class PostCommentTable(db.Model):
@@ -86,13 +86,13 @@ class PostCommentTable(db.Model):
 class PostLikeTable(db.Model):
 	__tablename__ = "post_likes"
 	like_counter= db.Column(db.Integer, autoincrement=True, primary_key= True)
-	post_id = db.Column(db.String, db.ForeignKey('post_id.post_id'), nullable= False)
+	post_id = db.Column(db.String, db.ForeignKey('post_interaction.post_id'), nullable= False)
 	liker_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False)
 
 class PostFlagTable(db.Model):
 	__tablename__ = "post_flags"
 	flag_counter= db.Column(db.Integer, autoincrement=True, primary_key= True)
-	post_id = db.Column(db.String, db.ForeignKey('post_id.post_id'), nullable= False)
+	post_id = db.Column(db.String, db.ForeignKey('post_interaction.post_id'), nullable= False)
 	flagger_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False)
 
 
