@@ -23,7 +23,7 @@ integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7T
 	<form method="post" action={{ url_for('login' ) }}>
 		<div class="mb-3">
 			<label for="exampleInputEmail1" class="form-label">Email address</label>
-			<input type="string" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name= "user_id">
+			<input type="string" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name= "user_id" value = {{user_name}}>
 			<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
 		</div>
 		<div class="mb-3">
@@ -40,6 +40,7 @@ integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7T
 	<div>
 		<button href="/user/signup" type="button">singup</button>
 		<a href="/user/signup">signup</a>
+		<a href="/session_test">session_test</a>
 	</div>
 	</div>
 </body>
