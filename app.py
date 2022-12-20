@@ -4,7 +4,7 @@ from flask_session import Session
 from flask_restful import Api, Resource
 from config.config import DevelopmentEnviroment
 from database.database import db
-from flask import sessions
+
 from model.model import init_db
 def generate_random_key():
 	# import string
@@ -29,6 +29,7 @@ Session(app)
 ran_k = generate_random_key()
 print('random key received as:', ran_k)
 app.secret_key = ran_k
+api = Api(app)
 db.init_app(app)
 
 # db.create_all()
@@ -69,7 +70,12 @@ def login():
 
 @app.route('/user/<string:user_name>', methods=['GET'])
 def user_home_page(user_name):
-	return c_user_home_page(user_name)
+	if user_name in list(session.keys()):
+		print('user found logging in to home page')
+		return c_user_home_page(user_name)
+	else:
+		print('no current user found redirecting to login page')
+		return redirect(url_for('login'))
 
 @app.route('/user/signup', methods=['GET', 'POST'])
 def user_sign_up():
@@ -90,6 +96,16 @@ def no_user_found():
 	return c_no_user_found()
 # user business logic complete
 
+#* API Work starting here
+#* Adding post Api
+
+from Api.post_api import PostLikeApi
+api.add_resource(PostLikeApi, "/api/like", "/api/like/<string:liker_id>/<string:post_id>")
+
+from Api.post_api import PostFlagApi
+api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string:post_id>")
+
+#TODO: Comment API
 
 
 if __name__ == "__main__":
