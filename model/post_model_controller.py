@@ -223,7 +223,7 @@ class PostModelManager():
         self.printDebug('Post Removed')
 
 
-    def add_to_db(self, item):
+    def add_to_db(self, item)-> bool:
         if item == None:
             raise Exception('None found')
         try:
@@ -250,7 +250,19 @@ class PostModelManager():
             self.printDebug('Comment added successfully')
             # print('comment added successfully')
             db.session.commit()
-        
+    
+    #* logic basically for get number of likes and dislikes
+    def get_num_likes(self, post_id:str)->int:
+        post_details = PostInteraction.query.filter_by(post_id = post_id).first()
+        # assuming this always exists
+        self.printDebug('num of likes' + str(post_details.likes))
+        return post_details.likes
+
+    def get_num_flags(self, post_id:str)->int:
+        post_de = PostInteraction.query.filter_by(post_id = post_id).first()
+        self.printDebug('returing num of flags:' + str(post_de.flags))
+        return post_de.flags
+
 
     def post_content_not_found_exception(self, post_id):
         raise Exception('no Post exists with post id:' + post_id)
