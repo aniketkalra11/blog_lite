@@ -108,6 +108,10 @@ def signout(user_id):
 		print('there might be some error ')
 	return redirect(url_for('signin'))
 
+@app.route('/user/profile/<string:user_id>', methods=['GET'])
+def user_profile(user_id):
+	return 'user_profile'
+
 
 #* API Work starting here
 #* Adding post Api
