@@ -6,74 +6,20 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{fname}}</title>
 	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
-	<style>
-		body{
-			background: rgb(240,240,240);
-		}
-		.blog_container{
-			place-items: center;
-			text-align: center;
-		}
-		.image_post{
-			border-radius: 2%;
-			box-shadow: 3px 3px 3px 3px  rgb(200,200,200);
-			background: white;
-			display:flex;
-			flex-direction: column;
-		}
-		#post_img{
-			height: 70%;
-			width: 70%;
-			margin-top: 2vh ;
-			border-radius: 5%;
-			box-shadow: 2px 2px 2px lightblue;
-		}
-		#title{
-			text-align: left;
-			margin-left:13%;
-			margin-top: 2vh;
-			margin-bottom: 2vh;
-
-		}
-		.post_comment_box{
-			background: rgb(230, 230, 230);
-			margin-bottom: 2vh;
-			margin-left: 13%;
-			margin-right: 13%;
-			width: 70%;
-			text-align: left;
-			overflow: auto;
-			min-height: 100px;
-			max-height: 200px;
-			width: auto;
-		}
-		.header_title{
-			margin-top: 2vh;
-		}
-		.comment_content{
-			display: flex;
-			flex-direction: column;
-		}
-		.single_comment{
-			display: flex;
-			flex-direction: column;
-			text-align: left;
-			background: rgb(250,250,250);
-			margin-top: 2px;
-			margin-bottom: 2px;
-		}
-		.like_flag_container{
-			display: grid;
-			grid-template-columns: auto auto;
-			margin-top:1vh;
-			margin-bottom: 1vh;
-		}
-		.interaction_marker{
-			height: 20px;
-			width: 20px;
-		}
-	</style>
+	<link href="{{url_for('static', filename='/user_home.css')}}" rel="stylesheet">
 </head>
+<style>
+	.post_create_button{
+		position: fixed;
+		bottom: 1vh;
+		left: 85vw;
+		border-radius: 50%;
+	}
+	#post_description{
+		text-align: left;
+		margin-left: 13%;
+	}
+</style>
 <body>
 	<div>
 		<nav class="py-2 bg-light border-bottom">
@@ -100,6 +46,7 @@
 			</div>
 			<div class="container">
 				<h3 id="title">test sample image</h3>
+				<p id="post_description">Here Post description will appear</p>
 			</div>
 			<div class="container like_flag_container">
 				<div class="container">
@@ -151,6 +98,9 @@
 				</div>
 			</div>
 		</div>
+	</div>
+	<div class="container post_create_button">
+		<a href="{{url_for('create_post', user_id= user_id)}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Create Post</a>
 	</div>
 </body>
 </html>

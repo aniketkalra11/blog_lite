@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{fname}}</title>
+	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='/user_home.css')}}" rel="stylesheet">
+</head>
+<body>
+	<div>
+		<nav class="py-2 bg-light border-bottom">
+			<div class="container d-flex flex-wrap">
+			  <ul class="nav me-auto">
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page"><img src="{{url_for('static', filename='img/blog_lite_logo.png')}}" style="width: 2vw; height: 3vh;"/></a></li>
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
+			  </ul>
+			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+			  </form>
+			  <ul class="nav">
+				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">Profile</a></li>
+				<li class="nav-item"><a href="{{url_for('signout', user_id = user_id)}}" class="nav-link link-dark px-2">Logout</a></li>
+			  </ul>
+			</div>
+		  </nav>
+	</div>
+	<div class="container blog_container">
+		<h1>Create Post</h1>
+		<div class="container">
+        	<form id="post_create_form" enctype="multipart/form-data" action="{{url_for('create_post', user_id=user_id)}}" method="post">
+				title: {{user_id}} Here
+				<input type="text" placeholder="Post Title" name = "title">
+				post_containt:
+				<input type="text" placeholder="Post caption" name = "caption">
+				image:
+				<input type="file" name="image">
+				<button type="submit">Submit</button>
+
+			</form>
+		</div>
+	</div>
+</body>
+</html>
