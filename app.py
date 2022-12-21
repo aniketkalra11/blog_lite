@@ -41,7 +41,7 @@ def init_db_main():
 		init_db()
 
 @app.route('/', methods=['GET', 'POST'])
-def login():
+def signin():
 	print(request)
 	if request.method == "POST":
 		form_data = request.form
@@ -53,7 +53,7 @@ def login():
 			session[user_name_g] = user_name_g
 			print('adding user to session')
 			print('addition complete', session)
-			return redirect( url_for('user_home_page', user_name = str(user_name_g)))
+			return redirect( url_for('user_home_page', user_id = str(user_name_g)))
 		else:
 			print('user validatio failed')
 			print(reason)
@@ -66,16 +66,17 @@ def login():
 		print(session.keys())
 		if list(session.keys()) != []:
 			user_name = session[list(session.keys())[0]]
-		return render_template('login.html', user_name= user_name)
+		# return render_template('login.html', user_name= user_name)
+		return render_template('signin.html')
 
-@app.route('/user/<string:user_name>', methods=['GET'])
-def user_home_page(user_name):
-	if user_name in list(session.keys()):
+@app.route('/user/<string:user_id>', methods=['GET'])
+def user_home_page(user_id):
+	if user_id in list(session.keys()):
 		print('user found logging in to home page')
-		return c_user_home_page(user_name)
+		return render_template('user_home.html', user_id = user_id, fname= user_id)
 	else:
 		print('no current user found redirecting to login page')
-		return redirect(url_for('login'))
+		return redirect(url_for('signin'))
 
 @app.route('/user/signup', methods=['GET', 'POST'])
 def user_sign_up():
@@ -85,7 +86,7 @@ def user_sign_up():
 		form_data = request.form
 		if c_add_user(form_data):
 			print('User added successfully')
-			return redirect(url_for('login'))
+			return redirect(url_for('signin'))
 		else:
 			print('addition of user failed')
 			print('redirecting again to singup page')
@@ -95,6 +96,18 @@ def user_sign_up():
 def no_user_found():
 	return c_no_user_found()
 # user business logic complete
+
+@app.route('/user/signout/<string:user_id>', methods=['GET'])
+def signout(user_id):
+	print('signout request received')
+	print('sessions are: ', session)
+	if user_id in session.keys():
+		del session[user_id]
+	else:
+		print('no user found')
+		print('there might be some error ')
+	return redirect(url_for('signin'))
+
 
 #* API Work starting here
 #* Adding post Api

@@ -56,7 +56,7 @@ class PostFlagApi(Resource):
     @marshal_with(flager_FB)
     def get(self, flager_id, post_id):
         try:
-            p_m_m.add_flagd(post_id, flager_id)
+            p_m_m.add_flag(post_id, flager_id)
         except Exception as e:
             print('Api', e)
             return 'error', 500

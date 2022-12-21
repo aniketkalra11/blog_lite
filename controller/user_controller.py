@@ -2,6 +2,7 @@ from flask import render_template
 from flask import request, abort, redirect, url_for
 from sqlalchemy.exc import SQLAlchemyError
 
+from datetime import datetime
 
 from model.user_model_controller import UserModelManager
 
@@ -75,7 +76,7 @@ def validate_user_data(user_id:str, password:str) -> tuple:
 
 def c_user_home_page(user_name):
 	print('user_home page')
-	return render_template('user_home.html', user_name = user_name)
+	
 
 def c_no_user_found():
 	return render_template('no_user_found.html')
@@ -96,12 +97,14 @@ def c_add_user(form_data) -> bool:
 		password = form_data['password']
 		fname = form_data['fname']
 		lname = form_data['lname']
-		dob = form_data['dob']
+		# ('dob', '2022-12-06')
+		dob = form_data['dob'].split('-')
+		d_dob = datetime(int(dob[0]), int(dob[1]), int(dob[2]))
 		city = form_data['city']
 		profession = form_data['profession']
 		if profession != "":
 			db_result = user_manager.add_user(userId= user_id, password= password, 
-											fname= fname, lname= lname, dob= dob, city= city, profession= profession)
+											fname= fname, lname= lname, dob= d_dob, city= city, profession= profession)
 		else:
 			db_result = user_manager.add_user(userId= user_id, password= password, 
 											fname= fname, lname= lname, dob= dob, city= city)
