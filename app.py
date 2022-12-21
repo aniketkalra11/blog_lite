@@ -1,30 +1,37 @@
 import os
-from flask import Flask, request, session
+from flask import Flask, request, session, flash
 from flask_session import Session
 from flask_restful import Api, Resource
 from config.config import DevelopmentEnviroment
 from database.database import db
-
+#for file system
+from werkzeug.utils import secure_filename
+from controller.user_controller import *
+from controller.post_controller import *
 from model.model import init_db
+
 def generate_random_key():
-	# import string
-	# import random
-	
-	# # initializing size of string
-	# N = 10
-	
-	# # using random.choices()
-	# # generating random strings
-	# res = ''.join(random.choices(string.ascii_uppercase +
-    #                          string.digits, k=N))
 	import secrets 
 	res = secrets.token_hex()
 	return res
+
+def set_upload_folder():
+	cwd = os.getcwd()
+	UPLOAD_FOLDER = os.path.join(cwd, 'resource')
+	print(UPLOAD_FOLDER)
+	if not os.path.exists(UPLOAD_FOLDER):
+		print('creating folder')
+		os.mkdir(UPLOAD_FOLDER)
+	print(UPLOAD_FOLDER)
+	app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentEnviroment)
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem' # neet to check wheather it is useful or not
+
 Session(app)
 ran_k = generate_random_key()
 print('random key received as:', ran_k)
@@ -33,15 +40,21 @@ api = Api(app)
 db.init_app(app)
 
 # db.create_all()
-from controller.user_controller import *
-from controller.post_controller import *
+
 #* For initial database intialization
 def init_db_main():
 	with app.app_context():
+		print('calling init db')
 		init_db()
+
+def is_user_in_session(user_id:str)->bool:
+	print('sesssion is:', session)
+	print('user_id receving as:', user_id)
+	return user_id in session.keys()
 
 @app.route('/', methods=['GET', 'POST'])
 def signin():
+	set_upload_folder()
 	print(request)
 	if request.method == "POST":
 		form_data = request.form
@@ -111,6 +124,27 @@ def signout(user_id):
 @app.route('/user/profile/<string:user_id>', methods=['GET'])
 def user_profile(user_id):
 	return 'user_profile'
+
+@app.route('/user/post/<string:user_id>/create_post', methods=['GET', 'POST'])
+def create_post(user_id):
+	print('post_request receiving')
+	if is_user_in_session(user_id):
+		if request.method == 'GET':
+			return render_template('create_post.html', user_id = user_id)
+		else:
+			form_data = request.form
+			file = request.files['image']
+			print(file)
+			is_success, reason = c_create_post(user_id, form_data, file)
+			if not is_success:
+				flash(reason)
+			# return redirect(url_for('user_home_page', user_id = user_id))
+			return redirect(url_for('create_post', user_id= user_id))
+	else:
+		print('no user in session redirecting to signup page')
+		return redirect(url_for('signin'))
+
+		
 
 
 #* API Work starting here

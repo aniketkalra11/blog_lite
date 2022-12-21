@@ -28,11 +28,13 @@ class PostModelManager():
     def create_post_id(self, user_id:str) -> str:
         # t_date = date.today()
         t_date = datetime.now()
-        day = str(t_date.date)
-        month = str(t_date.month)
+        day = t_date.date
+        print(type(day))
+        month = t_date.month
+        print(month)
         year = t_date.year #?: we will check wheather it is required or not
         time = t_date.strftime('%H_%M_%S')
-        id = user_id + "_" + day + "_" + month + "_" + time
+        id = user_id +  "_" + time
         print('final id is:', id)
         return id
     def create_post_comment_id(self, post_id:str)->str:
@@ -41,7 +43,7 @@ class PostModelManager():
         month = str(t_date.month)
         year = t_date.year #?: we will check wheather it is required or not
         time = t_date.strftime('%H_%M_%S')
-        id = post_id + "_" + day + "_" + month + "_" + time
+        id = post_id + "_" + time
         print('final id is:', id)
         return id
 
@@ -51,7 +53,7 @@ class PostModelManager():
         return id
         
 
-    def add_post(self, user_id, title, caption = None, timestamp= datetime.now(), imageurl = None):
+    def add_post(self, user_id, title, caption = None, timestamp= datetime.now(), imageurl = None) ->bool:
         user_post_info = UserPostAndFollowerInfo.query.filter_by(user_id = user_id).first()
         if user_post_info == None:
             raise Exception('User not found in info table')
@@ -68,7 +70,7 @@ class PostModelManager():
             post_content_obj.caption = caption
         post_content_obj.timestamp = timestamp
         if imageurl:
-            post_content_obj = imageurl
+            post_content_obj.image_url = imageurl
         post_id_obj.post_content.append(post_content_obj)
         post_id_obj.post_interaction.append(post_interaction_obj)
         try:
@@ -80,9 +82,11 @@ class PostModelManager():
             self.printDebug('database addition failed, Rollbacked')
             # self.session.rollback()
             db.session.rollback()
+            return False
         else:
             print('Commiting changes')
             db.session.commit()
+            return True
     
     def add_like(self, post_id, liker_id):
         self.debug = 'getting post as:' + post_id + ', and liker_id:' + liker_id

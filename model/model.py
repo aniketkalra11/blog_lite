@@ -3,6 +3,7 @@ from database.database import db
 NOT_AVAILABLE = "NOT_AVAILABLE"
 USER = "USER"
 ADMIN = "ADMIN"
+DEFAULT_PROFILE_ADDRESS= 'profile/default_profile.png'
 #* Adding one to many relation
 class UserIdPassword(db.Model):
 	__tablename__ = 'user_id_password'
@@ -19,6 +20,7 @@ class UserDetails(db.Model):
 	fname = db.Column(db.String, nullable= False)
 	lname = db.Column(db.String, nullable = False, default= NOT_AVAILABLE)
 	dob = db.Column(db.DateTime, nullable = False)
+	profile_photo = db.Column(db.String, nullable = False, default= DEFAULT_PROFILE_ADDRESS)
 	#Address starting
 	city = db.Column(db.String, nullable = False)
 	profession = db.Column(db.String, nullable = False, default= NOT_AVAILABLE)
