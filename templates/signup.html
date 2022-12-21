@@ -5,56 +5,92 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Uesr SignUp</title>
-	<link rel="stylesheet" href="./css/common.css">
+	<!-- <link rel="stylesheet" href="./css/common.css"> -->
+	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+	<style>
+		*{
+			margin: 0px;
+			padding: 0px;
+		}
+	</style>
 </head>
 <body>
-	<div class="container" id="header">
-		<div class="container" id="header_heading">
-			<h1 id="header_heading">Blog_Lite</h1>
-		</div>
-	</div>
-	<div class="container_main" id="center_body">
-	<!-- <div class="side_container" id="navigation_division"> -->
-		<nav id="side_nav" class="side_container">
-			<div class="profile_data">
-				<!-- <p>Here one picture will come</p> -->
-				<div id="image_area">
-				</div>
+	<div class="container-fluid">
+		<nav class="py-2 bg-light border-bottom">
+			<div class="container d-flex flex-wrap">
+			  <ul class="nav me-auto">
+				<li class="nav-item"><a href="/" class="nav-link link-dark px-2 active" aria-current="page"><img src="{{url_for('static', filename='img/blog_lite_logo.png')}}" style="width: 2vw; height: 3vh;"/></a></li>
+				<li class="nav-item"><a href="/" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
+			  </ul>
+			  <ul class="nav">
+				<li class="nav-item"><a href="{{url_for('signin')}}" class="nav-link link-dark px-2">Login</a></li>
+			  </ul>
 			</div>
-				<a href="login.html">Login</a>
-			
-			
-				<a href="user_home.html">user_home</a>
-			
-			
-				<a href="#">Logout</a>
-			
-		</nav>
-	<!-- </div> -->
-	<div class></div>
-		<form method="post" action="/user/signup">
-			<strong>userId</strong><input id="user_id" type="string" name="user_id"><br>
-			<strong>password</strong><input id="password" type="string" name="password"><br>
-			<strong>fname</strong><input id="password" type="string" name="fname"><br>
-			<strong>lname</strong><input id="password" type="string" name="lname"><br>
-			<strong>city</strong><input id="password" type="string" name="city"><br>
-			<strong>dob</strong><input id="dob" type="date" name="dob">
-			<strong>profession</strong><input id="password" type="string" name="profession"><br>
-			<button>Submit</button>
-		</form>
-
+		  </nav>
 	</div>
-
-	<div class="main_container" id="post_content">
-		<div>
-			<p>Here all content will come here</p>
+	<div class="container">
+		<div class="justify-content-center">
+			<form action="{{url_for('user_sign_up')}}" method="POST" clas="row padding-top">
+				<div class="form-group row">
+				<label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+				<div class="col-sm-10">
+					<input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="user_id">
+				</div>
+				</div>
+				<div class="form-group row">
+				<label for="inputPassword3" class="col-sm-2 col-form-label padding-top">Password</label>
+				<div class="col-sm-10">
+					<input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password">
+				</div>
+				</div>
+				<div class="form-group row">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">First-Name</label>
+					<div class="col-sm-10">
+						<input type="string" class="form-control" id="inputEmail3" placeholder="First-Name" name="fname">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">Last-Name</label>
+					<div class="col-sm-10">
+						<input type="string" class="form-control" id="inputEmail3" placeholder="Last-Name" name="lname">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">Date Of Birth</label>
+					<div class="col-sm-10">
+						<input type="date" class="form-control" id="inputEmail3" placeholder="First-Name" name="dob">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">City</label>
+					<div class="col-sm-10">
+						<input type="string" class="form-control" id="inputEmail3" placeholder="City" name="city">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">Profession</label>
+					<div class="col-sm-10">
+						<input type="string" class="form-control" id="inputEmail3" placeholder="Profession" name="profession">
+					</div>
+				</div>
+				<div class="form-group row">
+				<div class="col-sm-2">Checkbox</div>
+				<div class="col-sm-10">
+					<div class="form-check">
+					<input class="form-check-input" type="checkbox" id="gridCheck1">
+					<label class="form-check-label" for="gridCheck1">
+						Example checkbox
+					</label>
+					</div>
+				</div>
+				</div>
+				<div class="form-group row">
+				<div class="col-sm-10">
+					<button type="submit" class="btn btn-primary">Sign in</button>
+				</div>
+				</div>
+			</form>
 		</div>
-	</div>
-
-
-</div>
-
-
 	</div>
 </body>
 </html>
