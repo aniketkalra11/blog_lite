@@ -19,8 +19,37 @@
 		text-align: left;
 		margin-left: 13%;
 	}
+	#post_user_id{
+		text-decoration: none;
+	}
+	.post_user_id{
+		text-align: left;
+		margin-left: 15%;
+		margin-top: 1vh;
+		margin-bottom: 1vh;;
+	}
+	#like:hover{
+		background: lightblue;
+	}
+	#flag:hover{
+		background: lightblue;
+	}
 </style>
+<script src="{{url_for('static', filename='js/like_api_call.js')}}"></script>
 <body>
+	<!-- TODO: Introduce flashes -->
+	<!-- {# <div class="container flash_msg">
+		{% with messages = get_flash_messages() %}
+			{% if messages %} 
+				<ul class="flasher">
+					{% for message in messages %} 
+						<li>{{message}}</li>
+						{% endfor %} 
+				</ul>
+			{% endif %}
+		{% endwith %}
+		{% block body %}{% endblock %}
+	</div> #} -->
 	<div>
 		<nav class="py-2 bg-light border-bottom">
 			<div class="container d-flex flex-wrap">
@@ -41,6 +70,9 @@
 	<div class="container blog_container">
 		<h1>Dashboard</h1>
 		<div class="container image_post">
+			<div class="container post_user_id">
+				<a href="#" id="post_user_id"><h3>User_id</h3></a>
+			</div>
 			<div class="container">
 				<img src="{{url_for('static', filename='resources/img/12.png')}}" alt="main_image" id="post_img">
 			</div>
@@ -50,10 +82,10 @@
 			</div>
 			<div class="container like_flag_container">
 				<div class="container">
-					<img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker">
+					<a href="#" onclick="add_like(this); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
 				</div>
 				<div class="contianer">
-					<img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker">
+					<a href= "#" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 				</div>
 			</div>
 			<div class="container post_comment_box">
@@ -93,7 +125,17 @@
 							comment_1
 						</div>
 					</div>
-					
+					<div class="container single_comment">
+						<div class="container">
+							<strong>{{user_id}}</strong>
+						</div>
+						<div class="container">
+							<form method="post" action="{{url_for('add_post_comment', user_id=user_id, post_id= 123)}}" > <!-- TODO: write here-->
+								<input type="text" placeholder="Write your comment here...." name="content">
+								<button type="submit">Submit</button>
+							</form>
+						</div>
+					</div>
 				</div>
 				</div>
 			</div>

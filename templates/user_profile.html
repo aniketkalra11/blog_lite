@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{fname}}</title>
+	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='/user_home.css')}}" rel="stylesheet">
+</head>
+<style>
+	.post_create_button{
+		position: fixed;
+		bottom: 1vh;
+		left: 85vw;
+		border-radius: 50%;
+	}
+	#post_description{
+		text-align: left;
+		margin-left: 13%;
+	}
+	#post_user_id{
+		text-decoration: none;
+	}
+	.post_user_id{
+		text-align: left;
+		margin-left: 15%;
+		margin-top: 1vh;
+		margin-bottom: 1vh;;
+	}
+	#like:hover{
+		background: lightblue;
+	}
+	#flag:hover{
+		background: lightblue;
+	}
+
+    /* User Profile starting */
+    .main_body_container{
+        display: flex;
+        flex-direction: row;
+    }
+    .heading{
+        text-align: center;
+    }
+</style>
+<script src="{{url_for('static', filename='js/like_api_call.js')}}"></script>
+<body>
+	<!-- TODO: Introduce flashes -->
+	<!-- {# <div class="container flash_msg">
+		{% with messages = get_flash_messages() %}
+			{% if messages %} 
+				<ul class="flasher">
+					{% for message in messages %} 
+						<li>{{message}}</li>
+						{% endfor %} 
+				</ul>
+			{% endif %}
+		{% endwith %}
+		{% block body %}{% endblock %}
+	</div> #} -->
+	<div>
+		<nav class="py-2 bg-light border-bottom">
+			<div class="container d-flex flex-wrap">
+			  <ul class="nav me-auto">
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page"><img src="{{url_for('static', filename='img/blog_lite_logo.png')}}" style="width: 2vw; height: 3vh;"/></a></li>
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
+			  </ul>
+			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+			  </form>
+			  <ul class="nav">
+				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{input_data['user_id']}}'s Profile</a></li>
+				<li class="nav-item"><a href="{{url_for('signout', user_id = user_id)}}" class="nav-link link-dark px-2">Logout</a></li>
+			  </ul>
+			</div>
+		  </nav>
+	</div>
+    <div class="container-fluid heading">
+        <h2>{{user_id}} Profile</h2>
+    </div>
+    <div class="container-fluid main_body_container">
+        <div class="container">
+            <h3>Profile container</h3>
+        </div>
+        <div class="container">
+            <h3> Something we have</h3>
+        </div>
+    </div>
+
+
+</body>
+</html>

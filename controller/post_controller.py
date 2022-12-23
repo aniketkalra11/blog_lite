@@ -7,6 +7,45 @@ print('creating post model')
 '''
 Post Mostly edited via api so most of the stuff will exists in Api folder
 '''
+class UserFeedPostContainer:
+	def __init__(self, post_id):
+		sql_post_data = p_m_m.get_post_content(post_id)
+		self.post_id = sql_post_data.post_id
+		self.title = sql_post_data.title
+		self.caption = sql_post_data.caption
+		self.timestamp = sql_post_data.timestamp
+		self.image_url = sql_post_data.image_url
+		sql_post_id = p_m_m.get_post_id_tuple(post_id)
+		self.user_id = sql_post_id.user_id
+		sql_post_interaction = p_m_m.get_post_interaction(post_id)
+		self.likes = sql_post_interaction.likes
+		self.flags = sql_post_interaction.flags
+		self.post_comment_id = sql_post_interaction.post_comment_id
+		self.comments = p_m_m.get_comments_from_post_id(self.post_comment_id)
+		print('UserFeedPostContainer construction complete')
+
+	def __str__(self):
+		s = self.user_id +" " + self.post_id + " " + self.title + " " + self.image_url + "\n"
+		return s
+	
+	def __eq__(self, a):
+		return True if self.timestamp == a.timestamp else False
+	
+	def __gt__(self, a):
+		return True if self.timestamp > a.timestamp else False
+
+	def __lt__(self, a):
+		return True if self.timestamp < a.timestamp else False
+	
+	def __ge__(self, a):
+		return True if self.timestamp >= a.timestamp else False
+	
+	def __le__(self, a):
+		return True if self.timestamp <= a.timestamp else False
+	#implemented for sorting implementation
+
+
+
 cwd = os.getcwd()
 UPLOAD_FOLDER = os.path.join(cwd, 'resource')
 print(UPLOAD_FOLDER)
@@ -46,6 +85,18 @@ def c_create_post(user_id:str, form_data:dict, file) ->list:
         return False, 'Database entry failed'
     # print('file receiving as:',file)
     return True, 'Success'
+
+def c_add_comment(user_id:str, post_id:str, comment_content:str)->list:
+	debug_print('Adding a new comment to list')
+	try:
+		is_suc, reason = p_m_m.add_comment(post_id, user_id, comment_content)
+	except Exception as e:
+		is_suc = False
+		print('exception arrived', e)
+		reason = str(e)
+	if not is_suc:
+		print('add comment_failed')
+	return is_suc, reason
     
 
 

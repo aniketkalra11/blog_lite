@@ -123,7 +123,7 @@ def signout(user_id):
 
 @app.route('/user/profile/<string:user_id>', methods=['GET'])
 def user_profile(user_id):
-	return 'user_profile'
+	return render_template('user_profile.html')
 
 @app.route('/user/post/<string:user_id>/create_post', methods=['GET', 'POST'])
 def create_post(user_id):
@@ -144,7 +144,26 @@ def create_post(user_id):
 		print('no user in session redirecting to signup page')
 		return redirect(url_for('signin'))
 
+@app.route('/user/post/<string:user_id>/<string:post_id>', methods=['POST'])
+def add_post_comment(user_id, post_id):
+	print('add comment request received')
+	print('user_id:', user_id, 'post_id:', post_id)
+	comment = request.form['content']
+	print('comment received as:', comment)
+	is_success, reason = c_add_comment(user_id, post_id, comment)
+	if not is_success:
+		flash(reason)
+	return redirect(url_for('user_home_page', user_id= user_id))
 		
+@app.route('/user/jinja', methods=['GET'])
+def ji():
+	dict_data = {}
+	user_id = 'ani'
+	post_id = '123'
+	dict_data['user_id'] = 'ani'
+	dict_data['post_id'] = '123'
+	dict_data['list_post'] = ['123', '234', '456']
+	return render_template('user_home_jinja.html', input_data= dict_data, user_id = user_id)
 
 
 #* API Work starting here

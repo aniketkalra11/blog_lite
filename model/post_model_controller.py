@@ -190,7 +190,26 @@ class PostModelManager():
        
 
     #* Edit section complete adding remove section
+    #* get section starting here
+    def get_comments_from_post_id(self, post_comment_id:str)->list:
+        self.printDebug('post id receving as: ' + post_comment_id)
+        comments = PostCommentTable.query.filter_by(post_comment_id = post_comment_id).all()
+        print('comments received as:', comments)
+        return (comments)
 
+    def get_post_id_tuple(self, post_id):
+        print('Post id recevied as:', post_id)
+        return PostId.query.filter_by(post_id= post_id).first()
+
+    def get_post_interaction(self, post_id):
+        print('Post id recevied as:', post_id)
+        return PostInteraction.query.filter_by(post_id= post_id).first()
+    
+    def get_post_content(self, post_id):
+        print('Post id recevied as:', post_id)
+        return PostContent.query.filter_by(post_id= post_id).first()
+
+    #* Remove section starting
     def remove_like(self, post_id, liker_id):
         post_like = PostLikeTable.query.filter_by(post_id = post_id, liker_id = liker_id).first()
         post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
