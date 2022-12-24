@@ -86,7 +86,10 @@ def c_login_validation(userId:str, password:str)-> list:
 		print('incorrect password')
 		return [False, "Incorrect Password"]
 
-
+def c_get_user_following_list(user_id:str)->list:
+	result = []
+	result = user_manager.get_user_following_list(user_id)
+	return result
 
 def printDebug(stat:str)->None:
 	print("Controller: ", stat)

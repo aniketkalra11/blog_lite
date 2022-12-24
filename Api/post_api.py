@@ -35,7 +35,7 @@ class PostLikeApi(Resource):
         try:
             p_m_m.add_like(post_id, liker_id)
         except Exception as e:
-            print('APi',e)
+            print('exception arrived during like deleteion r', e)
             return 'error', 500
             # pass  # TODO: Raise valid http excpiton
         else:
@@ -44,9 +44,10 @@ class PostLikeApi(Resource):
     @marshal_with(liker_FB)
     def delete(self, liker_id, post_id):
         try:
+            print('receving remove like request:', liker_id)
             p_m_m.remove_like(post_id, liker_id)
         except Exception as e:
-            print(e)
+            print('exception 3 arrived during like deleteion r', e)
             return 'error', 500
             #TODO: print a valid exceptionS
         else:
@@ -58,7 +59,7 @@ class PostFlagApi(Resource):
         try:
             p_m_m.add_flag(post_id, flager_id)
         except Exception as e:
-            print('Api', e)
+            print('exception 34 arrived during flag insertion r', e)
             return 'error', 500
         else:
             return p_m_m.get_num_flags(post_id), 201
@@ -68,7 +69,7 @@ class PostFlagApi(Resource):
         try:
             p_m_m.remove_flag(post_id, flager_id)
         except Exception as e:
-            print('Api', e)
+            print('exception 324 arrived during flag deleteion r', e)
             return 'error', 500
         else:
             return p_m_m.get_num_flags(post_id), 201                

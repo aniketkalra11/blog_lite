@@ -112,11 +112,16 @@ def c_get_post_for_user(user_id:str, user_following_list:list):
 	debug_print('following list received as:' + str(user_following_list))
 	list_posts = []
 	for user in user_following_list:
-		print('searching posts for ', user)
-		posts = p_m_m.get_user_post(user.user_id)
+		print('searching posts for ', user.following_id)
+		posts = p_m_m.get_user_post(user.following_id)
 		for p in posts:
-			if len(p.post_id ) > 4:
-				obj = UserFeedPostContainer(p.post_id)
+			if len(p.post_id) > 4:
+				try:
+					obj = UserFeedPostContainer(p.post_id)
+				except Exception as e:
+					debug_print('Unable to create post object for ' + str(p.post_id))
+					print(e)
+					continue
 				obj.is_already_flagged = p_m_m.is_user_already_flaged(user_id, p.post_id)
 				obj.is_already_liked = p_m_m.is_user_already_liked(user_id, p.post_id)
 				list_posts.append(obj)

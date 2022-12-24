@@ -121,7 +121,7 @@ class UserModelManager():
 	def get_user_follower_list(self, userId:str)-> list:
 		user_followers = None
 		try:
-			user_followers = db.session.query(UserFollowers).filter_by(user_id = userId)
+			user_followers = db.session.query(UserFollowers).filter_by(user_id = userId).all()
 			print(user_followers)
 			if len(user_followers) == 0:
 				print('no user found')
@@ -131,9 +131,9 @@ class UserModelManager():
 			return []
 
 	def get_user_following_list(self, userId:str) -> list:
-		user_following = None
+		user_following = []
 		try:
-			user_following = db.session.query(UserFollowing).filter_by(user_id = userId)
+			user_following = db.session.query(UserFollowing).filter_by(user_id = userId).all()
 			print(user_following)
 			if len(user_following) == 0:
 				print('no user found')

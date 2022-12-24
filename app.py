@@ -86,8 +86,9 @@ def signin():
 def user_home_page(user_id):
 	if user_id in list(session.keys()):
 		print('user found logging in to home page')
-		
-		return render_template('user_home.html', user_id = user_id, fname= user_id)
+		following_list = c_get_user_following_list(user_id)
+		posts = c_get_post_for_user(user_id, following_list)
+		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts)
 	else:
 		print('no current user found redirecting to login page')
 		return redirect(url_for('signin'))

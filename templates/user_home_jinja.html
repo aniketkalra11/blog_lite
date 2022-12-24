@@ -33,7 +33,7 @@
 				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
 			  </form>
 			  <ul class="nav">
-				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{input_data['user_id']}}'s Profile</a></li>
+				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{user_id}}'s Profile</a></li>
 				<li class="nav-item"><a href="{{url_for('signout', user_id = user_id)}}" class="nav-link link-dark px-2">Logout</a></li>
 			  </ul>
 			</div>
@@ -56,19 +56,19 @@
 					<p id="post_description">{{post.caption}}</p>
 				</div>
 				<div class="container like_flag_container">
-					<div class="container" id="{{post_id}}_like"
+					<div class="container" id="{{post.post_id}}_like"
 					style="display: {{'none' if post.is_already_liked else 'block' }};">
 						<a href="#" onclick="add_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
 					</div>
-					<div class="container" id="{{post_id}}_remove_like" style="display: {{ 'block' if post.is_already_liked else 'none' }};">
-						<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+					<div class="container" id="{{post.post_id}}_remove_like" style="display: {{ 'block' if post.is_already_liked else 'none' }};">
+						<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star-fill.svg')}}" alt="like" id="like" class="interaction_marker"></a>
 					</div>
 
-					<div class="contianer" id="{{post_id}}_flag" style="display: {{'none' if post.is_already_flagged else 'block'}};">
+					<div class="contianer" id="{{post.post_id}}_flag" style="display: {{'none' if post.is_already_flagged else 'block'}};">
 						<a href= "#" onclick="add_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 					</div>
-					<div class="contianer" id="{{post_id}}_remove_flag" style="display: {{'block' if post.is_already_flagged else 'none'}};">
-						<a href= "#" onclick="delete_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false"><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+					<div class="contianer" id="{{post.post_id}}_remove_flag" style="display: {{'block' if post.is_already_flagged else 'none'}};">
+						<a href= "#" onclick="delete_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false"><img src="{{url_for('static', filename='icons/flag-fill.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 					</div>
 				</div>
 				<div class="container post_comment_box">

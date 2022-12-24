@@ -118,19 +118,19 @@ class PostModelManager():
         #     print('like added successfully')
 
     def add_flag(self, post_id, flager_id):
-        self.debug = 'getting post as:' + post_id + ', and liker_id:' + flager_id
+        self.debug = 'getting post as:' + post_id + ', and flagger_id:' + flager_id
         self.printDebug(self.debug)
         post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
         if post_interaction == None:
             self.post_content_not_found_exception(post_id)
-        p_f = PostFlagTable.query.filter_by(post_id = post_id, flager_id = flager_id).first()
+        p_f = PostFlagTable.query.filter_by(post_id = post_id, flagger_id = flager_id).first()
         if p_f != None:
             self.printDebug('Already flagged by user:' + flager_id)
             return
         # like_data = PostLikeTable(post_id= post_id, liker_id= liker_id)
-        flag_data = PostFlagTable(post_id = post_id, flager_id = flager_id)
+        flag_data = PostFlagTable(post_id = post_id, flagger_id = flager_id)
         post_interaction.flags = post_interaction.flags + 1
-        post_interaction.post_like_data.append(flag_data)
+        post_interaction.post_flag_data.append(flag_data)
         self.add_to_db(post_interaction)
         # try:
         #     self.debug = "Adding to data base"
@@ -242,17 +242,17 @@ class PostModelManager():
         if post_like == None or post_interaction == None:
             self.post_content_not_found_exception(post_id)
         post_interaction.likes = post_interaction.likes - 1
-        post_interaction.post_like_data.remove(post_like)
-        self.remove_from_db(post_interaction)
+        # post_interaction.post_like_data.remove(post_like)
+        self.remove_from_db(post_like)
 
     def remove_flag(self, post_id, flager_id):
-        post_flag = PostLikeTable.query.filter_by(post_id = post_id, liker_id = flager_id).first()
+        post_flag = PostFlagTable.query.filter_by(post_id = post_id, flagger_id = flager_id).first()
         post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
         if post_flag == None or post_interaction == None:
             self.post_content_not_found_exception(post_id)
         post_interaction.flags = post_interaction.flags - 1
-        post_interaction.post_flag_data.remove(post_flag)
-        self.remove_from_db(post_interaction)
+        # post_interaction.post_flag_data.remove(post_flag)
+        self.remove_from_db(post_flag)
     
     def remove_comment(self, post_id, comment_id):
         post_comment = PostCommentTable.query.filter_by(comment_id = comment_id).first()
