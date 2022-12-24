@@ -86,6 +86,7 @@ def signin():
 def user_home_page(user_id):
 	if user_id in list(session.keys()):
 		print('user found logging in to home page')
+		
 		return render_template('user_home.html', user_id = user_id, fname= user_id)
 	else:
 		print('no current user found redirecting to login page')
@@ -163,7 +164,12 @@ def ji():
 	dict_data['user_id'] = 'ani'
 	dict_data['post_id'] = '123'
 	dict_data['list_post'] = ['123', '234', '456']
-	return render_template('user_home_jinja.html', input_data= dict_data, user_id = user_id)
+	posts = []
+	users = user_manager.get_all_uesr()
+	print('all user received as:', users)
+	posts = c_get_post_for_user(user_id, users)
+	print('receving posts as' + str(posts))
+	return render_template('user_home_jinja.html', input_data= dict_data, user_id = user_id, posts= posts)
 
 
 #* API Work starting here

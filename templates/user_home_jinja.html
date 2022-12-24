@@ -6,59 +6,22 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{fname}}</title>
 	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
-	<link href="{{url_for('static', filename='/user_home.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='user_home.css')}}" rel="stylesheet">
 </head>
 <style>
-	.post_create_button{
-		position: fixed;
-		bottom: 1vh;
-		left: 85vw;
-		border-radius: 50%;
-	}
-	#post_description{
-		text-align: left;
-		margin-left: 13%;
-	}
-	#post_user_id{
-		text-decoration: none;
-	}
-	.post_user_id{
-		text-align: left;
-		margin-left: 15%;
-		margin-top: 1vh;
-		margin-bottom: 1vh;;
-	}
-	#like:hover{
-		background: lightblue;
-	}
-	#flag:hover{
-		background: lightblue;
-	}
 
-    /* User Profile starting */
-    .main_body_container{
-        display: flex;
-        flex-direction: row;
-    }
-    .heading{
-        text-align: center;
-    }
 </style>
 <script src="{{url_for('static', filename='js/like_api_call.js')}}"></script>
 <body>
 	<!-- TODO: Introduce flashes -->
-	<!-- {# <div class="container flash_msg">
-		{% with messages = get_flash_messages() %}
-			{% if messages %} 
-				<ul class="flasher">
-					{% for message in messages %} 
-						<li>{{message}}</li>
-						{% endfor %} 
-				</ul>
+	{% extends 'flesh_temp.html' %}
+	{% block body %}
+	<div class="container">
+		
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
 			{% endif %}
-		{% endwith %}
-		{% block body %}{% endblock %}
-	</div> #} -->
+	</div>
 	<div>
 		<nav class="py-2 bg-light border-bottom">
 			<div class="container d-flex flex-wrap">
@@ -78,81 +41,73 @@
 	</div>
 	<div class="container blog_container">
 		<h1>Dashboard</h1>
-		<div class="container image_post">
-			<div class="container post_user_id">
-				<a href="#" id="post_user_id"><h3>User_id</h3></a>
-			</div>
-			<div class="container">
-				<img src="{{url_for('static', filename='resources/img/12.png')}}" alt="main_image" id="post_img">
-			</div>
-			<div class="container">
-				<h3 id="title">test sample image</h3>
-				<p id="post_description">Here Post description will appear</p>
-			</div>
-			<div class="container like_flag_container">
+		{% for post in posts %}
+			<div class="container image_post">
+				<div class="container post_user_id">
+					<a href="{{url_for('user_profile', user_id=post.user_id)}}" id="post_user_id"><h3>{{post.user_id}}</h3></a>
+				</div>
+				{% if post.image_url != 'NOT_AVAILABLE' %}
+					<div class="container main_image">
+						<img class="post_image" src="{{url_for('static', filename=('resources/img/' + post.image_url)  )}}" alt="main_image" id="post_img">
+					</div>
+				{% endif %}
 				<div class="container">
-					<a href="#" onclick="add_like(this); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+					<h3 id="title">{{post.title}}</h3>
+					<p id="post_description">{{post.caption}}</p>
 				</div>
-				<div class="contianer">
-					<a href= "#" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+				<div class="container like_flag_container">
+					<div class="container" id="{{post_id}}_like"
+					style="display: {{'none' if post.is_already_liked else 'block' }};">
+						<a href="#" onclick="add_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+					</div>
+					<div class="container" id="{{post_id}}_remove_like" style="display: {{ 'block' if post.is_already_liked else 'none' }};">
+						<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+					</div>
+
+					<div class="contianer" id="{{post_id}}_flag" style="display: {{'none' if post.is_already_flagged else 'block'}};">
+						<a href= "#" onclick="add_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+					</div>
+					<div class="contianer" id="{{post_id}}_remove_flag" style="display: {{'block' if post.is_already_flagged else 'none'}};">
+						<a href= "#" onclick="delete_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false"><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+					</div>
+				</div>
+				<div class="container post_comment_box">
+					<div class="container header_title">
+						<h6 id="minor_heading">comment table: -</h6>
+					</div>
+					<div class="container comment_content">
+						{% for comment in post.comments %}
+							<div class="container single_comment">
+								<div class="container">
+									<strong>{{comment.commenter_id}}</strong>
+								</div>
+								<div class="container">
+									<p>
+										{{comment.comment_content}}
+									</p>
+								</div>
+							</div>
+						{% endfor %}
+						<div class="container single_comment">
+							<div class="container">
+								<strong>{{user_id}}</strong>
+							</div>
+							<div class="container">
+								<form method="post" action="{{url_for('add_post_comment', user_id=user_id, post_id= post.post_id)}}" > <!-- TODO: write here-->
+									<input type="text" placeholder="Write your comment here...." name="content">
+									<button type="submit">Submit</button>
+								</form>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="container post_comment_box">
-				<div class="container header_title">
-					<h6 id="minor_heading">comment table: -</h6>
-				</div>
-				<div class="container comment_content">
-                    {% for comment in post.comments %}
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
-						</div>
-						<div class="condainer">
-							comment_1
-						</div>
-					</div>
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
-						</div>
-						<div class="condainer">
-							comment_2
-						</div>
-					</div>
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
-						</div>
-						<div class="condainer">
-							comment_3
-						</div>
-					</div>
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
-						</div>
-						<div class="condainer">
-							comment_1
-						</div>
-					</div>
-					<div class="container single_comment">
-						<div class="container">
-							<strong>{{user_id}}</strong>
-						</div>
-						<div class="container">
-							<form method="post" action="{{url_for('add_post_comment', user_id=user_id, post_id= 123)}}" > <!-- TODO: write here-->
-								<input type="text" placeholder="Write your comment here...." name="content">
-								<button type="submit">Submit</button>
-							</form>
-						</div>
-					</div>
-				</div>
-				</div>
-			</div>
-		</div>
+		{% endfor %}
 	</div>
+
 	<div class="container post_create_button">
 		<a href="{{url_for('create_post', user_id= user_id)}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Create Post</a>
 	</div>
+	{% endblock %}
 </body>
 </html>

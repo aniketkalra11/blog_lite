@@ -1,7 +1,5 @@
 
-user_id = 'ani'
-post_id = '123'
-function add_like(){
+function add_like(user_id, post_id){
     const request = new XMLHttpRequest();
     api_url = "/api/like/" + user_id + "/" + post_id
     console.log(api_url)
@@ -14,7 +12,7 @@ function add_like(){
         }
     }
 }
-function delete_like(){
+function delete_like(user_id, post_id){
     const request = new XMLHttpRequest();
         api_url = "/api/like/" + user_id + "/" + post_id
         console.log(api_url)
@@ -28,9 +26,9 @@ function delete_like(){
         }
 }
 
-function add_like(){
+function add_flag(user_id, post_id){
     const request = new XMLHttpRequest();
-    api_url = "/api/like/" + user_id + "/" + post_id
+    api_url = "/api/flag/" + user_id + "/" + post_id
     console.log(api_url)
     request.open("GET", api_url)
     request.send()
@@ -41,9 +39,9 @@ function add_like(){
         }
     }
 }
-function delete_like(){
+function delete_like(user_id, post_id){
     const request = new XMLHttpRequest();
-    api_url = "/api/like/" + user_id + "/" + post_id
+    api_url = "/api/flag/" + user_id + "/" + post_id
     console.log(api_url)
     request.open("DELETE", api_url)
     request.send()

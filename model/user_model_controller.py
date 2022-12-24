@@ -162,3 +162,8 @@ class UserModelManager():
 	def get_user_details(self, userId:str) -> tuple:
 		user_data = db.session.query(UserDetails).query(user_id = userId).first()
 		return user_data if user_data else (-1, ) # returning a empty tuple with entry value -1 
+
+	def get_all_uesr(self) ->list:
+		user_list = UserDetails.query.all()
+		print(user_list)
+		return user_list
