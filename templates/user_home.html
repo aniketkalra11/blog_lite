@@ -58,7 +58,10 @@
 				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
 			  </ul>
 			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+				<ul class="nav">
+				<li><input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="search"></li>
+				<li><button class="btn btn-secondary nav-item" action="submit">search</button></li>
+				</ul>
 			  </form>
 			  <ul class="nav">
 				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">Profile</a></li>

@@ -121,7 +121,7 @@ class UserModelManager():
 	def get_user_follower_list(self, userId:str)-> list:
 		user_followers = None
 		try:
-			user_followers = db.session.query(UserFollowers).filter_by(user_id = userId)
+			user_followers = db.session.query(UserFollowers).filter_by(user_id = userId).all()
 			print(user_followers)
 			if len(user_followers) == 0:
 				print('no user found')
@@ -131,9 +131,9 @@ class UserModelManager():
 			return []
 
 	def get_user_following_list(self, userId:str) -> list:
-		user_following = None
+		user_following = []
 		try:
-			user_following = db.session.query(UserFollowing).filter_by(user_id = userId)
+			user_following = db.session.query(UserFollowing).filter_by(user_id = userId).all()
 			print(user_following)
 			if len(user_following) == 0:
 				print('no user found')
@@ -153,12 +153,28 @@ class UserModelManager():
 			else:
 				raise Exception('unable to find data', userId)
 		except Exception as e:
-			print('exception arrived while executing')
+			print('exception arrived while executing', e)
 			return (-1, -1, -1)
 		else:
 			print('result received as:', rslt_tuple)
 			return rslt_tuple
 
 	def get_user_details(self, userId:str) -> tuple:
-		user_data = db.session.query(UserDetails).query(user_id = userId).first()
+		user_data = db.session.query(UserDetails).filter_by(user_id = userId).first()
 		return user_data if user_data else (-1, ) # returning a empty tuple with entry value -1 
+
+	def get_all_uesr(self) ->list:
+		user_list = UserDetails.query.all()
+		print(user_list)
+		return user_list
+	def get_user_by_name(self, name:str)->list:
+		user_list = []
+		l1 = (UserDetails.query.filter(UserDetails.fname.like(name)).all())
+		print('receving name as:', l1)
+		l2 = (UserDetails.query.filter(UserDetails.lname.like(name)).all())
+		for x in l1:
+			if x in l2:
+				l2.remove(x)
+		print('receving name as:', l2)
+		user_list = l1 + l2
+		return user_list

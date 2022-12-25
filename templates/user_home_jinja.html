@@ -9,56 +9,19 @@
 	<link href="{{url_for('static', filename='user_home.css')}}" rel="stylesheet">
 </head>
 <style>
-	.post_create_button{
-		position: fixed;
-		bottom: 1vh;
-		left: 85vw;
-		border-radius: 50%;
-	}
-	#post_description{
-		text-align: left;
-		margin-left: 13%;
-	}
-	#post_user_id{
-		text-decoration: none;
-	}
-	.post_user_id{
-		text-align: left;
-		margin-left: 15%;
-		margin-top: 1vh;
-		margin-bottom: 1vh;;
-	}
-	#like:hover{
-		background: lightblue;
-	}
-	#flag:hover{
-		background: lightblue;
-	}
 
-    /* User Profile starting */
-    .main_body_container{
-        display: flex;
-        flex-direction: row;
-    }
-    .heading{
-        text-align: center;
-    }
 </style>
 <script src="{{url_for('static', filename='js/like_api_call.js')}}"></script>
 <body>
 	<!-- TODO: Introduce flashes -->
-	<!-- {# <div class="container flash_msg">
-		{% with messages = get_flash_messages() %}
-			{% if messages %} 
-				<ul class="flasher">
-					{% for message in messages %} 
-						<li>{{message}}</li>
-						{% endfor %} 
-				</ul>
+	{% extends 'flesh_temp.html' %}
+	{% block body %}
+	<div class="container">
+		
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
 			{% endif %}
-		{% endwith %}
-		{% block body %}{% endblock %}
-	</div> #} -->
+	</div>
 	<div>
 		<nav class="py-2 bg-light border-bottom">
 			<div class="container d-flex flex-wrap">
@@ -66,11 +29,14 @@
 				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page"><img src="{{url_for('static', filename='img/blog_lite_logo.png')}}" style="width: 2vw; height: 3vh;"/></a></li>
 				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
 			  </ul>
-			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" method="get" action="{{url_for('search', user_id=user_id)}}">
+				<ul class="nav">
+				<li><input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="search"></li>
+				<li><button class="btn btn-secondary nav-item" action="submit">search</button></li>
+				</ul>
 			  </form>
 			  <ul class="nav">
-				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{input_data['user_id']}}'s Profile</a></li>
+				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{user_id}}'s Profile</a></li>
 				<li class="nav-item"><a href="{{url_for('signout', user_id = user_id)}}" class="nav-link link-dark px-2">Logout</a></li>
 			  </ul>
 			</div>
@@ -90,17 +56,11 @@
 				<p id="post_description">Here Post description will appear</p>
 			</div>
 			<div class="container like_flag_container">
-				<div class="container" id="{{post_id}}_like">
-					<a href="#" onclick="add_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+				<div class="container">
+					<a href="#" onclick="add_like(this); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
 				</div>
-				<div class="container" id="{{post_id}}_remove_like">
-					<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
-				</div>
-				<div class="contianer" id="{{post_id}}_flag">
-					<a href= "#" onclick="add_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
-				</div>
-				<div class="contianer" id="{{post_id}}_remove_like">
-					<a href= "#" onclick="delete_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false"><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+				<div class="contianer">
+					<a href= "#" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 				</div>
 			</div>
 			<div class="container post_comment_box">
@@ -109,17 +69,38 @@
 				</div>
 				<div class="container comment_content">
                     {% for comment in post.comments %}
-						<div class="container single_comment">
-							<div class="container">
-								<strong>{{comment.commenter_id}}</strong>
-							</div>
-							<div class="condainer">
-								<p>
-									{{comment.comment_content}}
-								</p>
-							</div>
+					<div class="container single_comment">
+						<div class="container">
+							<strong>user_id</strong>
 						</div>
-					{% endfor %}
+						<div class="condainer">
+							comment_1
+						</div>
+					</div>
+					<div class="container single_comment">
+						<div class="container">
+							<strong>user_id</strong>
+						</div>
+						<div class="condainer">
+							comment_2
+						</div>
+					</div>
+					<div class="container single_comment">
+						<div class="container">
+							<strong>user_id</strong>
+						</div>
+						<div class="condainer">
+							comment_3
+						</div>
+					</div>
+					<div class="container single_comment">
+						<div class="container">
+							<strong>user_id</strong>
+						</div>
+						<div class="condainer">
+							comment_1
+						</div>
+					</div>
 					<div class="container single_comment">
 						<div class="container">
 							<strong>{{user_id}}</strong>
@@ -134,10 +115,12 @@
 				</div>
 				</div>
 			</div>
-		</div>
+		{% endfor %}
 	</div>
+
 	<div class="container post_create_button">
 		<a href="{{url_for('create_post', user_id= user_id)}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Create Post</a>
 	</div>
+	{% endblock %}
 </body>
 </html>

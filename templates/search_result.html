@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='user_home.css')}}" rel="stylesheet">
+	<style>
+		.search_body{
+			text-align: center;
+		}
+		.profile_container{
+			display: grid;
+			grid-template-columns: auto auto auto;
+			max-height: 1080px;
+		}
+		.user_container{
+			max-width: 40vw;
+			margin: 10px;
+		}
+	</style>
+</head>
+<body>
+    {% extends 'flesh_temp.html' %}
+	{% block body %}
+	<div class="container">
+		
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+	</div>
+	<div>
+		<nav class="py-2 bg-light border-bottom">
+			<div class="container d-flex flex-wrap">
+			  <ul class="nav me-auto">
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page"><img src="{{url_for('static', filename='img/blog_lite_logo.png')}}" style="width: 2vw; height: 3vh;"/></a></li>
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
+			  </ul>
+			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" method="get" action="{{url_for('search', user_id=user_id)}}">
+				<ul class="nav">
+				<li><input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="search"></li>
+				<li><button class="btn btn-secondary nav-item" action="submit">search</button></li>
+				</ul>
+			  </form>
+			  <ul class="nav">
+				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{user_id}}'s Profile</a></li>
+				<li class="nav-item"><a href="{{url_for('signout', user_id = user_id)}}" class="nav-link link-dark px-2">Logout</a></li>
+			  </ul>
+			</div>
+		  </nav>
+	</div>
+	<div class="contianer search_body">
+		<h2>Serach result {{query}}</h2>
+		<div class="container profile_container">
+		{% for user in users %}
+			<div class="container user_container">
+				<div class="card" style="width: 18rem;">
+					<img class="card-img-top" src="{{url_for('static', filename=(user.profile_photo)) }}" alt="Card image cap">
+					<div class="card-body">
+						<a href="{{url_for('view_user_profile', user_id=user_id, view_id= user.user_id)}}" id="post_user_id"><h5 class="card-title">{{user.name}}</h5></a>
+					<p class="card-text"><strong>Follower:</strong>{{user.num_flwr}}    <strong>Following:</strong> {{user.num_flwing}}  <strong>Post count:</strong>{{user.num_post}}</p>
+
+					<a href="#" class="btn btn-primary">Follow/UnFollow</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+		</div>
+	</div>
+
+    {% endblock %}
+</body>
+</html>

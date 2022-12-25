@@ -15,6 +15,14 @@
 	</style>
 </head>
 <body>
+	{% extends 'flesh_temp.html' %}
+	{% block body %}
+	<div class="container">
+		
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+	</div>
 	<div class="container-fluid">
 		<nav class="py-2 bg-light border-bottom">
 			<div class="container d-flex flex-wrap">
@@ -92,5 +100,6 @@
 			</form>
 		</div>
 	</div>
+	{% endblock %}
 </body>
 </html>

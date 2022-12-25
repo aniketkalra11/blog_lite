@@ -11,9 +11,10 @@ body{
     background: white;
     display:flex;
     flex-direction: column;
+    margin: 3vh;
+
 }
 #post_img{
-    height: 70%;
     width: 70%;
     margin-top: 2vh ;
     border-radius: 5%;
@@ -63,3 +64,38 @@ body{
     height: 20px;
     width: 20px;
 }
+
+	.post_create_button{
+		position: fixed;
+		bottom: 1vh;
+		left: 85vw;
+		border-radius: 50%;
+	}
+	#post_description{
+		text-align: left;
+		margin-left: 13%;
+	}
+	#post_user_id{
+		text-decoration: none;
+	}
+	.post_user_id{
+		text-align: left;
+		margin-left: 15%;
+		margin-top: 1vh;
+		margin-bottom: 1vh;;
+	}
+	#like:hover{
+		background: lightblue;
+	}
+	#flag:hover{
+		background: lightblue;
+	}
+
+    /* User Profile starting */
+    .main_body_container{
+        display: flex;
+        flex-direction: row;
+    }
+    .heading{
+        text-align: center;
+    }
