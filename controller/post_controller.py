@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from model.post_model_controller import PostModelManager
+from .user_controller import get_user_name
 
 p_m_m = PostModelManager()
 print('creating post model')
@@ -20,6 +21,7 @@ class UserFeedPostContainer:
 		sql_post_id = p_m_m.get_post_id_tuple(post_id)
 		print('UserFeedContainer',sql_post_id)
 		self.user_id = sql_post_id.user_id
+		self.user_name = get_user_name(self.user_id)
 		sql_post_interaction = p_m_m.get_post_interaction(post_id)
 		print('UserFeedContainer',sql_post_interaction)
 		self.likes = sql_post_interaction.likes
@@ -106,30 +108,44 @@ def c_add_comment(user_id:str, post_id:str, comment_content:str)->list:
 	if not is_suc:
 		print('add comment_failed')
 	return is_suc, reason
-    
-def c_get_post_for_user(user_id:str, user_following_list:list):
+
+def c_get_user_post(user_id:str)->list:
+	posts = p_m_m.get_user_post(user_id)
+
+	r_p = []
+	for p in posts:
+		obj =create_post_container_obj(p.user_id, p.post_id)
+		if obj:
+			r_p.append(obj)
+	print(r_p)
+	r_p.sort(reverse=True)
+	return r_p
+
+def c_get_home_page_post(user_id:str, user_following_list:list):
 	debug_print('searching following list for user:'+ user_id)
 	debug_print('following list received as:' + str(user_following_list))
 	list_posts = []
 	for user in user_following_list:
 		print('searching posts for ', user.following_id)
-		posts = p_m_m.get_user_post(user.following_id)
-		for p in posts:
-			if len(p.post_id) > 4:
-				try:
-					obj = UserFeedPostContainer(p.post_id)
-				except Exception as e:
-					debug_print('Unable to create post object for ' + str(p.post_id))
-					print(e)
-					continue
-				obj.is_already_flagged = p_m_m.is_user_already_flaged(user_id, p.post_id)
-				obj.is_already_liked = p_m_m.is_user_already_liked(user_id, p.post_id)
-				list_posts.append(obj)
+		posts = c_get_user_post(user.following_id)
+		print(posts)
+		list_posts.extend(posts)
 	list_posts.sort(reverse= True)
 	print(list_posts)
 	return list_posts
 
-
+def create_post_container_obj(user_id, post_id):
+	obj = None
+	if len(post_id) > 4:
+		try:
+			obj = UserFeedPostContainer(post_id)
+		except Exception as e:
+			debug_print('Unable to create post object for ' + str(post_id))
+			print(e)
+		else:
+			obj.is_already_flagged = p_m_m.is_user_already_flaged(user_id, post_id)
+			obj.is_already_liked = p_m_m.is_user_already_liked(user_id, post_id)
+	return obj
 
 def debug_print(s:str):
     print('post_controller:', s)

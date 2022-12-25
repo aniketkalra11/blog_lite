@@ -62,6 +62,7 @@ def signin():
 		is_success, reason = c_login_validation(form_data['user_id'], form_data['password'])
 		if is_success:
 			print('validatio complete redirecting to welcome page')
+			flash('Welcome' + str(form_data['user_id']))
 			user_name_g = form_data['user_id']
 			session[user_name_g] = user_name_g
 			print('adding user to session')
@@ -69,9 +70,10 @@ def signin():
 			return redirect( url_for('user_home_page', user_id = str(user_name_g)))
 		else:
 			print('user validatio failed')
+			flash(reason)
 			print(reason)
 			# redirect(url_for('login'))
-			return url_for('no_user_found')
+			return redirect(url_for('signin'))
 
 	elif request.method == 'GET':
 		print(session.keys())
@@ -87,7 +89,7 @@ def user_home_page(user_id):
 	if user_id in list(session.keys()):
 		print('user found logging in to home page')
 		following_list = c_get_user_following_list(user_id)
-		posts = c_get_post_for_user(user_id, following_list)
+		posts = c_get_home_page_post(user_id, following_list)
 		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts)
 	else:
 		print('no current user found redirecting to login page')
@@ -125,7 +127,9 @@ def signout(user_id):
 
 @app.route('/user/profile/<string:user_id>', methods=['GET'])
 def user_profile(user_id):
-	return render_template('user_profile.html')
+	u_d = c_get_user_details(user_id)
+	posts = c_get_user_post(user_id)
+	return render_template('user_profile.html', user_id= user_id, user_details = u_d, posts = posts)
 
 @app.route('/user/post/<string:user_id>/create_post', methods=['GET', 'POST'])
 def create_post(user_id):
@@ -156,7 +160,35 @@ def add_post_comment(user_id, post_id):
 	if not is_success:
 		flash(reason)
 	return redirect(url_for('user_home_page', user_id= user_id))
-		
+
+
+@app.route('/user/profile/<string:user_id>/<string:view_id>', methods=['GET'])
+def view_user_profile(user_id:str, view_id:str):
+	u_d = c_get_user_details(view_id)
+	posts = c_get_user_post(view_id)
+	return render_template('user_profile.html', user_id= user_id, user_details = u_d, posts = posts, view_id = view_id)
+
+
+@app.route('/user/search/<string:user_id>', methods=['GET'])
+def search(user_id:str):
+	try:
+		print(request.args)
+		query = request.args['search']
+		# form_data = request.form
+		print('search query received for:', query)
+		user_list = get_user_list_by_name(query)
+		print(*user_list, sep='\n')
+	except Exception as e:
+		print('exception arrived', e)
+	# return redirect(url_for('user_home_page', user_id= user_id))
+	# return redirect(url_for('create_post', user_id=user_id))
+	return render_template('search_result.html', user_id= user_id, users= user_list)
+
+
+
+
+
+
 @app.route('/user/jinja', methods=['GET'])
 def ji():
 	dict_data = {}
@@ -168,11 +200,13 @@ def ji():
 	posts = []
 	users = user_manager.get_all_uesr()
 	print('all user received as:', users)
-	posts = c_get_post_for_user(user_id, users)
+	posts = c_get_home_page_post(user_id, users)
 	print('receving posts as' + str(posts))
 	return render_template('user_home_jinja.html', input_data= dict_data, user_id = user_id, posts= posts)
 
-
+@app.route('/test/search')
+def te():
+	return render_template('search_result.html')
 #* API Work starting here
 #* Adding post Api
 

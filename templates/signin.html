@@ -73,9 +73,17 @@
     <!-- Custom styles for this template -->
     <link href="{{url_for(('static'), filename='signin.css')}}" rel="stylesheet">
   </head>
-  <body class="text-center">
-    
+<body class="text-center">
+  {% extends 'flesh_temp.html' %}
+	{% block body %}
 <main class="form-signin w-100 m-auto">
+  
+	<div class="container">
+		
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+	</div>
   <form action="{{url_for('signin')}}" method="post" >
     <img class="mb-4" src="{{url_for('static', filename= 'img/blog_lite_logo.png')}}" alt="" width="72" height="57">
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
@@ -96,6 +104,6 @@
 </main>
 
 
-    
+{% endblock %}
   </body>
 </html>

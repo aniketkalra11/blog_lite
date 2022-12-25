@@ -6,8 +6,27 @@ from datetime import datetime
 
 from model.user_model_controller import UserModelManager
 
+from datetime import datetime
 user_manager = UserModelManager()
 
+class UserContainer():
+	def __init__(self, user_id):
+		self.user_id = user_id
+		user_details = user_manager.get_user_details(user_id)
+		self.name = user_details.fname + ' ' + user_details.lname
+		# datetime.strftime()
+		self.dob = user_details.dob.strftime('%d/%m/%Y')
+		print('dob', self.dob)
+		self.city = user_details.city
+		self.profession = user_details.profession
+		self.profile_photo = user_details.profile_photo
+		print(self.profile_photo)
+		self.num_flwr, self.num_flwing, self.num_post = user_manager.get_user_post_flr_flwing_count(user_id)
+		self.follwers = user_manager.get_user_follower_list(user_id)
+		self.followings = user_manager.get_user_following_list(user_id)
+	def __str__(self):
+		s = self.user_id + ' ' + self.name + ' ' + self.dob + ' ' + self.city + ' ' + self.profession
+		return s
 
 # @app.route('/', methods=['GET'])
 def c_login(request) -> str:
@@ -17,7 +36,9 @@ def c_login(request) -> str:
 	return render_template('login.html')
 
 
-
+def create_user_container(user_id:str)->UserContainer:
+	obj = UserContainer(user_id)
+	return obj
 def validate_user_data(user_id:str, password:str) -> tuple:
 	if '@' not in user_id:
 		return (False, "@ not present in user id")
@@ -91,5 +112,24 @@ def c_get_user_following_list(user_id:str)->list:
 	result = user_manager.get_user_following_list(user_id)
 	return result
 
+def c_get_user_details(user_id:str):
+	usr_d = user_manager.get_user_details(user_id)
+	printDebug(str(usr_d))
+	return usr_d
 def printDebug(stat:str)->None:
 	print("Controller: ", stat)
+
+def get_user_name(user_id:str)->str:
+	u_d = user_manager.get_user_details(user_id)
+	return str(u_d.fname) + str(u_d.lname)
+
+
+def get_user_list_by_name(name:str)->list:
+	n_f = '%{}%'.format(name)
+	l = user_manager.get_user_by_name(n_f)
+	c_l = []
+	for x in l:
+		obj = create_user_container(x.user_id)
+		c_l.append(obj)
+	print('search result', l)
+	return c_l

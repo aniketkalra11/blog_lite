@@ -73,4 +73,7 @@ class PostFlagApi(Resource):
             return 'error', 500
         else:
             return p_m_m.get_num_flags(post_id), 201                
-        
+
+
+class UserFollowUnFollowApi(Resource):
+    pass

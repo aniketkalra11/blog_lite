@@ -29,8 +29,11 @@
 				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page"><img src="{{url_for('static', filename='img/blog_lite_logo.png')}}" style="width: 2vw; height: 3vh;"/></a></li>
 				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= user_id)}}" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
 			  </ul>
-			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-				<input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" method="get" action="{{url_for('search', user_id=user_id)}}">
+				<ul class="nav">
+				<li><input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="search"></li>
+				<li><button class="btn btn-secondary nav-item" action="submit">search</button></li>
+				</ul>
 			  </form>
 			  <ul class="nav">
 				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{user_id}}'s Profile</a></li>
@@ -44,7 +47,7 @@
 		{% for post in posts %}
 			<div class="container image_post">
 				<div class="container post_user_id">
-					<a href="{{url_for('user_profile', user_id=post.user_id)}}" id="post_user_id"><h3>{{post.user_id}}</h3></a>
+					<a href="{{url_for('view_user_profile', user_id=user_id, view_id= post.user_id)}}" id="post_user_id"><h3>{{post.user_id}}</h3></a>
 				</div>
 				{% if post.image_url != 'NOT_AVAILABLE' %}
 					<div class="container main_image">
