@@ -52,7 +52,7 @@ def validate_user_data(user_id:str, password:str) -> tuple:
 def c_no_user_found():
 	return render_template('no_user_found.html')
 
-def c_add_user(form_data) -> bool:
+def c_add_user(form_data) -> list:
 	'''
 		This function will add user return true if successfully executed
 	'''
@@ -63,8 +63,11 @@ def c_add_user(form_data) -> bool:
 	try:
 		user_id = form_data['user_id'] 
 		if user_id == '':
-			print('empty id received')
-			return db_result
+			# print('empty id received')
+			warn_str = 'empty id received'
+			return db_result, warn_str
+		if user_manager.is_user_exists(form_data['user_id']):
+			return False, "User id " + form_data['user_id'] + " already exists"
 		password = form_data['password']
 		fname = form_data['fname']
 		lname = form_data['lname']
@@ -86,10 +89,10 @@ def c_add_user(form_data) -> bool:
 	except Exception as e:
 		# print('Controller: Exception arrived during addtion', e)
 		printDebug("Exception arrived during addition " + str(e))
-		return db_result
+		return db_result, 'Unable to add User please try after some time'
 	else:
 		printDebug('Successfully added into the database')
-		return db_result
+		return db_result, ''
 
 
 
@@ -113,7 +116,7 @@ def c_get_user_following_list(user_id:str)->list:
 	return result
 
 def c_get_user_details(user_id:str):
-	usr_d = user_manager.get_user_details(user_id)
+	usr_d = create_user_container(user_id)
 	printDebug(str(usr_d))
 	return usr_d
 def printDebug(stat:str)->None:
@@ -121,7 +124,8 @@ def printDebug(stat:str)->None:
 
 def get_user_name(user_id:str)->str:
 	u_d = user_manager.get_user_details(user_id)
-	return str(u_d.fname) + str(u_d.lname)
+	# u_d = create_user_container(user_id)
+	return str(u_d.fname) + ' ' +str(u_d.lname)
 
 
 def get_user_list_by_name(name:str)->list:

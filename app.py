@@ -10,6 +10,7 @@ from controller.user_controller import *
 from controller.post_controller import *
 from model.model import init_db
 
+
 def generate_random_key():
 	import secrets 
 	res = secrets.token_hex()
@@ -101,12 +102,14 @@ def user_sign_up():
 		return render_template('signup.html')
 	else:
 		form_data = request.form
-		if c_add_user(form_data):
-			print('User added successfully')
+		is_sucess, warn = c_add_user(form_data)
+		if is_sucess:
+			flash('User added successfully')
 			return redirect(url_for('signin'))
 		else:
 			print('addition of user failed')
 			print('redirecting again to singup page')
+			flash(warn)
 			return redirect(url_for('user_sign_up'))
 
 @app.route('/user/no_user_found', methods=['GET'])
@@ -129,7 +132,8 @@ def signout(user_id):
 def user_profile(user_id):
 	u_d = c_get_user_details(user_id)
 	posts = c_get_user_post(user_id)
-	return render_template('user_profile.html', user_id= user_id, user_details = u_d, posts = posts)
+	print(u_d)
+	return render_template('user_profile.html', user_id= user_id, profile = u_d, posts = posts)
 
 @app.route('/user/post/<string:user_id>/create_post', methods=['GET', 'POST'])
 def create_post(user_id):
@@ -154,7 +158,11 @@ def create_post(user_id):
 def add_post_comment(user_id, post_id):
 	print('add comment request received')
 	print('user_id:', user_id, 'post_id:', post_id)
-	comment = request.form['content']
+	try:
+		comment = request.form['content']
+	except Exception as e:
+		flash(str(e))
+		return ''
 	print('comment received as:', comment)
 	is_success, reason = c_add_comment(user_id, post_id, comment)
 	if not is_success:
@@ -166,7 +174,7 @@ def add_post_comment(user_id, post_id):
 def view_user_profile(user_id:str, view_id:str):
 	u_d = c_get_user_details(view_id)
 	posts = c_get_user_post(view_id)
-	return render_template('user_profile.html', user_id= user_id, user_details = u_d, posts = posts, view_id = view_id)
+	return render_template('view_user_profile.html', user_id= user_id, profile = u_d, posts = posts, view_id = view_id)
 
 
 @app.route('/user/search/<string:user_id>', methods=['GET'])
@@ -185,7 +193,31 @@ def search(user_id:str):
 	return render_template('search_result.html', user_id= user_id, users= user_list)
 
 
+@app.route('/user/post/<string:user_id>/edit_post', methods=['GET', 'POST'])
+def edit_post(user_id):
+	print(request.args)
+	post_id = request.args['post_id']
+	print('edit reques received for post', post_id)
+	if request.method == 'GET':
+		post = c_get_post_by_post_id(post_id)
+		return render_template('edit_post.html', user_id= user_id, post_id= post_id, post = post)
+	else:
+		form_data = request.form
+		file = request.files['image']
+		print(file)
+		is_success, warn = c_edit_post(user_id, post_id, form_data, file)
+		if not is_success:
+			flash(warn)
+		return redirect(url_for('user_profile', user_id = user_id))
 
+
+@app.route('/user/post/delete/<string:user_id>/<string:post_id>', methods=['GET'])
+def delete_post( user_id, post_id):
+	is_success, warn = c_delete_post(user_id, post_id)
+	if not is_success:
+		flash(warn)
+	return redirect(url_for('user_profile', user_id = user_id))
+	
 
 
 

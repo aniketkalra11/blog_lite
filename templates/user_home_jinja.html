@@ -56,7 +56,7 @@
 				{% endif %}
 				<div class="container">
 					<h3 id="title">{{post.title}}</h3>
-					<p id="post_description">{{post.caption}}</p>
+					<p id="post_description">{{post.caption | safe}}</p>
 				</div>
 				<div class="container like_flag_container">
 					<div class="container" id="{{post.post_id}}_like"

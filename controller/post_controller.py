@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from model.post_model_controller import PostModelManager
+from markupsafe import Markup
 from .user_controller import get_user_name
 
 p_m_m = PostModelManager()
@@ -14,7 +15,10 @@ class UserFeedPostContainer:
 		print('UserFeedContainer',sql_post_data)
 		self.post_id = sql_post_data.post_id
 		self.title = sql_post_data.title
+		s_t = Markup.escape(sql_post_data.caption)
+		print(s_t)
 		self.caption = sql_post_data.caption
+		# self.caption = str(s_t)
 		self.timestamp = sql_post_data.timestamp
 		self.image_url = str(sql_post_data.image_url)
 		print(self.image_url)
@@ -70,6 +74,8 @@ def allowed_file(filename):
 def get_extension(file_name):
     return file_name.split('.')[-1]
 
+def create_file_name(user_id:str, filename)->str:
+	return user_id + '_' + datetime.now().strftime('%H_%M_%S') + '.' +   get_extension(filename)
 
 def c_create_post(user_id:str, form_data:dict, file) ->list:
 	debug_print('crating_post')
@@ -81,7 +87,7 @@ def c_create_post(user_id:str, form_data:dict, file) ->list:
 	filedir = None
 	file_name = None
 	if file.filename != '' and allowed_file(file.filename):
-		file_name = user_id + '_' + datetime.now().strftime('%H_%M_%S') + '.' +   get_extension(file.filename)
+		file_name = create_file_name(user_id, file.filename)
 		print(file_name, 'created')
 		filedir = os.path.join(UPLOAD_FOLDER, file_name)
 		debug_print('file dir is:' + str(filedir))
@@ -133,6 +139,46 @@ def c_get_home_page_post(user_id:str, user_following_list:list):
 	list_posts.sort(reverse= True)
 	print(list_posts)
 	return list_posts
+def remove_image(img_url):
+	file_dir = os.path.join(UPLOAD_FOLDER, img_url) 
+	if os.path.isfile(file_dir):
+		print('removing old photo')
+		os.remove(file_dir)
+	else:
+		print('unable to remove image')
+
+def c_edit_post(user_id:str, post_id:str, form_data, file= None)->list:
+	debug_print('update post request received for')
+	warn_str = ''
+	old_post = c_get_post_by_post_id(post_id)
+	try:
+		title = form_data['title']
+		caption = form_data['caption']
+		photo_d = form_data['photo_d']
+		img_url = file.filename
+		if img_url == '' :
+			img_url = 'NOT_AVAILABLE' if photo_d == 'remove_photo' else None
+		else:
+			if allowed_file(img_url):
+				warn_str = 'updating photo'
+				img_url = create_file_name(user_id, file.filename)
+			else:
+				return False, 'Unknown File received'
+		p_m_m.edit_post(post_id, title, caption, img_url)
+	except Exception as e:
+		debug_print('Exception arrived during post edit' + str(e))
+		warn_str = 'Unable to edit post' + str(e)
+		return False, warn_str
+	else:
+		if old_post.image_url != img_url or (img_url and img_url == 'NOT_AVAILABLE'):
+			# old_img_dir = os.path.join(UPLOAD_FOLDER, old_post.image_url)
+			# debug_print(old_img_dir)
+			remove_image(old_post.image_url)
+		if img_url != '' and img_url != "NOT_AVAILABLE":
+			fildir = os.path.join(UPLOAD_FOLDER, img_url)
+			debug_print("saving new file" + fildir)
+			file.save(fildir)
+		return True, warn_str
 
 def create_post_container_obj(user_id, post_id):
 	obj = None
@@ -146,6 +192,24 @@ def create_post_container_obj(user_id, post_id):
 			obj.is_already_flagged = p_m_m.is_user_already_flaged(user_id, post_id)
 			obj.is_already_liked = p_m_m.is_user_already_liked(user_id, post_id)
 	return obj
+
+def c_get_post_by_post_id(post_id:str)->UserFeedPostContainer:
+	obj = UserFeedPostContainer(post_id)
+	return obj
+
+def c_delete_post(user_id, post_id)-> list:
+	debug_print('delete post:'+ post_id)
+	old_post = c_get_post_by_post_id(post_id)
+	try:
+		p_m_m.remove_post(user_id, post_id)
+	except Exception as e:
+		print('unable to delete post')
+		return False, str(e)
+	else:
+		remove_image(old_post.image_url)
+		print('image removed')
+		return True, ''
+
 
 def debug_print(s:str):
     print('post_controller:', s)

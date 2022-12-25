@@ -101,7 +101,7 @@
 				<div class="card-body">
 					<h5 class="card-title">{{profile.name}}</h5>
 					<p class="card-text"><strong>Date Of Birth:</strong> {{profile.dob}}  <strong>City:</strong> {{profile.city}}  <br>
-					{{ (('<strong> Profession  </strong>' + ' '  + profile.profession ) if profile.profession != 'NOT_AVAILABLE' else '  ') | safe}}
+						{{ (('<strong> Profession  </strong>' + ' '  + profile.profession ) if profile.profession != 'NOT_AVAILABLE' else '  ') | safe}}
 					</p>
 				</div>
 				<ul class="list-group list-group-flush">
@@ -131,7 +131,7 @@
 							{% endif %}
 							<div class="container">
 								<h3 id="title">{{post.title}}</h3>
-								<p id="post_description">{{post.caption | safe}}</p>
+								<p id="post_description">{{post.caption}}</p>
 							</div>
 							<div class="container like_flag_container">
 								<div class="container" id="{{post.post_id}}_like"
@@ -141,6 +141,7 @@
 								<div class="container" id="{{post.post_id}}_remove_like" style="display: {{ 'block' if post.is_already_liked else 'none' }};">
 									<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star-fill.svg')}}" alt="like" id="like" class="interaction_marker"></a>
 								</div>
+			
 								<div class="contianer" id="{{post.post_id}}_flag" style="display: {{'none' if post.is_already_flagged else 'block'}};">
 									<a href= "#" onclick="add_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 								</div>
@@ -176,16 +177,6 @@
 											</form>
 										</div>
 									</div>
-								</div>
-							</div>
-							<div class="container like_flag_container">
-								<div class="container" id="{{post.post_id}}_like">
-									<button class="btn btn-primary" onclick='window.location.href = "{{url_for('edit_post', user_id= user_id, post_id= post.post_id )}}";'>Edit Post</button>
-								</div>
-								<div class="contianer" id="{{post.post_id}}_remove_flag">
-									<form onsubmit="return confirm('Do you really want to Delete this post?');" action="{{url_for('delete_post', user_id= user_id, post_id= post.post_id)}}" method="get">
-										<button class="btn btn-danger" action="submit">Delete Post</button>
-									</form>
 								</div>
 							</div>
 						</div>

@@ -68,7 +68,7 @@ class PostModelManager():
         
         if caption:
             post_content_obj.caption = caption
-        post_content_obj.timestamp = timestamp
+        post_content_obj.timestamp = datetime.now()
         if imageurl:
             post_content_obj.image_url = imageurl
         post_id_obj.post_content.append(post_content_obj)
@@ -193,8 +193,14 @@ class PostModelManager():
         post_comment.comment_contend = content
         self.add_to_db(post_comment)
 
-    def edit_post(self, post_id):
+    def edit_post(self, post_id, title, caption, image_url = None ):
         #TODO: need to decide what we need to edit in this section
+        old_post = self.get_post_content(post_id)
+        old_post.title = title
+        old_post.caption = caption
+        
+        old_post.image_url = image_url if image_url else old_post.image_url
+        self.add_to_db(old_post)
         self.printDebug('Under construction')
         pass
        
@@ -264,11 +270,14 @@ class PostModelManager():
     
     def remove_post(self, user_id:str, post_id:str):
         post_id_t = PostId.query.filter_by(post_id = post_id).first()
-        post_interaction = PostInteraction.query.filter_by(post_id = post_id)
+        post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
+        user_post_count = UserPostAndFollowerInfo.query.filter_by(user_id = user_id).first()
+        user_post_count.num_of_post = user_post_count.num_of_post - 1
         if not post_id_t or not post_interaction:
             self.post_content_not_found_exception(post_id)
         self.remove_from_db(post_interaction)
         self.remove_from_db(post_id_t)
+        self.add_to_db(user_post_count)
         self.printDebug('Post Removed')
 
 

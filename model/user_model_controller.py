@@ -146,9 +146,10 @@ class UserModelManager():
 		user_flr, user_flwing, post_count = 0, 0, 0
 		rslt_tuple = None
 		try:
-			data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
+			data = UserPostAndFollowerInfo.query.filter_by(user_id= userId).first()
+			print('getting user post count', data)
 			if data:
-				(user_flr, user_flwing, post_count) = (data.num_followers, data.num_following, data.num_post)
+				(user_flr, user_flwing, post_count) = (data.num_followers, data.num_of_following, data.num_of_post)
 				rslt_tuple = (user_flr, user_flwing, post_count)
 			else:
 				raise Exception('unable to find data', userId)
