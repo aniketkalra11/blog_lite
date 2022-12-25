@@ -149,7 +149,7 @@ def create_post(user_id):
 			if not is_success:
 				flash(reason)
 			# return redirect(url_for('user_home_page', user_id = user_id))
-			return redirect(url_for('create_post', user_id= user_id))
+			return redirect(url_for('user_profile', user_id= user_id))
 	else:
 		print('no user in session redirecting to signup page')
 		return redirect(url_for('signin'))
@@ -186,11 +186,14 @@ def search(user_id:str):
 		print('search query received for:', query)
 		user_list = get_user_list_by_name(query)
 		print(*user_list, sep='\n')
+		u_f_l = c_get_user_following_list(user_id)
+		l_f_id = [x.following_id for x in u_f_l]
+		print('user_following id', l_f_id)
 	except Exception as e:
 		print('exception arrived', e)
 	# return redirect(url_for('user_home_page', user_id= user_id))
 	# return redirect(url_for('create_post', user_id=user_id))
-	return render_template('search_result.html', user_id= user_id, users= user_list)
+	return render_template('search_result.html', user_id= user_id, users= user_list, user_following_list = l_f_id)
 
 
 @app.route('/user/post/<string:user_id>/edit_post', methods=['GET', 'POST'])
@@ -247,6 +250,9 @@ api.add_resource(PostLikeApi, "/api/like", "/api/like/<string:liker_id>/<string:
 
 from Api.post_api import PostFlagApi
 api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string:post_id>")
+
+from Api.user_follow_api import FollowApi
+api.add_resource(FollowApi, '/api/follow', '/api/follow/<string:user_id>/<string:f_user_id>')
 
 #TODO: Comment API
 

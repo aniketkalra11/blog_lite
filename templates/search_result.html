@@ -21,6 +21,7 @@
 			margin: 10px;
 		}
 	</style>
+<script src="{{url_for('static', filename='js/follow_user.js')}}"></script>
 </head>
 <body>
     {% extends 'flesh_temp.html' %}
@@ -60,9 +61,10 @@
 					<img class="card-img-top" src="{{url_for('static', filename=(user.profile_photo)) }}" alt="Card image cap">
 					<div class="card-body">
 						<a href="{{url_for('view_user_profile', user_id=user_id, view_id= user.user_id)}}" id="post_user_id"><h5 class="card-title">{{user.name}}</h5></a>
-					<p class="card-text"><strong>Follower:</strong>{{user.num_flwr}}    <strong>Following:</strong> {{user.num_flwing}}  <strong>Post count:</strong>{{user.num_post}}</p>
+					<p class="card-text"><strong>Follower:</strong><span id="{{user.user_id}}_p">{{user.num_flwr}}</span>    <strong>Following:</strong> {{user.num_flwing}}  <strong>Post count:</strong>{{user.num_post}}</p>
 
-					<a href="#" class="btn btn-primary">Follow/UnFollow</a>
+					<a href="#" class="btn btn-primary" style="display: {{ 'none' if (user.user_id in user_following_list) else 'inline-block' }}" onclick="add_follower(user_id= '{{user_id}}', f_user_id= '{{user.user_id}}'); return false" id="{{user.user_id}}_follow">Follow</a>
+					<a href="#" class="btn btn-danger" style="display: {{ 'inline-block' if (user.user_id in user_following_list) else 'none' }}" onclick="delete_follower(user_id= '{{user_id}}', f_user_id= '{{user.user_id}}'); return false" id="{{user.user_id}}_unfollow">UnFollow</a>
 					</div>
 				</div>
 			</div>

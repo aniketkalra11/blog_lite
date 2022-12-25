@@ -82,7 +82,7 @@ class UserModelManager():
 			user_follower = UserFollowers(user_id = userId, follower_id = followerId)
 			db.session.add(user_follower)
 			print('adding follower details:', userId, 'Follower id:', followerId)
-			q_data = db.session.query(UserPostAndFollowerInfo).query(user_id = userId).first()
+			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
 			if q_data:
 				q_data.num_followers = q_data.num_followers + 1
 				db.session.add(q_data)
@@ -105,7 +105,7 @@ class UserModelManager():
 			print('adding user following', user_following)
 			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
 			if q_data:
-				q_data.following_id = q_data.following_id + 1
+				q_data.num_of_following = q_data.num_of_following + 1
 				db.session.add(q_data)
 			else:
 				raise Exception('unable to find data', userId)
@@ -179,3 +179,45 @@ class UserModelManager():
 		print('receving name as:', l2)
 		user_list = l1 + l2
 		return user_list
+	#* REMOVE SECTION STARTING HERE
+
+	def remove_user_follower(self, userId:str, followerId:str)->bool:
+		try:
+			user_follower = UserFollowers.query.filter_by(user_id = userId, follower_id = followerId).first()
+			db.session.delete(user_follower)
+			print('adding follower details:', userId, 'Follower id:', followerId)
+			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
+			if q_data:
+				q_data.num_followers = q_data.num_followers - 1
+				db.session.add(q_data)
+				print('updating follower count', q_data)
+			else:
+				raise Exception('unable to find data', userId)
+		except Exception as e:
+			print('exception arrived as e:', e)
+			db.session.rollback()
+			return False
+		else:
+			db.session.commit()
+			print('follower commit successful')
+			return True
+
+	def remove_user_following(self, userId:str, followingId:str) -> bool:
+		try:
+			user_following = UserFollowing.query.filter_by(user_id = userId, following_id = followingId).first()
+			db.session.delete(user_following)
+			print('adding user following', user_following)
+			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
+			if q_data:
+				q_data.num_of_following = q_data.num_of_following - 1
+				db.session.add(q_data)
+			else:
+				raise Exception('unable to find data', userId)
+		except Exception as e:
+			print('exception arrived in add_user_following as: ', e)
+			db.session.rollback()
+			return False
+		else:
+			db.session.commit()
+			print('following commit complete')
+			return True
