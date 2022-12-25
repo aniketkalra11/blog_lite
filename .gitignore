@@ -1,7 +1,9 @@
-controller/__pycache__/post_controller.cpython-38.pyc
-database/__pycache__/database.cpython-38.pyc
-database/__pycache__/database.cpython-38.pyc
-model/__pycache__/model.cpython-38.pyc
-model/__pycache__/post_model_controller.cpython-38.pyc
+controller/__pycache__
+database/__pycache__
+database/__pycache__
+model/__pycache__
+model/__pycache__
+config/__pycache__
 flask_session
 Api/__pycache__
+validation/__pycache__

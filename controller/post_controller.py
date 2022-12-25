@@ -47,7 +47,7 @@ class UserFeedPostContainer:
 
 
 cwd = os.getcwd()
-UPLOAD_FOLDER = os.path.join(cwd, 'resource')
+UPLOAD_FOLDER = os.path.join(cwd, 'static', 'resources', 'img')
 print(UPLOAD_FOLDER)
 if not os.path.exists(UPLOAD_FOLDER):
     print('creating folder')
@@ -71,13 +71,13 @@ def c_create_post(user_id:str, form_data:dict, file) ->list:
     # file = form_data.files['image']
     filedir = None
     if file.filename != '' and allowed_file(file.filename):
-        file_name = 'user_id_' + datetime.now().strftime('%H_%M_%S') + '.' +   get_extension(file.filename)
+        file_name = user_id + '_' + datetime.now().strftime('%H_%M_%S') + '.' +   get_extension(file.filename)
         print(file_name, 'created')
         filedir = os.path.join(UPLOAD_FOLDER, file_name)
         debug_print('file dir is:' + str(filedir))
         # 
 
-    is_sucess = p_m_m.add_post(user_id, title=title, caption= caption, imageurl= filedir)
+    is_sucess = p_m_m.add_post(user_id, title=title, caption= caption, imageurl= file_name)
     if is_sucess:
         file.save(filedir)
         print('images saved')

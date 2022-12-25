@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{fname}}</title>
 	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
-	<link href="{{url_for('static', filename='/user_home.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='user_home.css')}}" rel="stylesheet">
 </head>
 <style>
 	.post_create_button{
@@ -90,11 +90,17 @@
 				<p id="post_description">Here Post description will appear</p>
 			</div>
 			<div class="container like_flag_container">
-				<div class="container">
-					<a href="#" onclick="add_like(this); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+				<div class="container" id="{{post_id}}_like">
+					<a href="#" onclick="add_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
 				</div>
-				<div class="contianer">
-					<a href= "#" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+				<div class="container" id="{{post_id}}_remove_like">
+					<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+				</div>
+				<div class="contianer" id="{{post_id}}_flag">
+					<a href= "#" onclick="add_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+				</div>
+				<div class="contianer" id="{{post_id}}_remove_like">
+					<a href= "#" onclick="delete_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false"><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 				</div>
 			</div>
 			<div class="container post_comment_box">
@@ -103,38 +109,17 @@
 				</div>
 				<div class="container comment_content">
                     {% for comment in post.comments %}
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
+						<div class="container single_comment">
+							<div class="container">
+								<strong>{{comment.commenter_id}}</strong>
+							</div>
+							<div class="condainer">
+								<p>
+									{{comment.comment_content}}
+								</p>
+							</div>
 						</div>
-						<div class="condainer">
-							comment_1
-						</div>
-					</div>
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
-						</div>
-						<div class="condainer">
-							comment_2
-						</div>
-					</div>
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
-						</div>
-						<div class="condainer">
-							comment_3
-						</div>
-					</div>
-					<div class="container single_comment">
-						<div class="container">
-							<strong>user_id</strong>
-						</div>
-						<div class="condainer">
-							comment_1
-						</div>
-					</div>
+					{% endfor %}
 					<div class="container single_comment">
 						<div class="container">
 							<strong>{{user_id}}</strong>

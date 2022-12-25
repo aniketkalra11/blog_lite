@@ -94,6 +94,11 @@ class PostModelManager():
         post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
         if post_interaction == None:
             self.post_content_not_found_exception(post_id)
+        #already likes check 
+        p_l = PostLikeTable.query.filter_by(post_id = post_id, liker_id = liker_id).first()
+        if p_l != None:
+            self.printDebug("Post already liked by user:" + liker_id)
+            return
         like_data = PostLikeTable(post_id= post_id, liker_id= liker_id)
         post_interaction.likes = post_interaction.likes + 1
         post_interaction.post_like_data.append(like_data)
@@ -118,6 +123,10 @@ class PostModelManager():
         post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
         if post_interaction == None:
             self.post_content_not_found_exception(post_id)
+        p_f = PostFlagTable.query.filter_by(post_id = post_id, flager_id = flager_id).first()
+        if p_f != None:
+            self.printDebug('Already flagged by user:' + flager_id)
+            return
         # like_data = PostLikeTable(post_id= post_id, liker_id= liker_id)
         flag_data = PostFlagTable(post_id = post_id, flager_id = flager_id)
         post_interaction.flags = post_interaction.flags + 1
