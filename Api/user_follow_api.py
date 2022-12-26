@@ -2,8 +2,8 @@ from flask_restful import Resource
 from flask_restful import fields, marshal_with, reqparse
 #!TODO: Add validation in the 
 
-from model.user_model_controller import UserModelManager
-user_manager = UserModelManager()
+from model.common_model_object import user_manager
+# user_manager = UserModelManager()
 
 
 create_parser = reqparse.RequestParser()

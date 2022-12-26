@@ -20,6 +20,7 @@ class UserModelManager():
 	def __init__(self):
 		print('Starting user Manger')
 		self.total_user = 0
+		self.DEFUALT_PROFILE = 'profile/default_profile.png'
 		# self.user_list = db.session.execute(db.select(UserIdPassword)).all()
 		# self.total_user = len(self.user_list)
 		# for x in self.user_list:
@@ -179,6 +180,25 @@ class UserModelManager():
 		print('receving name as:', l2)
 		user_list = l1 + l2
 		return user_list
+
+	#* edit section starting
+	def edit_profile_details(self, user_id:str, password:str, fname:str, lname:str, city:str, profession:str, profile_photo:str = None)->list:
+		try:
+			u_d = self.get_user_details(user_id)
+			u_d.password = password
+			u_d.fname = fname
+			u_d.lname = lname
+			u_d.city = city
+			u_d.profession = profession
+			if profile_photo:
+				u_d.profile_photo = profile_photo
+			db.session.add(u_d)
+		except Exception as e:
+			return False, 'Unable to Update profile' + str(e)
+		else:
+			db.session.commit()
+			return True, ''
+
 	#* REMOVE SECTION STARTING HERE
 
 	def remove_user_follower(self, userId:str, followerId:str)->bool:

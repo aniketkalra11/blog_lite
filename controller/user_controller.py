@@ -1,18 +1,27 @@
+import os
 from flask import render_template
 from flask import request, abort, redirect, url_for
 from sqlalchemy.exc import SQLAlchemyError
 
 from datetime import datetime
 
-from model.user_model_controller import UserModelManager
-
+# from model.user_model_controller import UserModelManager
+from model.common_model_object import user_manager
+from .common_function import *
 from datetime import datetime
-user_manager = UserModelManager()
-
+# user_manager = UserModelManager()
+cwd = os.getcwd()
+UPLOAD_FOLDER = os.path.join(cwd, 'static' )
+print(UPLOAD_FOLDER)
+if not os.path.exists(UPLOAD_FOLDER):
+    print('creating folder')
+    os.mkdir(UPLOAD_FOLDER)
+print(UPLOAD_FOLDER)
 class UserContainer():
 	def __init__(self, user_id):
 		self.user_id = user_id
 		user_details = user_manager.get_user_details(user_id)
+		self.user_details = user_details
 		self.name = user_details.fname + ' ' + user_details.lname
 		# datetime.strftime()
 		self.dob = user_details.dob.strftime('%d/%m/%Y')
@@ -20,6 +29,7 @@ class UserContainer():
 		self.city = user_details.city
 		self.profession = user_details.profession
 		self.profile_photo = user_details.profile_photo
+		self.user_type = user_details.member_type
 		print(self.profile_photo)
 		self.num_flwr, self.num_flwing, self.num_post = user_manager.get_user_post_flr_flwing_count(user_id)
 		self.follwers = user_manager.get_user_follower_list(user_id)
@@ -27,6 +37,23 @@ class UserContainer():
 	def __str__(self):
 		s = self.user_id + ' ' + self.name + ' ' + self.dob + ' ' + self.city + ' ' + self.profession
 		return s
+	def __eq__(self, a):
+		try:
+			return True if self.name == a.name else False
+		except:
+			return False
+	
+	def __gt__(self, a):
+		return True if self.name > a.name else False
+
+	def __lt__(self, a):
+		return True if self.name < a.name else False
+	
+	def __ge__(self, a):
+		return True if self.name >= a.name else False
+	
+	def __le__(self, a):
+		return True if self.name <= a.name else False
 
 # @app.route('/', methods=['GET'])
 def c_login(request) -> str:
@@ -52,6 +79,9 @@ def validate_user_data(user_id:str, password:str) -> tuple:
 def c_no_user_found():
 	return render_template('no_user_found.html')
 
+def name_validation(s:str)->bool:
+	return s.isalpha()
+
 def c_add_user(form_data) -> list:
 	'''
 		This function will add user return true if successfully executed
@@ -71,11 +101,17 @@ def c_add_user(form_data) -> list:
 		password = form_data['password']
 		fname = form_data['fname']
 		lname = form_data['lname']
+		if not name_validation(fname) or not name_validation(lname):
+			return False, 'Name Should be aplhabets only'
 		# ('dob', '2022-12-06')
 		dob = form_data['dob'].split('-')
 		d_dob = datetime(int(dob[0]), int(dob[1]), int(dob[2]))
 		city = form_data['city']
+		if not name_validation(city):
+			return False, 'City Name should not contain any special characters'
 		profession = form_data['profession']
+		if not name_validation(city):
+			return False, 'Profession should not contain any special characters'
 		if profession != "":
 			db_result = user_manager.add_user(userId= user_id, password= password, 
 											fname= fname, lname= lname, dob= d_dob, city= city, profession= profession)
@@ -94,7 +130,50 @@ def c_add_user(form_data) -> list:
 		printDebug('Successfully added into the database')
 		return db_result, ''
 
-
+def c_edit_user(user_id,form_data, files) ->list:
+		old_details = user_manager.get_user_details(user_id)
+		old_image_url = old_details.profile_photo
+		password = form_data['password']
+		fname = form_data['fname']
+		lname = form_data['lname']
+		if not name_validation(fname) or not name_validation(lname):
+			return False, 'Name Should be aplhabets only'
+		city = form_data['city']
+		if not name_validation(city):
+			return False, 'City Name should not contain any special characters'
+		profession = form_data['profession']
+		if not name_validation(city):
+			return False, 'Profession should not contain any special characters'
+		profile_photo = None
+		file = files['image']
+		print(file)
+		if file.filename == '':
+			print('no profile photo provided continuing with older one')
+		else: 
+			if allowed_file(file.filename):
+				f_name = create_file_name(user_id, file.filename)
+				file_dir = os.path.join('profile/',  f_name)
+				print('updated file dir: ',file_dir)
+				profile_photo = file_dir
+		print('profile photo is:', profile_photo)
+		is_success, reason = user_manager.edit_profile_details(user_id, password, fname, lname, city, profession, profile_photo= profile_photo)
+		if is_success:
+			if profile_photo:
+				file_dir = os.path.join(UPLOAD_FOLDER, profile_photo)
+				print('updating profile photo', file_dir)
+				print(file)
+				file.save(file_dir)
+				print('old_image url:', old_image_url)
+				if old_image_url != user_manager.DEFUALT_PROFILE:
+					print('removing old profile photo')
+					try:
+						os.remove(os.path.join(UPLOAD_FOLDER, old_image_url))
+					except Exception as e:
+						print('unable to remove old photo: ', e)
+			return True, ''
+		else:
+			print('upadation failed')
+			return is_success, reason
 
 def c_login_validation(userId:str, password:str)-> list:
 	result = []
@@ -110,7 +189,7 @@ def c_login_validation(userId:str, password:str)-> list:
 		print('incorrect password')
 		return [False, "Incorrect Password"]
 
-def c_get_user_following_list(user_id:str)->list:
+def c_get_raw_user_following_list(user_id:str)->list:
 	result = []
 	result = user_manager.get_user_following_list(user_id)
 	return result
@@ -127,6 +206,10 @@ def get_user_name(user_id:str)->str:
 	# u_d = create_user_container(user_id)
 	return str(u_d.fname) + ' ' +str(u_d.lname)
 
+def c_is_admin_user(user_id:str)->bool:
+	u_d = user_manager.get_user_details(user_id)
+	return True if u_d.member_type == 'ADMIN' else False
+	
 
 def get_user_list_by_name(name:str)->list:
 	n_f = '%{}%'.format(name)
@@ -137,3 +220,21 @@ def get_user_list_by_name(name:str)->list:
 		c_l.append(obj)
 	print('search result', l)
 	return c_l
+
+def c_get_user_follower_list(user_id:str)->list:
+	l = user_manager.get_user_follower_list(user_id)
+	r_l = []
+	for x in l:
+		obj = create_user_container(x.follower_id)
+		r_l.append(obj)
+	r_l.sort()
+	return r_l
+
+def c_get_user_following_list(user_id:str)->list:
+	l = user_manager.get_user_following_list(user_id)
+	r_l = []
+	for x in l:
+		obj = create_user_container(x.following_id)
+		r_l.append(obj)
+	r_l.sort()
+	return r_l

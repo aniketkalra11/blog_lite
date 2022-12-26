@@ -3,9 +3,10 @@ from flask_restful import fields, marshal_with, reqparse
 #!TODO: Add validation in the 
 # from app import session #? Do we really require this
 
-from model.post_model_controller import PostModelManager
+# from model.post_model_controller import PostModelManager
+from model.common_model_object import p_m_m
 
-p_m_m = PostModelManager() #? Check wheather i can create shared object or not
+# p_m_m = PostModelManager() #? Check wheather i can create shared object or not
 # print('session receiving as:', session)
 
 

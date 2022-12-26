@@ -18,7 +18,7 @@ def generate_random_key():
 
 def set_upload_folder():
 	cwd = os.getcwd()
-	UPLOAD_FOLDER = os.path.join(cwd, 'resource')
+	UPLOAD_FOLDER = cwd
 	print(UPLOAD_FOLDER)
 	if not os.path.exists(UPLOAD_FOLDER):
 		print('creating folder')
@@ -89,8 +89,12 @@ def signin():
 def user_home_page(user_id):
 	if user_id in list(session.keys()):
 		print('user found logging in to home page')
-		following_list = c_get_user_following_list(user_id)
-		posts = c_get_home_page_post(user_id, following_list)
+		if c_is_admin_user(user_id):
+			following_list = user_manager.get_all_uesr()
+			posts = c_get_home_page_post(user_id, following_list)
+		else:
+			following_list = c_get_user_following_list(user_id)
+			posts = c_get_home_page_post(user_id, following_list)
 		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts)
 	else:
 		print('no current user found redirecting to login page')
@@ -185,10 +189,10 @@ def search(user_id:str):
 		# form_data = request.form
 		print('search query received for:', query)
 		user_list = get_user_list_by_name(query)
-		print(*user_list, sep='\n')
-		u_f_l = c_get_user_following_list(user_id)
+		# print(*user_list, sep='\n')
+		u_f_l = c_get_raw_user_following_list(user_id)
 		l_f_id = [x.following_id for x in u_f_l]
-		print('user_following id', l_f_id)
+		# print('user_following id', l_f_id)
 	except Exception as e:
 		print('exception arrived', e)
 	# return redirect(url_for('user_home_page', user_id= user_id))
@@ -221,8 +225,35 @@ def delete_post( user_id, post_id):
 		flash(warn)
 	return redirect(url_for('user_profile', user_id = user_id))
 	
+@app.route('/user/profile/follower/<string:user_id>', methods=['GET'])
+def follower_page(user_id):
+	print('getting following list')
+	f_l = c_get_user_follower_list(user_id)
+	u_f_l = c_get_raw_user_following_list(user_id)
+	l_f_id = [x.following_id for x in u_f_l]
+	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id)
 
+@app.route('/user/profile/following/<string:user_id>', methods=['GET'])
+def following_page(user_id):
+	print('getting following list')
+	f_l = c_get_user_following_list(user_id)
+	u_f_l = c_get_raw_user_following_list(user_id)
+	l_f_id = [x.following_id for x in u_f_l]
+	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id)
 
+@app.route('/update/<string:user_id>/profile', methods=['GET', 'POST'])
+def edit_user_profile(user_id:str):
+	if request.method == "GET":
+		user_obj = create_user_container(user_id)
+		return render_template('profile_edit.html', user_id= user_id, user_obj = user_obj)
+	else:
+		print('receving form')
+		file_d = request.files
+		form_data = request.form
+		is_sucss, reason = c_edit_user(user_id, form_data, file_d)
+		if not is_sucss:
+			flash(reason)
+		return redirect(url_for('user_profile', user_id=user_id))
 
 @app.route('/user/jinja', methods=['GET'])
 def ji():

@@ -100,22 +100,24 @@
 				<img class="card-img-top" src="{{url_for('static', filename=profile.profile_photo)}}" alt="Card image cap">
 				<div class="card-body">
 					<h5 class="card-title">{{profile.name}}</h5>
-					<p class="card-text"><strong>Date Of Birth:</strong> {{profile.dob}}  <strong>City:</strong> {{profile.city}}  <br>
-					{{ (('<strong> Profession  </strong>' + ' '  + profile.profession ) if profile.profession != 'NOT_AVAILABLE' else '  ') | safe}}
+					<p class="card-text"><strong>Date Of Birth:</strong> {{profile.dob}}  <br><strong>City:</strong> {{profile.city}}  <br>
+					{{ (('<strong> Profession:  </strong>' + ' '  + profile.profession ) if profile.profession != 'NOT_AVAILABLE' else '  ') | safe}}
 					</p>
 				</div>
 				<ul class="list-group list-group-flush">
 				<li class="list-group-item"><strong>Number of Followers</strong> {{profile.num_flwr}}</li>
 				<li class="list-group-item"><strong>Number of Following</strong> {{profile.num_flwing}}</li>
 				<li class="list-group-item"><strong>Number of Posts</strong> {{profile.num_post}}</li>
+				<li class="list-group-item"><a href="{{url_for('edit_user_profile', user_id = user_id)}}" class="card-link">Edit Profile</a></li>
 				</ul>
 				<div class="card-body">
-				<a href="#" class="card-link">View Followers</a>
-				<a href="#" class="card-link">View Followings</a>
+				<a href="{{url_for('follower_page', user_id= user_id)}}" class="card-link">View Followers</a>
+				<a href="{{url_for('following_page', user_id= user_id)}}" class="card-link">View Followings</a>
+				
 				</div>
 			</div>
 		</div>
-
+	<!-- ?: user profile post without delete -->
 			<div class="container bolgs_main">
 				<div class="container blog_container">
 					<h1>Post</h1>

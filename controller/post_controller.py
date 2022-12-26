@@ -1,10 +1,12 @@
 import os
 from datetime import datetime
-from model.post_model_controller import PostModelManager
+# from model.post_model_controller import PostModelManager
+from model.common_model_object import p_m_m
 from markupsafe import Markup
 from .user_controller import get_user_name
+from .common_function import *
 
-p_m_m = PostModelManager()
+# p_m_m = PostModelManager()
 print('creating post model')
 '''
 Post Mostly edited via api so most of the stuff will exists in Api folder
@@ -67,15 +69,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
 print(UPLOAD_FOLDER)
 
-ALLOWED_EXTENSIONS= {'png', 'jpg', 'jpeg', 'gif'} #TODO: will add later
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def get_extension(file_name):
-    return file_name.split('.')[-1]
-
-def create_file_name(user_id:str, filename)->str:
-	return user_id + '_' + datetime.now().strftime('%H_%M_%S') + '.' +   get_extension(filename)
 
 def c_create_post(user_id:str, form_data:dict, file) ->list:
 	debug_print('crating_post')
@@ -132,10 +126,14 @@ def c_get_home_page_post(user_id:str, user_following_list:list):
 	debug_print('following list received as:' + str(user_following_list))
 	list_posts = []
 	for user in user_following_list:
-		print('searching posts for ', user.following_id)
-		posts = c_get_user_post(user.following_id)
-		print(posts)
-		list_posts.extend(posts)
+		try:
+			print('searching posts for ', user.following_id)
+			posts = c_get_user_post(user.following_id)
+			print(posts)
+			list_posts.extend(posts)
+		except Exception as e:
+			posts = c_get_user_post(user.user_id)
+			list_posts.extend(posts)
 	list_posts.sort(reverse= True)
 	print(list_posts)
 	return list_posts
