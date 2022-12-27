@@ -31,8 +31,37 @@ Plese Follow instruction for start application
 6. After Successful signup Please enter your userid and password
 # if your user id and password is correct then you will be redirected to Dashboard otherwise prompted with proper error
 
-7.
+7. Your Dashboard will contain all the posts in cronological order 
+# You can like dislike and comment on post And If your Dashboard is empty then you are prompted with Message to Follow Users 
 
+8. In the Navigation Bar you can search for users 
+# It supports string matching which means if you are trying to search for 'Aniket' then Simply 'Ani' will provide you same results
+  #On Search result Page 
+  8.1 You can Follow/UnFollow user
+  8.2 Your dashboard will be updated on the basis of your following list
 
+9. In the profile section you can manage your posts
+# ACTIONS WHICH ARE PERMITTED
+ #1. Edit your post
+ #2. Delete your post
+ #3. Add profile photo
+
+10. In profile Section you can view your follower list Following list and can update your profile details like:
+  #Name, city, Profession, and Passwords
+
+11. An 'ADMIN' User can Watch all the posts delete the posts and delete the user //TODO: Under Construction
+
+#12. CRUD Api on user and posts
+  12.1 A user can me made admin only via API command there is not gui provided for user conversion
+    Once use become ADMIN he/she can able to delete use update user and delete the entire post but cannot update the post
+  12.2 Using Api we can retrive list of blogs made by an user
+  12.3 retrive any posts details and url of image
+  12.4 Comment, Like and Delete Blog. // UnderConstruction
+  
+  
+  
+  
+    
+  
 
 
