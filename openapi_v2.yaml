@@ -1,0 +1,349 @@
+openapi: 3.0.0
+info:
+  title: post CRUD Api
+  description: This will help to perform CRUD Api on post 
+  version: 1.0.0
+  
+servers:
+  - url: http://localhost:5500/api
+    description: 'site will be hosted on local host'
+    
+paths:
+
+  /user/make_admin/{user_id}:
+    get:
+      summary: return a list of substring
+      description: Optionally we are defining it
+      parameters:
+        - name: user_id
+          in: path
+          description: 'required for user verification'
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: JSON file
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/make_admin'
+        '404':
+          description: 'Unable to find user id'
+        '500':
+          description: 'Internal server error'
+          
+    delete:
+        summary: return a list of substring
+        description: Optionally we are defining it
+        parameters:
+          - name: user_id
+            in: path
+            description: 'required for user verification'
+            required: true
+            schema:
+              type: string
+        responses:
+          '201':
+            description: JSON file
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/make_admin'
+          '404':
+            description: 'Unable to find user id'
+          '500':
+            description: 'Internal server error'
+
+
+
+  /user/get_post_list/{user_id}:
+    get:
+      summary: return a list of substring
+      description: Optionally we are defining it
+      parameters:
+        - name: user_id
+          in: path
+          description: 'required for user verification'
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: JSON file
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/post_json'
+        '404':
+          description: 'Unable to find user id'
+        '500':
+          description: 'Internal server error'
+  
+  /user/get_post_details/{user_id}/{post_id}:
+    get:
+      summary: return a list of substring
+      description: Optionally we are defining it
+      parameters:
+        - name: user_id
+          in: path
+          description: 'required for user verification'
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          description: 'post_id which you want to retrive'
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: JSON file
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/post_details'
+        '404':
+          description: 'Unable to find user id'
+        '500':
+          description: 'Internal server error'
+    delete:
+      summary: 'delete existing post'
+      description: Delete the post which is mentioned
+      parameters:
+          - name: user_id
+            in: path
+            description: 'required for user verification'
+            required: true
+            schema:
+              type: string
+          - name: post_id
+            in: path
+            description: 'post_id which you want to retrive'
+            required: true
+            schema:
+              type: string
+      responses:
+        '201':
+          description: JSON file
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/post_deleted'
+        '404':
+          description: 'Unable to find user id'
+        '500':
+          description: 'Internal server error'
+
+  /user/like/{user_id}/{post_id}:
+    get:
+      summary: return a list of substring
+      description: Optionally we are defining it
+      parameters:
+        - name: user_id
+          in: path
+          description: 'required for user verification'
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          description: 'post_id which you want to retrive'
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: JSON file
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/post_details'
+        '404':
+          description: 'Unable to find user id'
+        '500':
+          description: 'Internal server error'
+    delete:
+        summary: 'delete existing post'
+        description: Delete the post which is mentioned
+        parameters:
+            - name: user_id
+              in: path
+              description: 'required for user verification'
+              required: true
+              schema:
+                type: string
+            - name: post_id
+              in: path
+              description: 'post_id which you want to retrive'
+              required: true
+              schema:
+                type: string
+        responses:
+          '201':
+            description: JSON file
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/post_likes'
+          '404':
+            description: 'Unable to find user id'
+          '500':
+            description: 'Internal server error'
+
+  /user/flag/{user_id}/{post_id}:
+    get:
+      summary: return a list of substring
+      description: Optionally we are defining it
+      parameters:
+        - name: user_id
+          in: path
+          description: 'required for user verification'
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          description: 'post_id which you want to retrive'
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: JSON file
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/post_flags'
+        '404':
+          description: 'Unable to find user id'
+        '500':
+          description: 'Internal server error'
+    delete:
+        summary: 'delete existing post'
+        description: Delete the post which is mentioned
+        parameters:
+            - name: user_id
+              in: path
+              description: 'required for user verification'
+              required: true
+              schema:
+                type: string
+            - name: post_id
+              in: path
+              description: 'post_id which you want to retrive'
+              required: true
+              schema:
+                type: string
+        responses:
+          '201':
+            description: JSON file
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/post_deleted'
+          '404':
+            description: 'Unable to find user id'
+          '500':
+            description: 'Internal server error'
+
+
+
+
+components:
+  schemas:
+    post_json:
+      type: object
+      properties:
+        post_ids:
+          type: array
+          xml:
+            name: posts
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/post_id'
+    post_details:
+      type: object
+      properties:
+        post_id:
+          type: string
+          example: post_123
+        likes:
+          type: integer
+          example: 2
+        flags:
+          type: integer
+          example: 2
+        image_url:
+          type: string
+          example: '2'
+          
+
+    post_deleted:
+      type: object
+      properties:
+        post_id:
+          type: string
+          example: post_123
+        is_success:
+          type: boolean
+          example: true
+          
+    make_admin:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: user_123
+        is_success:
+          type: boolean
+          example: true
+    
+    post_likes:
+      type: object
+      properties:
+        likes:
+          type: integer
+          example: 12
+
+    post_flags:
+      type: object
+      properties:
+        flags:
+          type: integer
+          example: 12
+
+
+    likes:
+      type: integer
+    liker:
+      type: string
+    flags:
+      type: integer
+    flager:
+      type: string
+    user_id: 
+      type: string
+    post_id:
+      type: string
+    f_user_id:
+      type: string
