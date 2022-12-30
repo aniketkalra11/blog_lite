@@ -112,6 +112,9 @@
 			</div>
 		{% endfor %}
 	</div>
+	{% if posts| length == 0 %}
+		<div><h3>Please Follow some users to see their posts</h3></div>
+	{% endif %}
 
 	<div class="container post_create_button">
 		<a href="{{url_for('create_post', user_id= user_id)}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Create Post</a>
