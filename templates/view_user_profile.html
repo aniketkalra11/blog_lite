@@ -120,20 +120,21 @@
 				<div class="container blog_container">
 					<h1>Post</h1>
 					{% for post in posts %}
-						<div class="container image_post">
-							<div class="container post_user_id">
-								<a href="{{url_for('view_user_profile', user_id=user_id, view_id= post.user_id)}}" id="post_user_id"><h3>{{post.user_id}}</h3></a>
+					<div class="container image_post">
+						<div class="container post_user_id">
+							<a href="{{url_for('view_user_profile', user_id=user_id, view_id= post.user_id)}}" id="post_user_id"><h3>{{post.user_name}}</h3></a>
+						</div>
+						{% if post.image_url != 'NOT_AVAILABLE' %}
+							<div class="container main_image">
+								<img class="post_image" src="{{url_for('static', filename=('resources/img/' + post.image_url)  )}}" alt="main_image" id="post_img">
 							</div>
-							{% if post.image_url != 'NOT_AVAILABLE' %}
-								<div class="container main_image">
-									<img class="post_image" src="{{url_for('static', filename=('resources/img/' + post.image_url)  )}}" alt="main_image" id="post_img">
-								</div>
-							{% endif %}
+						{% endif %}
+						<div class="container">
+							<h3 id="title">{{post.title}}</h3>
+							<p id="post_description">{{post.caption | safe}}</p>
+						</div>
+						<div class="container like_flag_container">
 							<div class="container">
-								<h3 id="title">{{post.title}}</h3>
-								<p id="post_description">{{post.caption | safe}}</p>
-							</div>
-							<div class="container like_flag_container">
 								<div class="container" id="{{post.post_id}}_like"
 								style="display: {{'none' if post.is_already_liked else 'block' }};">
 									<a href="#" onclick="add_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
@@ -141,46 +142,50 @@
 								<div class="container" id="{{post.post_id}}_remove_like" style="display: {{ 'block' if post.is_already_liked else 'none' }};">
 									<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star-fill.svg')}}" alt="like" id="like" class="interaction_marker"></a>
 								</div>
-			
+								<span id="{{post.post_id}}_like_count">{{post.likes}}</span>
+							</div>
+							<div class="container">
 								<div class="contianer" id="{{post.post_id}}_flag" style="display: {{'none' if post.is_already_flagged else 'block'}};">
 									<a href= "#" onclick="add_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 								</div>
 								<div class="contianer" id="{{post.post_id}}_remove_flag" style="display: {{'block' if post.is_already_flagged else 'none'}};">
 									<a href= "#" onclick="delete_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false"><img src="{{url_for('static', filename='icons/flag-fill.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
 								</div>
+								<span id="{{post.post_id}}_flag_count">{{post.flags}}</span>
 							</div>
-							<div class="container post_comment_box">
-								<div class="container header_title">
-									<h6 id="minor_heading">comment table: -</h6>
-								</div>
-								<div class="container comment_content">
-									{% for comment in post.comments %}
-										<div class="container single_comment">
-											<div class="container">
-												<strong>{{comment.commenter_id}}</strong>
-											</div>
-											<div class="container">
-												<p>
-													{{comment.comment_content}}
-												</p>
-											</div>
-										</div>
-									{% endfor %}
+						</div>
+						<div class="container post_comment_box">
+							<div class="container header_title">
+								<h6 id="minor_heading">Comments: -</h6>
+							</div>
+							<div class="container comment_content">
+								{% for comment in post.comments %}
 									<div class="container single_comment">
 										<div class="container">
-											<strong>{{user_id}}</strong>
+											<strong>{{comment.commenter_name}}</strong>
 										</div>
 										<div class="container">
-											<form method="post" action="{{url_for('add_post_comment', user_id=user_id, post_id= post.post_id)}}" > <!-- TODO: write here-->
-												<input type="text" placeholder="Write your comment here...." name="content">
-												<button type="submit">Submit</button>
-											</form>
+											<p>
+												{{comment.comment_content}}
+											</p>
 										</div>
+									</div>
+								{% endfor %}
+								<div class="container single_comment">
+									<div class="container">
+										<strong>{{user_id}}</strong>
+									</div>
+									<div class="container">
+										<form method="post" action="{{url_for('add_post_comment', user_id=user_id, post_id= post.post_id)}}" > <!-- TODO: write here-->
+											<input type="text" placeholder="Write your comment here...." name="content" required>
+											<button type="submit">Submit</button>
+										</form>
 									</div>
 								</div>
 							</div>
 						</div>
-					{% endfor %}
+					</div>
+				{% endfor %}
 				</div>
 			
 		

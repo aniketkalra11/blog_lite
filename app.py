@@ -178,6 +178,7 @@ def add_post_comment(user_id, post_id):
 def view_user_profile(user_id:str, view_id:str):
 	u_d = c_get_user_details(view_id)
 	posts = c_get_user_post(view_id)
+	posts = c_update_user_like_dislike_flags(user_id, posts)
 	return render_template('view_user_profile.html', user_id= user_id, profile = u_d, posts = posts, view_id = view_id)
 
 
