@@ -11,6 +11,21 @@ print('creating post model')
 '''
 Post Mostly edited via api so most of the stuff will exists in Api folder
 '''
+
+class PostCommentContainer:
+	def __init__(self, comment_id):
+		print('post comment id:', comment_id)
+		self.comment = p_m_m.get_comment_from_comment_id(comment_id)
+		if self.comment:
+			self.commenter_name = get_user_name(self.comment.commenter_id)
+			print('commenter name received as:', self.commenter_name)
+			self.comment_content = self.comment.comment_content
+			self.commenter_id = self.comment.commenter_id
+		else:
+			raise Exception('No comment Found')
+	def __str__(self):
+		return str(self.comment) + " " + str(self.commenter_name) + " " + str(self.commenter_id)
+
 class UserFeedPostContainer:
 	def __init__(self, post_id):
 		sql_post_data = p_m_m.get_post_content(post_id)
@@ -33,12 +48,24 @@ class UserFeedPostContainer:
 		self.likes = sql_post_interaction.likes
 		self.flags = sql_post_interaction.flags
 		self.post_comment_id = sql_post_interaction.post_comment_id
-		self.comments = p_m_m.get_comments_from_post_id(self.post_comment_id)
+		self.comments = self.get_post_comment_container(self.post_comment_id)
 		print('UserFeedContainer',self.comments)
+		print(*self.comments)
 		self.is_already_liked = False # will update later
 		self.is_already_flagged = False # will update later
 		print('UserFeedPostContainer construction complete')
 
+	def get_post_comment_container(self, post_comment_id):
+		print('post_comment id is:', post_comment_id)
+		comments = p_m_m.get_comments_from_post_id(post_comment_id)
+		l_container = []
+		for c in comments:
+			try:
+				con = PostCommentContainer(c.comment_id)
+				l_container.append(con)
+			except Exception as e:
+				print(e)
+		return l_container
 	def __str__(self):
 		s = self.user_id +" " + self.post_id + " " + self.title + " " + self.image_url + "\n"
 		return s
@@ -120,20 +147,25 @@ def c_get_user_post(user_id:str)->list:
 	print(r_p)
 	r_p.sort(reverse=True)
 	return r_p
+def c_update_user_like_dislike_flags(user_id:str, posts:list) -> list:
+	for p in posts:
+		p.is_already_liked = p_m_m.is_user_already_liked(user_id, p.post_id)
+		p.is_already_flagged = p_m_m.is_user_already_flaged(user_id, p.post_id)
+	return posts
 
 def c_get_home_page_post(user_id:str, user_following_list:list):
-	debug_print('searching following list for user:'+ user_id)
-	debug_print('following list received as:' + str(user_following_list))
+	# debug_print('searching following list for user:'+ user_id)
+	# debug_print('following list received as:' + str(user_following_list))
 	list_posts = []
 	for user in user_following_list:
 		try:
-			print('searching posts for ', user.following_id)
 			posts = c_get_user_post(user.following_id)
-			print(posts)
-			list_posts.extend(posts)
 		except Exception as e:
+			print('exception arrived for user_id: ', user_id, ' exception:', str(e))
 			posts = c_get_user_post(user.user_id)
-			list_posts.extend(posts)
+
+		posts = c_update_user_like_dislike_flags(user_id, posts)
+		list_posts.extend(posts)
 	list_posts.sort(reverse= True)
 	print(list_posts)
 	return list_posts
@@ -168,14 +200,15 @@ def c_edit_post(user_id:str, post_id:str, form_data, file= None)->list:
 		warn_str = 'Unable to edit post' + str(e)
 		return False, warn_str
 	else:
-		if old_post.image_url != img_url or (img_url and img_url == 'NOT_AVAILABLE'):
-			# old_img_dir = os.path.join(UPLOAD_FOLDER, old_post.image_url)
-			# debug_print(old_img_dir)
-			remove_image(old_post.image_url)
-		if img_url != '' and img_url != "NOT_AVAILABLE":
-			fildir = os.path.join(UPLOAD_FOLDER, img_url)
-			debug_print("saving new file" + fildir)
-			file.save(fildir)
+		if img_url:
+			if old_post.image_url != img_url or (img_url and img_url == 'NOT_AVAILABLE'):
+				# old_img_dir = os.path.join(UPLOAD_FOLDER, old_post.image_url)
+				# debug_print(old_img_dir)
+				remove_image(old_post.image_url)
+			if img_url != '' and img_url != "NOT_AVAILABLE":
+				fildir = os.path.join(UPLOAD_FOLDER, img_url)
+				debug_print("saving new file" + fildir)
+				file.save(fildir)
 		return True, warn_str
 
 def create_post_container_obj(user_id, post_id):

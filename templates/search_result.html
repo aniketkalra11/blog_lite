@@ -54,6 +54,9 @@
 	</div>
 	<div class="contianer search_body">
 		<h2>Serach result {{query}}</h2>
+		{% if users|length == 0 %}
+		<h2>No user Found</h2>
+		{% endif%}
 		<div class="container profile_container">
 		{% for user in users %}
 			<div class="container user_container">

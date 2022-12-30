@@ -213,6 +213,10 @@ class PostModelManager():
         print('comments received as:', comments)
         return (comments)
 
+    def get_comment_from_comment_id(self, comment_id:str):
+        comment = PostCommentTable.query.filter_by(comment_id = comment_id).first()
+        return comment if comment else None
+
     def get_post_id_tuple(self, post_id):
         print('Post id recevied as:', post_id)
         return PostId.query.filter_by(post_id= post_id).first()

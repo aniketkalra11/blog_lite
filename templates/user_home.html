@@ -93,7 +93,7 @@
 			</div>
 			<div class="container post_comment_box">
 				<div class="container header_title">
-					<h6 id="minor_heading">comment table: -</h6>
+					<h6 id="minor_heading">Comments: -</h6>
 				</div>
 				<div class="container comment_content">
 					<div class="container single_comment">
@@ -134,7 +134,7 @@
 						</div>
 						<div class="container">
 							<form method="post" action="{{url_for('add_post_comment', user_id=user_id, post_id= 123)}}" > <!-- TODO: write here-->
-								<input type="text" placeholder="Write your comment here...." name="content">
+								<input type="text" placeholder="Write your comment here...." name="content" required>
 								<button type="submit">Submit</button>
 							</form>
 						</div>
