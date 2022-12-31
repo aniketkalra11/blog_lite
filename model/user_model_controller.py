@@ -241,3 +241,31 @@ class UserModelManager():
 			db.session.commit()
 			print('following commit complete')
 			return True
+
+	def make_user_admin(self, user_id:str)->bool:
+		user_details = UserDetails.query.filter_by(user_id= user_id).first()
+		if user_details:
+			user_details.member_type = 'ADMIN'
+			db.session.add(user_details)
+		else:
+			raise Exception('No User Found')
+		try:
+			db.session.commit()
+		except:
+			db.session.rollback()
+			return False
+		return True
+
+	def remove_as_admin(self, user_id:str)->bool:
+		user_details = UserDetails.query.filter_by(user_id= user_id).first()
+		if user_details:
+			user_details.member_type = 'USER'
+			db.session.add(user_details)
+		else:
+			raise Exception('No User Found')
+		try:
+			db.session.commit()
+		except:
+			db.session.rollback()
+			return False
+		return True

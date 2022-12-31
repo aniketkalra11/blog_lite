@@ -286,6 +286,15 @@ api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string
 from Api.user_follow_api import FollowApi
 api.add_resource(FollowApi, '/api/follow', '/api/follow/<string:user_id>/<string:f_user_id>')
 
+from Api.user_control_api import UserControlApi
+api.add_resource(UserControlApi, '/api/user/make_admin', '/api/user/make_admin/<string:user_id>')
+
+from Api.user_control_api import GetUserPostList
+api.add_resource(GetUserPostList, '/api/user/get_post_list', '/api/user/get_post_list/<string:user_id>')
+
+from Api.post_api import PostCRUDApi
+api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_details/<string:user_id>/<string:post_id>')
+
 #TODO: Comment API
 
 
