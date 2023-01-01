@@ -92,8 +92,10 @@ cwd = os.getcwd()
 UPLOAD_FOLDER = os.path.join(cwd, 'static', 'resources', 'img')
 #print(UPLOAD_FOLDER)
 if not os.path.exists(UPLOAD_FOLDER):
-    #print('creating folder')
-    os.mkdir(UPLOAD_FOLDER)
+	try:
+		os.mkdir(UPLOAD_FOLDER)
+	except Exception as e:
+		pass
 #print(UPLOAD_FOLDER)
 
 
