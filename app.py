@@ -284,7 +284,8 @@ def follower_page(user_id):
 	f_l = c_get_user_follower_list(user_id)
 	u_f_l = c_get_raw_user_following_list(user_id)
 	l_f_id = [x.following_id for x in u_f_l]
-	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id)
+	user = create_user_container(user_id)
+	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id, user = user)
 
 @app.route('/user/profile/following/<string:user_id>', methods=['GET'])
 def following_page(user_id):
@@ -292,7 +293,8 @@ def following_page(user_id):
 	f_l = c_get_user_following_list(user_id)
 	u_f_l = c_get_raw_user_following_list(user_id)
 	l_f_id = [x.following_id for x in u_f_l]
-	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id)
+	user = create_user_container(user_id)
+	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id, user= user)
 
 @app.route('/update/<string:user_id>/profile', methods=['GET', 'POST'])
 def edit_user_profile(user_id:str):
