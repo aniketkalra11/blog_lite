@@ -122,7 +122,8 @@ class UserModelManager():
 			user_followers = db.session.query(UserFollowers).filter_by(user_id = userId).all()
 			#print(user_followers)
 			if len(user_followers) == 0:
-				print('no user found')
+				# print('no user found')
+				pass
 			return user_followers
 		except Exception as e:
 			#print('error while fetching user_follower: ', user_followers)
@@ -134,7 +135,8 @@ class UserModelManager():
 			user_following = db.session.query(UserFollowing).filter_by(user_id = userId).all()
 			#print(user_following)
 			if len(user_following) == 0:
-				print('no user found')
+				# print('no user found')
+				pass
 			return user_following
 		except Exception as e:
 			#print('error while fetching user_follower: ', user_following)
@@ -276,7 +278,7 @@ class UserModelManager():
 		for u in user_fing:
 			try:
 				#print(u)
-				self.remove_user_follower(u.following_id, user_id)
+				self.remove_user_follower(user_id, u.following_id)
 			except Exception as e:
 				#print('error otnrason', e)
 				pass
@@ -284,7 +286,7 @@ class UserModelManager():
 		for u in user_flwr:
 			#print(u)
 			try:
-				self.remove_user_following(u.follower_id, user_id)
+				self.remove_user_following(user_id, u.follower_id)
 			except Exception as e:
 				#print('error stneirasn ', e)
 				pass

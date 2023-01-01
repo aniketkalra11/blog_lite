@@ -99,7 +99,8 @@ def user_home_page(user_id):
 			u_posts = c_get_user_post(user_id)
 			posts.extend(u_posts)
 			posts.sort(reverse=True)
-		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts)
+		user = create_user_container(user_id)
+		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts, user= user)
 	else:
 		print('no current user found redirecting to login page')
 		return redirect(url_for('signin'))
@@ -136,7 +137,8 @@ def admin_delete_user(admin_id, user_id):
 def admin_view_profile(admin_id, user_id):
 	u_d = c_get_user_details(user_id)
 	posts = c_get_user_post(user_id)
-	return render_template('admin_profile_view.html', user_id= user_id, profile = u_d, posts = posts, admin_id=admin_id)	
+	user = create_user_container(admin_id)
+	return render_template('admin_profile_view.html', user_id= user_id, profile = u_d, posts = posts, admin_id=admin_id, user= user)	
 
 @app.route('/admin/profile/delete/post/<string:admin_id>/<string:user_id>/<string:post_id>', methods=['GET'])
 def admin_delete_post(admin_id, user_id, post_id):
@@ -182,7 +184,8 @@ def user_profile(user_id):
 	u_d = c_get_user_details(user_id)
 	posts = c_get_user_post(user_id)
 	print(u_d)
-	return render_template('user_profile.html', user_id= user_id, profile = u_d, posts = posts)
+	user = create_user_container(user_id)
+	return render_template('user_profile.html', user_id= user_id, profile = u_d, posts = posts, user = user)
 
 @app.route('/user/post/<string:user_id>/create_post', methods=['GET', 'POST'])
 def create_post(user_id):
@@ -224,7 +227,8 @@ def view_user_profile(user_id:str, view_id:str):
 	u_d = c_get_user_details(view_id)
 	posts = c_get_user_post(view_id)
 	posts = c_update_user_like_dislike_flags(user_id, posts)
-	return render_template('view_user_profile.html', user_id= user_id, profile = u_d, posts = posts, view_id = view_id)
+	user = create_user_container(user_id)
+	return render_template('view_user_profile.html', user_id= user_id, profile = u_d, posts = posts, view_id = view_id, user= user)
 
 
 
@@ -245,7 +249,8 @@ def search(user_id:str):
 		print('exception arrived', e)
 	# return redirect(url_for('user_home_page', user_id= user_id))
 	# return redirect(url_for('create_post', user_id=user_id))
-	return render_template('search_result.html', user_id= user_id, users= user_list, user_following_list = l_f_id)
+	user = create_user_container(user_id)
+	return render_template('search_result.html', user_id= user_id, users= user_list, user_following_list = l_f_id, user= user)
 
 
 @app.route('/user/post/<string:user_id>/edit_post', methods=['GET', 'POST'])
