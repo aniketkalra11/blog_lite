@@ -28,36 +28,36 @@ class UserModelManager():
 
 	def add_user(self, userId, password, fname, lname, dob, city, profession= None, member_type= 'user') -> bool:
 		try:
-			print('adding user to Database:', userId)
+			#print('adding user to Database:', userId)
 			user = UserIdPassword(user_id = userId, password = password)
 			
 			# db.session.add(user)
-			print('adding user to session')
+			#print('adding user to session')
 
 			if profession:
-				print('profession is available ', profession)
+				#print('profession is available ', profession)
 				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profession= profession)
 			else:
-				print('profession is not available skipping it')
+				#print('profession is not available skipping it')
 				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city)
 			db.session.add(user_details)
-			print('adding user details')
+			#print('adding user details')
 
 			u_f_details = UserPostAndFollowerInfo(user_id = userId)
 			user.user_details.append(user_details)
 			db.session.add(u_f_details)
-			print('user additional details')
+			#print('user additional details')
 
 		except Exception as e:
-			print('exception is:', e)
+			#print('exception is:', e)
 			db.session.rollback()
-			print('rollbacking everything')
+			#print('rollbacking everything')
 			return False
 		else:
-			print('commiting changes')
+			#print('commiting changes')
 			db.session.commit()
 			self.total_user += 1
-			print('total user increased ', self.total_user)
+			#print('total user increased ', self.total_user)
 			return True
 
 	def is_user_exists(self, userId:str) -> bool:
@@ -65,42 +65,42 @@ class UserModelManager():
 			this Function will check and tell wheather user exists or not
 		'''
 		user_data = db.session.query(UserDetails).filter_by(user_id = userId).first()
-		print(user_data, "user data retrived from userId", userId)
+		#print(user_data, "user data retrived from userId", userId)
 		return True if user_data  else False
 
 	def is_user_pwd_correct(self, userId:str, password:str) -> bool:
-		print('for password validation userId receiving as:', userId, 'password as:', password)
+		#print('for password validation userId receiving as:', userId, 'password as:', password)
 		# user_data = db.session.query(UserIdPassword).filter(UserIdPassword.user_id == userId and UserIdPassword.password == password).first()
 		user_data = UserIdPassword.query.filter_by(user_id = userId, password= password).first()
-		print('user data and password retrived as: ', user_data)
+		#print('user data and password retrived as: ', user_data)
 		return True if user_data else False
 
 	def add_user_follower(self, userId:str, followerId:str)-> bool:
 		try:
 			user_follower = UserFollowers(user_id = userId, follower_id = followerId)
 			db.session.add(user_follower)
-			print('adding follower details:', userId, 'Follower id:', followerId)
+			#print('adding follower details:', userId, 'Follower id:', followerId)
 			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
 			if q_data:
 				q_data.num_followers = q_data.num_followers + 1
 				db.session.add(q_data)
-				print('updating follower count', q_data)
+				#print('updating follower count', q_data)
 			else:
 				raise Exception('unable to find data', userId)
 		except Exception as e:
-			print('exception arrived as e:', e)
+			#print('exception arrived as e:', e)
 			db.session.rollback()
 			return False
 		else:
 			db.session.commit()
-			print('follower commit successful')
+			#print('follower commit successful')
 			return True
 
 	def add_user_following(self, userId:str, followingId:str) -> bool:
 		try:
 			user_following = UserFollowing(user_id = userId, following_id = followingId)
 			db.session.add(user_following)
-			print('adding user following', user_following)
+			#print('adding user following', user_following)
 			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
 			if q_data:
 				q_data.num_of_following = q_data.num_of_following + 1
@@ -108,36 +108,36 @@ class UserModelManager():
 			else:
 				raise Exception('unable to find data', userId)
 		except Exception as e:
-			print('exception arrived in add_user_following as: ', e)
+			#print('exception arrived in add_user_following as: ', e)
 			db.session.rollback()
 			return False
 		else:
 			db.session.commit()
-			print('following commit complete')
+			#print('following commit complete')
 			return True
 
 	def get_user_follower_list(self, userId:str)-> list:
 		user_followers = None
 		try:
 			user_followers = db.session.query(UserFollowers).filter_by(user_id = userId).all()
-			print(user_followers)
+			#print(user_followers)
 			if len(user_followers) == 0:
 				print('no user found')
 			return user_followers
 		except Exception as e:
-			print('error while fetching user_follower: ', user_followers)
+			#print('error while fetching user_follower: ', user_followers)
 			return []
 
 	def get_user_following_list(self, userId:str) -> list:
 		user_following = []
 		try:
 			user_following = db.session.query(UserFollowing).filter_by(user_id = userId).all()
-			print(user_following)
+			#print(user_following)
 			if len(user_following) == 0:
 				print('no user found')
 			return user_following
 		except Exception as e:
-			print('error while fetching user_follower: ', user_following)
+			#print('error while fetching user_follower: ', user_following)
 			return []
 
 	def get_user_post_flr_flwing_count(self, userId:str)-> tuple:
@@ -145,17 +145,17 @@ class UserModelManager():
 		rslt_tuple = None
 		try:
 			data = UserPostAndFollowerInfo.query.filter_by(user_id= userId).first()
-			print('getting user post count', data)
+			#print('getting user post count', data)
 			if data:
 				(user_flr, user_flwing, post_count) = (data.num_followers, data.num_of_following, data.num_of_post)
 				rslt_tuple = (user_flr, user_flwing, post_count)
 			else:
 				raise Exception('unable to find data', userId)
 		except Exception as e:
-			print('exception arrived while executing', e)
+			#print('exception arrived while executing', e)
 			return (-1, -1, -1)
 		else:
-			print('result received as:', rslt_tuple)
+			#print('result received as:', rslt_tuple)
 			return rslt_tuple
 
 	def get_user_details(self, userId:str) -> tuple:
@@ -164,17 +164,17 @@ class UserModelManager():
 
 	def get_all_uesr(self) ->list:
 		user_list = UserDetails.query.all()
-		print(user_list)
+		#print(user_list)
 		return user_list
 	def get_user_by_name(self, name:str)->list:
 		user_list = []
 		l1 = (UserDetails.query.filter(UserDetails.fname.like(name)).all())
-		print('receving name as:', l1)
+		#print('receving name as:', l1)
 		l2 = (UserDetails.query.filter(UserDetails.lname.like(name)).all())
 		for x in l1:
 			if x in l2:
 				l2.remove(x)
-		print('receving name as:', l2)
+		#print('receving name as:', l2)
 		user_list = l1 + l2
 		return user_list
 
@@ -203,28 +203,28 @@ class UserModelManager():
 		try:
 			user_follower = UserFollowers.query.filter_by(user_id = userId, follower_id = followerId).first()
 			db.session.delete(user_follower)
-			print('adding follower details:', userId, 'Follower id:', followerId)
+			#print('adding follower details:', userId, 'Follower id:', followerId)
 			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
 			if q_data:
 				q_data.num_followers = q_data.num_followers - 1
 				db.session.add(q_data)
-				print('updating follower count', q_data)
+				#print('updating follower count', q_data)
 			else:
 				raise Exception('unable to find data', userId)
 		except Exception as e:
-			print('exception arrived as e:', e)
+			#print('exception arrived as e:', e)
 			db.session.rollback()
 			return False
 		else:
 			db.session.commit()
-			print('follower commit successful')
+			#print('follower commit successful')
 			return True
 
 	def remove_user_following(self, userId:str, followingId:str) -> bool:
 		try:
 			user_following = UserFollowing.query.filter_by(user_id = userId, following_id = followingId).first()
 			db.session.delete(user_following)
-			print('adding user following', user_following)
+			#print('adding user following', user_following)
 			q_data = db.session.query(UserPostAndFollowerInfo).filter_by(user_id = userId).first()
 			if q_data:
 				q_data.num_of_following = q_data.num_of_following - 1
@@ -232,12 +232,12 @@ class UserModelManager():
 			else:
 				raise Exception('unable to find data', userId)
 		except Exception as e:
-			print('exception arrived in add_user_following as: ', e)
+			#print('exception arrived in add_user_following as: ', e)
 			db.session.rollback()
 			return False
 		else:
 			db.session.commit()
-			print('following commit complete')
+			#print('following commit complete')
 			return True
 
 	def make_user_admin(self, user_id:str)->bool:
@@ -275,27 +275,27 @@ class UserModelManager():
 		user_fing = UserFollowing.query.filter_by(user_id = user_id).all()
 		for u in user_fing:
 			try:
-				print(u)
+				#print(u)
 				self.remove_user_follower(u.following_id, user_id)
 			except Exception as e:
-				print('error otnrason', e)
+				#print('error otnrason', e)
 				pass
 		user_flwr = UserFollowers.query.filter_by(user_id = user_id).all()
 		for u in user_flwr:
-			print(u)
+			#print(u)
 			try:
 				self.remove_user_following(u.follower_id, user_id)
 			except Exception as e:
-				print('error stneirasn ', e)
+				#print('error stneirasn ', e)
 				pass
 		if user_id_pwd and user_f_c:
 			try:
 				db.session.delete(user_id_pwd)
 				db.session.delete(user_f_c)
-				print('deleting user: ', user_id)
+				#print('deleting user: ', user_id)
 			except Exception as e:
-				print('exception arrived while deleteing ', e)
+				#print('exception arrived while deleteing ', e)
 				db.session.rollback()
 			else:
-				print('chages commited ', user_id)
+				#print('chages commited ', user_id)
 				db.session.commit()

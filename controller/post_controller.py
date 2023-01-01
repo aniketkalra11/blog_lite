@@ -14,11 +14,11 @@ Post Mostly edited via api so most of the stuff will exists in Api folder
 
 class PostCommentContainer:
 	def __init__(self, comment_id):
-		print('post comment id:', comment_id)
+		#print('post comment id:', comment_id)
 		self.comment = p_m_m.get_comment_from_comment_id(comment_id)
 		if self.comment:
 			self.commenter_name = get_user_name(self.comment.commenter_id)
-			print('commenter name received as:', self.commenter_name)
+			#print('commenter name received as:', self.commenter_name)
 			self.comment_content = self.comment.comment_content
 			self.commenter_id = self.comment.commenter_id
 		else:
@@ -29,34 +29,34 @@ class PostCommentContainer:
 class UserFeedPostContainer:
 	def __init__(self, post_id):
 		sql_post_data = p_m_m.get_post_content(post_id)
-		print('UserFeedContainer',sql_post_data)
+		#print('UserFeedContainer',sql_post_data)
 		self.post_id = sql_post_data.post_id
 		self.title = sql_post_data.title
 		s_t = Markup.escape(sql_post_data.caption)
-		print(s_t)
+		#print(s_t)
 		self.caption = sql_post_data.caption
 		# self.caption = str(s_t)
 		self.timestamp = sql_post_data.timestamp
 		self.image_url = str(sql_post_data.image_url)
-		print(self.image_url)
+		#print(self.image_url)
 		sql_post_id = p_m_m.get_post_id_tuple(post_id)
-		print('UserFeedContainer',sql_post_id)
+		#print('UserFeedContainer',sql_post_id)
 		self.user_id = sql_post_id.user_id
 		self.user_name = get_user_name(self.user_id)
 		sql_post_interaction = p_m_m.get_post_interaction(post_id)
-		print('UserFeedContainer',sql_post_interaction)
+		#print('UserFeedContainer',sql_post_interaction)
 		self.likes = sql_post_interaction.likes
 		self.flags = sql_post_interaction.flags
 		self.post_comment_id = sql_post_interaction.post_comment_id
 		self.comments = self.get_post_comment_container(self.post_comment_id)
-		print('UserFeedContainer',self.comments)
-		print(*self.comments)
+		#print('UserFeedContainer',self.comments)
+		#print(*self.comments)
 		self.is_already_liked = False # will update later
 		self.is_already_flagged = False # will update later
-		print('UserFeedPostContainer construction complete')
+		#print('UserFeedPostContainer construction complete')
 
 	def get_post_comment_container(self, post_comment_id):
-		print('post_comment id is:', post_comment_id)
+		#print('post_comment id is:', post_comment_id)
 		comments = p_m_m.get_comments_from_post_id(post_comment_id)
 		l_container = []
 		for c in comments:
@@ -90,11 +90,11 @@ class UserFeedPostContainer:
 
 cwd = os.getcwd()
 UPLOAD_FOLDER = os.path.join(cwd, 'static', 'resources', 'img')
-print(UPLOAD_FOLDER)
+#print(UPLOAD_FOLDER)
 if not os.path.exists(UPLOAD_FOLDER):
-    print('creating folder')
+    #print('creating folder')
     os.mkdir(UPLOAD_FOLDER)
-print(UPLOAD_FOLDER)
+#print(UPLOAD_FOLDER)
 
 
 
@@ -103,13 +103,13 @@ def c_create_post(user_id:str, form_data:dict, file) ->list:
 	debug_print('form_received as:' + str(form_data))
 	title = form_data['title']
 	caption = form_data['caption']
-	print('title as ', title, 'caption as:', caption)
+	#print('title as ', title, 'caption as:', caption)
 	# file = form_data.files['image']
 	filedir = None
 	file_name = None
 	if file.filename != '' and allowed_file(file.filename):
 		file_name = create_file_name(user_id, file.filename)
-		print(file_name, 'created')
+		#print(file_name, 'created')
 		filedir = os.path.join(UPLOAD_FOLDER, file_name)
 		debug_print('file dir is:' + str(filedir))
 		# 
@@ -118,10 +118,10 @@ def c_create_post(user_id:str, form_data:dict, file) ->list:
 	if is_sucess:
 		if file_name:
 			file.save(filedir)
-			print('images saved')
+			#print('images saved')
 	else:
 		return False, 'Database entry failed'
-	# print('file receiving as:',file)
+	# #print('file receiving as:',file)
 	return True, 'Success'
 
 def c_add_comment(user_id:str, post_id:str, comment_content:str)->list:
@@ -130,7 +130,7 @@ def c_add_comment(user_id:str, post_id:str, comment_content:str)->list:
 		is_suc, reason = p_m_m.add_comment(post_id, user_id, comment_content)
 	except Exception as e:
 		is_suc = False
-		print('exception arrived', e)
+		#print('exception arrived', e)
 		reason = str(e)
 	if not is_suc:
 		print('add comment_failed')
@@ -144,7 +144,7 @@ def c_get_user_post(user_id:str)->list:
 		obj =create_post_container_obj(p.user_id, p.post_id)
 		if obj:
 			r_p.append(obj)
-	print(r_p)
+	#print(r_p)
 	r_p.sort(reverse=True)
 	return r_p
 def c_update_user_like_dislike_flags(user_id:str, posts:list) -> list:
@@ -161,18 +161,18 @@ def c_get_home_page_post(user_id:str, user_following_list:list):
 		try:
 			posts = c_get_user_post(user.following_id)
 		except Exception as e:
-			print('exception arrived for user_id: ', user_id, ' exception:', str(e))
+			#print('exception arrived for user_id: ', user_id, ' exception:', str(e))
 			posts = c_get_user_post(user.user_id)
 
 		posts = c_update_user_like_dislike_flags(user_id, posts)
 		list_posts.extend(posts)
 	list_posts.sort(reverse= True)
-	print(list_posts)
+	#print(list_posts)
 	return list_posts
 def remove_image(img_url):
 	file_dir = os.path.join(UPLOAD_FOLDER, img_url) 
 	if os.path.isfile(file_dir):
-		print('removing old photo')
+		#print('removing old photo')
 		os.remove(file_dir)
 	else:
 		print('unable to remove image')

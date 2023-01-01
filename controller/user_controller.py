@@ -25,12 +25,12 @@ class UserContainer():
 		self.name = user_details.fname + ' ' + user_details.lname
 		# datetime.strftime()
 		self.dob = user_details.dob.strftime('%d/%m/%Y')
-		print('dob', self.dob)
+		#print('dob', self.dob)
 		self.city = user_details.city
 		self.profession = user_details.profession
 		self.profile_photo = user_details.profile_photo
 		self.user_type = user_details.member_type
-		print(self.profile_photo)
+		#print(self.profile_photo)
 		self.num_flwr, self.num_flwing, self.num_post = user_manager.get_user_post_flr_flwing_count(user_id)
 		self.follwers = user_manager.get_user_follower_list(user_id)
 		self.followings = user_manager.get_user_following_list(user_id)
@@ -57,9 +57,9 @@ class UserContainer():
 
 # @app.route('/', methods=['GET'])
 def c_login(request) -> str:
-	print('login request received')
+	#print('login request received')
 	form_data = request.form
-	print(form_data)
+	#print(form_data)
 	return render_template('login.html')
 
 
@@ -87,14 +87,14 @@ def c_add_user(form_data) -> list:
 		This function will add user return true if successfully executed
 	'''
 	# form_data = request.form
-	print(form_data)
+	#print(form_data)
 	db_result = False
 
 	try:
 		user_id = form_data['user_id'] 
 		user_id.lower()
 		if user_id == '':
-			# print('empty id received')
+			# #print('empty id received')
 			warn_str = 'empty id received'
 			return db_result, warn_str
 		if user_manager.is_user_exists(form_data['user_id']):
@@ -124,7 +124,7 @@ def c_add_user(form_data) -> list:
 			raise Exception('unable added into database error from model')
 		printDebug(log)
 	except Exception as e:
-		# print('Controller: Exception arrived during addtion', e)
+		# #print('Controller: Exception arrived during addtion', e)
 		printDebug("Exception arrived during addition " + str(e))
 		return db_result, 'Unable to add User please try after some time'
 	else:
@@ -147,33 +147,33 @@ def c_edit_user(user_id,form_data, files) ->list:
 			return False, 'Profession should not contain any special characters'
 		profile_photo = None
 		file = files['image']
-		print(file)
+		#print(file)
 		if file.filename == '':
 			print('no profile photo provided continuing with older one')
 		else: 
 			if allowed_file(file.filename):
 				f_name = create_file_name(user_id, file.filename)
 				file_dir = os.path.join('profile/',  f_name)
-				print('updated file dir: ',file_dir)
+				#print('updated file dir: ',file_dir)
 				profile_photo = file_dir
-		print('profile photo is:', profile_photo)
+		#print('profile photo is:', profile_photo)
 		is_success, reason = user_manager.edit_profile_details(user_id, fname, lname, city, profession, profile_photo= profile_photo)
 		if is_success:
 			if profile_photo:
 				file_dir = os.path.join(UPLOAD_FOLDER, profile_photo)
-				print('updating profile photo', file_dir)
-				print(file)
+				#print('updating profile photo', file_dir)
+				#print(file)
 				file.save(file_dir)
-				print('old_image url:', old_image_url)
+				#print('old_image url:', old_image_url)
 				if old_image_url != user_manager.DEFUALT_PROFILE:
-					print('removing old profile photo')
+					#print('removing old profile photo')
 					try:
 						os.remove(os.path.join(UPLOAD_FOLDER, old_image_url))
 					except Exception as e:
 						print('unable to remove old photo: ', e)
 			return True, ''
 		else:
-			print('upadation failed')
+			#print('upadation failed')
 			return is_success, reason
 
 def c_login_validation(userId:str, password:str)-> list:
@@ -187,10 +187,10 @@ def c_login_validation(userId:str, password:str)-> list:
 	else:
 		return [False, 'User not found']
 	if user_manager.is_user_pwd_correct(userId, password):
-		print(' Validatio complete returing ture')
+		#print(' Validatio complete returing ture')
 		return [True, ""]
 	else:
-		print('incorrect password')
+		#print('incorrect password')
 		return [False, "Incorrect Password"]
 
 def c_get_raw_user_following_list(user_id:str)->list:
@@ -225,7 +225,7 @@ def get_user_list_by_name(name:str)->list:
 	for x in l:
 		obj = create_user_container(x.user_id)
 		c_l.append(obj)
-	print('search result', l)
+	#print('search result', l)
 	return c_l
 
 def c_get_user_follower_list(user_id:str)->list:
@@ -253,7 +253,7 @@ def c_delete_user(user_id:str)->bool:
 		image_url = user_details.image_url
 		if image_url != user_manager.DEFUALT_PROFILE:
 			image_dir = os.path.join(UPLOAD_FOLDER, image_url)
-			print(image_dir)
+			#print(image_dir)
 			try:
 				os.remove(image_dir)
 			except Exception as e:
