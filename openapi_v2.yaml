@@ -2,18 +2,27 @@ openapi: 3.0.0
 info:
   title: post CRUD Api
   description: This will help to perform CRUD Api on post 
+  contact:
+    email: 21f3002102@student.onlinedegree.iitm.ac.in
   version: 1.0.0
   
 servers:
   - url: http://localhost:5500/api
     description: 'site will be hosted on local host'
-    
+tags:
+  - name: user_id
+    description: 'user_id'
+  - name: post_id
+    description: 'post_id'
 paths:
 
   /user/make_admin/{user_id}:
     get:
       summary: return a list of substring
       description: Optionally we are defining it
+      operationId: makeadmin
+      tags:
+        - user_id
       parameters:
         - name: user_id
           in: path
@@ -38,6 +47,9 @@ paths:
     delete:
         summary: return a list of substring
         description: Optionally we are defining it
+        operationId: remove_admin
+        tags:
+          - user_id
         parameters:
           - name: user_id
             in: path
@@ -65,6 +77,9 @@ paths:
     get:
       summary: return a list of substring
       description: Optionally we are defining it
+      operationId: get_post_list
+      tags:
+        - user_id
       parameters:
         - name: user_id
           in: path
@@ -90,6 +105,9 @@ paths:
     get:
       summary: return a list of substring
       description: Optionally we are defining it
+      operationId: getpost_details
+      tags:
+        - post_id
       parameters:
         - name: user_id
           in: path
@@ -119,6 +137,9 @@ paths:
     delete:
       summary: 'delete existing post'
       description: Delete the post which is mentioned
+      operationId: delete_post
+      tags:
+        - post_id
       parameters:
           - name: user_id
             in: path
@@ -145,11 +166,13 @@ paths:
           description: 'Unable to find user id'
         '500':
           description: 'Internal server error'
-
   /user/like/{user_id}/{post_id}:
     get:
       summary: return a list of substring
       description: Optionally we are defining it
+      operationId: add_like
+      tags:
+        - post_id
       parameters:
         - name: user_id
           in: path
@@ -179,6 +202,9 @@ paths:
     delete:
         summary: 'delete existing post'
         description: Delete the post which is mentioned
+        operationId: remove_like
+        tags:
+          - post_id
         parameters:
             - name: user_id
               in: path
@@ -210,6 +236,9 @@ paths:
     get:
       summary: return a list of substring
       description: Optionally we are defining it
+      operationId: add_flag
+      tags:
+         - post_id
       parameters:
         - name: user_id
           in: path
@@ -239,6 +268,9 @@ paths:
     delete:
         summary: 'delete existing post'
         description: Delete the post which is mentioned
+        operationId: remove_flag
+        tags:
+          - post_id
         parameters:
             - name: user_id
               in: path
@@ -265,6 +297,10 @@ paths:
             description: 'Unable to find user id'
           '500':
             description: 'Internal server error'
+
+
+
+
 
 
 
@@ -317,33 +353,9 @@ components:
         is_success:
           type: boolean
           example: true
-    
-    post_likes:
-      type: object
-      properties:
-        likes:
-          type: integer
-          example: 12
-
-    post_flags:
-      type: object
-      properties:
-        flags:
-          type: integer
-          example: 12
-
-
-    likes:
-      type: integer
-    liker:
-      type: string
-    flags:
-      type: integer
-    flager:
-      type: string
-    user_id: 
-      type: string
     post_id:
       type: string
-    f_user_id:
-      type: string
+    post_likes:
+      type: integer
+    post_flags:
+      type: integer
