@@ -12,7 +12,11 @@ class UserIdPassword(db.Model):
 	password = db.Column(db.String, nullable= False)
 	# user_details = db.relationship('UserDetails', foreign_key = ['user_details.user_id'], backref='user_id_password', lazy=True)
 	user_details = db.relationship('UserDetails', backref='user_id_password', cascade="all, delete-orphan", lazy=True)
-
+	user_follower = db.relationship('UserFollowers', backref='follower_ids',  cascade="all, delete-orphan", lazy=True, primaryjoin= 'UserIdPassword.user_id == UserFollowers.user_id')
+	user_following = db.relationship('UserFollowing', backref='following_ids',  cascade="all, delete-orphan", lazy=True, primaryjoin= 'UserIdPassword.user_id == UserFollowing.user_id')
+	user_follower = db.relationship('UserFollowers', backref='follower_ids_2',  cascade="all, delete-orphan", lazy=True, primaryjoin= 'UserIdPassword.user_id == UserFollowers.follower_id')
+	user_following = db.relationship('UserFollowing', backref='following_ids_2',  cascade="all, delete-orphan", lazy=True, primaryjoin= 'UserIdPassword.user_id == UserFollowing.following_id')
+	user_comment_c = db.relationship('PostCommentTable', backref='comment',  cascade="all, delete-orphan", lazy=True, primaryjoin= 'UserIdPassword.user_id == PostCommentTable.commenter_id')
 
 class UserDetails(db.Model):
 	__tablename__ = "user_details"

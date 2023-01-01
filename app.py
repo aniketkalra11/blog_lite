@@ -90,15 +90,60 @@ def user_home_page(user_id):
 	if user_id in list(session.keys()):
 		print('user found logging in to home page')
 		if c_is_admin_user(user_id):
-			following_list = user_manager.get_all_uesr()
-			posts = c_get_home_page_post(user_id, following_list)
+			# following_list = user_manager.get_all_uesr()
+			# posts = c_get_home_page_post(user_id, following_list)
+			return redirect(url_for('admin_home_page', admin_id= user_id))
 		else:
 			following_list = c_get_user_following_list(user_id)
 			posts = c_get_home_page_post(user_id, following_list)
+			u_posts = c_get_user_post(user_id)
+			posts.extend(u_posts)
+			posts.sort(reverse=True)
 		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts)
 	else:
 		print('no current user found redirecting to login page')
 		return redirect(url_for('signin'))
+
+
+@app.route('/admin/<string:admin_id>', methods=['GET'])
+def admin_home_page(admin_id):
+	flash('welcome admin')
+	raw_users = user_manager.get_all_uesr()
+	users = []
+	for r_u in raw_users:
+		u_obj = create_user_container(r_u.user_id)
+		users.append(u_obj)
+	return render_template('admin_home_page.html', users = users, admin_id= admin_id)
+
+@app.route('/admin/delete/<string:admin_id>/<string:user_id>', methods=['GET'])
+def admin_delete_user(admin_id, user_id):
+	print('adminId:', admin_id, " user id:", user_id)
+	if c_is_admin_user(admin_id) and admin_id in list(session.keys()):
+		posts = c_get_user_post(user_id)
+		for p in posts:
+			try:
+				is_success, err = c_delete_post(user_id, p.post_id)
+				if not is_success:
+					print('unable to remove post', err)
+			except Exception as e:
+				print('exception arrived while removing posts', e)
+				print(p)
+		print('admin verification complete deleting user',)
+		print(c_delete_user(user_id), 'delete result')
+	return redirect(url_for('admin_home_page', admin_id= admin_id))
+
+@app.route('/admin/profile/view/<string:admin_id>/<string:user_id>', methods=['GET'])
+def admin_view_profile(admin_id, user_id):
+	u_d = c_get_user_details(user_id)
+	posts = c_get_user_post(user_id)
+	return render_template('admin_profile_view.html', user_id= user_id, profile = u_d, posts = posts, admin_id=admin_id)	
+
+@app.route('/admin/profile/delete/post/<string:admin_id>/<string:user_id>/<string:post_id>', methods=['GET'])
+def admin_delete_post(admin_id, user_id, post_id):
+	is_success, warn = c_delete_post(user_id, post_id)
+	if not is_success:
+		flash(warn)
+	return redirect(url_for('admin_view_profile', admin_id=admin_id, user_id=user_id))
 
 @app.route('/user/signup', methods=['GET', 'POST'])
 def user_sign_up():
@@ -180,6 +225,8 @@ def view_user_profile(user_id:str, view_id:str):
 	posts = c_get_user_post(view_id)
 	posts = c_update_user_like_dislike_flags(user_id, posts)
 	return render_template('view_user_profile.html', user_id= user_id, profile = u_d, posts = posts, view_id = view_id)
+
+
 
 
 @app.route('/user/search/<string:user_id>', methods=['GET'])

@@ -1,4 +1,4 @@
-'''
+'''password
 	This will work as the interface between controller and model
 	all the database related action are performed by this interface
 	it will provide ready to use fuctions using that we will directly add to user
@@ -39,10 +39,7 @@ class UserModelManager():
 				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profession= profession)
 			else:
 				print('profession is not available skipping it')
-				(y, m, d) = [int(x) for x in dob.split('-')]
-
-				d_t = date(y, m, d)
-				user_details = UserDetails(fname=fname, lname= lname, dob= d_t, city=city)
+				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city)
 			db.session.add(user_details)
 			print('adding user details')
 
@@ -182,10 +179,11 @@ class UserModelManager():
 		return user_list
 
 	#* edit section starting
-	def edit_profile_details(self, user_id:str, password:str, fname:str, lname:str, city:str, profession:str, profile_photo:str = None)->list:
+	def edit_profile_details(self, user_id:str, fname:str, lname:str, city:str, profession:str, profile_photo:str = None, password:str = None)->list:
 		try:
 			u_d = self.get_user_details(user_id)
-			u_d.password = password
+			if password:
+				u_d.password = password
 			u_d.fname = fname
 			u_d.lname = lname
 			u_d.city = city
@@ -269,3 +267,35 @@ class UserModelManager():
 			db.session.rollback()
 			return False
 		return True
+	
+	def delete_user(self, user_id:str)->bool:
+		user_id_pwd = UserIdPassword.query.filter_by(user_id = user_id).first()
+		user_f_c = UserPostAndFollowerInfo.query.filter_by(user_id = user_id).first()
+		#updating user following follwer count
+		user_fing = UserFollowing.query.filter_by(user_id = user_id).all()
+		for u in user_fing:
+			try:
+				print(u)
+				self.remove_user_follower(u.following_id, user_id)
+			except Exception as e:
+				print('error otnrason', e)
+				pass
+		user_flwr = UserFollowers.query.filter_by(user_id = user_id).all()
+		for u in user_flwr:
+			print(u)
+			try:
+				self.remove_user_following(u.follower_id, user_id)
+			except Exception as e:
+				print('error stneirasn ', e)
+				pass
+		if user_id_pwd and user_f_c:
+			try:
+				db.session.delete(user_id_pwd)
+				db.session.delete(user_f_c)
+				print('deleting user: ', user_id)
+			except Exception as e:
+				print('exception arrived while deleteing ', e)
+				db.session.rollback()
+			else:
+				print('chages commited ', user_id)
+				db.session.commit()

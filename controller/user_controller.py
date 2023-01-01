@@ -92,6 +92,7 @@ def c_add_user(form_data) -> list:
 
 	try:
 		user_id = form_data['user_id'] 
+		user_id.lower()
 		if user_id == '':
 			# print('empty id received')
 			warn_str = 'empty id received'
@@ -117,7 +118,7 @@ def c_add_user(form_data) -> list:
 											fname= fname, lname= lname, dob= d_dob, city= city, profession= profession)
 		else:
 			db_result = user_manager.add_user(userId= user_id, password= password, 
-											fname= fname, lname= lname, dob= dob, city= city)
+											fname= fname, lname= lname, dob= d_dob, city= city)
 		log = "Addtion result "+ str(db_result)
 		if not db_result:
 			raise Exception('unable added into database error from model')
@@ -133,7 +134,7 @@ def c_add_user(form_data) -> list:
 def c_edit_user(user_id,form_data, files) ->list:
 		old_details = user_manager.get_user_details(user_id)
 		old_image_url = old_details.profile_photo
-		password = form_data['password']
+		# password = form_data['password']
 		fname = form_data['fname']
 		lname = form_data['lname']
 		if not name_validation(fname) or not name_validation(lname):
@@ -156,7 +157,7 @@ def c_edit_user(user_id,form_data, files) ->list:
 				print('updated file dir: ',file_dir)
 				profile_photo = file_dir
 		print('profile photo is:', profile_photo)
-		is_success, reason = user_manager.edit_profile_details(user_id, password, fname, lname, city, profession, profile_photo= profile_photo)
+		is_success, reason = user_manager.edit_profile_details(user_id, fname, lname, city, profession, profile_photo= profile_photo)
 		if is_success:
 			if profile_photo:
 				file_dir = os.path.join(UPLOAD_FOLDER, profile_photo)
@@ -177,11 +178,14 @@ def c_edit_user(user_id,form_data, files) ->list:
 
 def c_login_validation(userId:str, password:str)-> list:
 	result = []
+	userId.lower()
 	if userId == "":
 		printDebug('Empty userId received')
 		return [False, "empty user Id"]
 	if user_manager.is_user_exists(userId):
 		print(userId, ' found')
+	else:
+		return [False, 'User not found']
 	if user_manager.is_user_pwd_correct(userId, password):
 		print(' Validatio complete returing ture')
 		return [True, ""]
@@ -207,8 +211,11 @@ def get_user_name(user_id:str)->str:
 	return str(u_d.fname) + ' ' +str(u_d.lname)
 
 def c_is_admin_user(user_id:str)->bool:
-	u_d = user_manager.get_user_details(user_id)
-	return True if u_d.member_type == 'ADMIN' else False
+	try:
+		u_d = user_manager.get_user_details(user_id)
+		return True if u_d.member_type == 'ADMIN' else False
+	except:
+		return False
 	
 
 def get_user_list_by_name(name:str)->list:
@@ -238,3 +245,17 @@ def c_get_user_following_list(user_id:str)->list:
 		r_l.append(obj)
 	r_l.sort()
 	return r_l
+
+def c_delete_user(user_id:str)->bool:
+	user_details = user_manager.get_user_details(user_id)
+	is_success  = user_manager.delete_user(user_id)
+	if is_success:
+		image_url = user_details.image_url
+		if image_url != user_manager.DEFUALT_PROFILE:
+			image_dir = os.path.join(UPLOAD_FOLDER, image_url)
+			print(image_dir)
+			try:
+				os.remove(image_dir)
+			except Exception as e:
+				print('unable to remove image', e)
+	return is_success

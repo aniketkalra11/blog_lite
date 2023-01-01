@@ -304,12 +304,12 @@ class PostModelManager():
             raise Exception('None found')
         try:
             db.session.delete(item)
-            self.printDebug('adding to db')
+            self.printDebug('removing to db')
         except Exception as e:
             print('excepiton arrived during comment addition', e)
             db.session.rollback()
         else:
-            self.printDebug('Comment added successfully')
+            self.printDebug('Commit successfully')
             # print('comment added successfully')
             db.session.commit()
     
