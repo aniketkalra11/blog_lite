@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin home page</title>
+</head>
+<body>
+    {% extends 'flesh_temp.html' %}
+	{% block body %}
+	<div class="container">
+		
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+    <h1>Welcome admin </h1>
+    
+        <table id="user table">
+            <tr>
+                <th>S no</th>
+                <th>User Id</th>
+                <th>Name</th>
+                <th>City</th>
+                <th>DOB</th>
+                <th>Profession</th>
+                <th>User_type</th>
+                <th>View Profile</th>
+                <th>Delete</th>
+                
+            </tr>
+            {% for i in range(users | length) %}
+                <tr>
+                    <td>{{i}}</td>
+                    <td>{{users[i].user_id}}</td>
+                    <td>{{users[i].name}}</td>
+                    <td>{{users[i].city}}</td>
+                    <td>{{users[i].dob}}</td>
+                    <td>{{users[i].profession}}</td>
+                    <td>{{users[i].user_type}}</td>
+                    <td><a href="{{ url_for('admin_view_profile', user_id = users[i].user_id, admin_id=admin_id )}}">view profile</a></td>
+                    <td><form onsubmit="return confirm('Do you really want to Delete this User?');" action="{{url_for('admin_delete_user', user_id= users[i].user_id, admin_id= admin_id)}}" method="get">
+                        <button class="btn btn-danger" action="submit">Delete User</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <br>
+        <h6><a href="{{url_for('signout', user_id=admin_id)}}">Logout</a></h6>
+{% endblock %}
+</body>
+</html>

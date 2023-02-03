@@ -88,7 +88,7 @@ function add_flag(user_id, post_id){
         }
         else if (request.status == 403){
             console.log('already flagged post found')
-            alert('you can\'t like a post that you already like')
+            alert('you can\'t flag a post that you already like')
         }
         else{
             alert('unable to process your request please try after some time')

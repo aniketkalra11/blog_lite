@@ -91,6 +91,56 @@ class PostFlagApi(Resource):
         else:
             return self.get_num_of_flags(post_id), 201                
 
+post_details = {
+    'user_id': fields.String,
+    'post_id': fields.String,
+    'title': fields.String,
+    'caption': fields.String,
+    'timestamp': fields.DateTime,
+    'image_url': fields.String
+}
+details = {
+    'is_success': fields.Boolean,
+    'post_id': fields.String
+}
+class PostCRUDApi(Resource):
+    @marshal_with(post_details)
+    def get(self, user_id, post_id):
 
-class UserFollowUnFollowApi(Resource):
-    pass
+        try:
+            p_id = p_m_m.get_post_id_tuple(post_id)
+            if p_id.user_id != user_id:
+                return '', 404
+            p = p_m_m.get_post_content(post_id)
+            print(p)
+            d = {
+                'user_id': user_id,
+                'post_id': p.post_id,
+                'title': p.title,
+                'caption': p.caption,
+                'timestamp': p.timestamp,
+                'image_url': p.image_url
+            }
+        except Exception as e:
+            print('error arrived', e)
+            return '', 404
+        return d, 200
+    @marshal_with(details)
+    def delete(self, user_id, post_id):
+        print('deleteing post ', post_id)
+        p = p_m_m.get_post_id_tuple(post_id)
+        try:
+            if p.user_id != user_id:
+                return 'no allowed', 403
+            try:
+                p_m_m.remove_post(user_id, post_id)
+            except Exception as e:
+                return 'no allowed', 403
+        except: 
+            return {'is_success': False, 'post_id': post_id}, 404
+        d = {
+            'is_success': True,
+            'post_id': post_id
+        }
+        print('post removed')
+        return d, 202

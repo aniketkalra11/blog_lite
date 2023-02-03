@@ -4,6 +4,7 @@ blog lite application development for project september tearm
 Requirements:- 
 1. Flask, Jinja2, Flask_session and BootStrep Minimal css precompiled file for basic aesthtics
 (please refer requirement.txt for more details)
+(please refer requirement.txt for more details)
 
 
 *** Before Running the application Please ensure that Following Files Must exists
@@ -20,6 +21,7 @@ Plese Follow instruction for start application
 2. now open any web browser ('Google Chrome or Firefox prefered') and type following address in the urlbar 'http://localhost:5000/'
 #Now application login page should be visible to you if not, Please check app.py is running properly or you entered the correct address
 
+3. If you are new, please select signup otherwise enter your login credential and click on signin
 3. If you are new, please select signup otherwise enter your login credential and click on signin
 # if your credential are correct then you will be redirected to dashboard otherwise a proper alert message will published
 
@@ -49,7 +51,9 @@ Plese Follow instruction for start application
 
 10. In profile Section you can view your follower list Following list and can update your profile details like:
   #Name, city, Profession
+  #Name, city, Profession
 
+11. An 'ADMIN' User can Watch all the posts delete the posts and delete the user 
 11. An 'ADMIN' User can Watch all the posts delete the posts and delete the user 
 
 #12. CRUD Api on user and posts
