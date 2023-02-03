@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{fname}}</title>
+	<link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='user_home.css')}}" rel="stylesheet">
+	<script src="{{url_for('static', filename='js/like_api_call.js')}}"></script>
+</head>
+<style>
+	.post_create_button{
+		position: fixed;
+		bottom: 1vh;
+		left: 85vw;
+		border-radius: 50%;
+	}
+	#post_description{
+		text-align: left;
+		margin-left: 13%;
+	}
+	#post_user_id{
+		text-decoration: none;
+	}
+	.post_user_id{
+		text-align: left;
+		margin-left: 15%;
+		margin-top: 1vh;
+		margin-bottom: 1vh;;
+	}
+	#like:hover{
+		background: lightblue;
+	}
+	#flag:hover{
+		background: lightblue;
+	}
+
+    /* User Profile starting */
+    .main_body_container{
+        display: flex;
+        flex-direction: row;
+		margin: 0px;
+		width: 30vw;
+    }
+    .heading{
+        text-align: center;
+    }
+	.profile_photo{
+		height: 10vw;
+		width: 20vw;
+	}
+	.profile_container{
+		flex-grow: 1;
+		margin-top: 12vh;
+		
+	}
+	.bolgs_main{
+		flex-grow: 7;
+	}
+	.blog_container{
+		width: 60vw;
+	}
+</style>
+<script src="{{url_for('static', filename='js/like_api_call.js')}}"></script>
+<body>
+	{% extends 'flesh_temp.html' %}
+	{% block body %}
+	<div class="container">
+		
+			{% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
+	</div>
+	<div>
+		<nav class="py-2 bg-light border-bottom">
+			<div class="container d-flex flex-wrap">
+			  <ul class="nav me-auto">
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= admin_id)}}" class="nav-link link-dark px-2 active" aria-current="page"><img src="{{url_for('static', filename='img/blog_lite_logo.png')}}" style="width: 2vw; height: 3vh;"/></a></li>
+				<li class="nav-item"><a href="{{url_for('user_home_page', user_id= admin_id)}}" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
+			  </ul>
+			  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" method="get" action="{{url_for('search', user_id=user_id)}}">
+				<ul class="nav">
+				<li><input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="search"></li>
+				<li><button class="btn btn-secondary nav-item" action="submit">search</button></li>
+				</ul>
+			  </form>
+			  <ul class="nav">
+				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{user_id}}'s Profile</a></li>
+				<li class="nav-item"><a href="{{url_for('signout', user_id = user_id)}}" class="nav-link link-dark px-2">Logout</a></li>
+			  </ul>
+			</div>
+		  </nav>
+	</div>
+    <div class="container-fluid heading">
+    </div>
+	<div class="container main_body_container">
+		<div class="container-fluid profile_container">
+			<div class="card" style="width: 18rem;">
+				<img class="card-img-top" src="{{url_for('static', filename=profile.profile_photo)}}" alt="Card image cap">
+				<div class="card-body">
+					<h5 class="card-title">{{profile.name}}</h5>
+					<p class="card-text"><strong>Date Of Birth:</strong> {{profile.dob}}  <br><strong>City:</strong> {{profile.city}}  <br>
+					{{ (('<strong> Profession:  </strong>' + ' '  + profile.profession ) if profile.profession != 'NOT_AVAILABLE' else '  ') | safe}}
+					</p>
+				</div>
+				<ul class="list-group list-group-flush">
+				<li class="list-group-item"><strong>Number of Followers</strong> {{profile.num_flwr}}</li>
+				<li class="list-group-item"><strong>Number of Following</strong> {{profile.num_flwing}}</li>
+				<li class="list-group-item"><strong>Number of Posts</strong> {{profile.num_post}}</li>
+				<!-- <li class="list-group-item"><a href="{{url_for('edit_user_profile', user_id = user_id)}}" class="card-link">Edit Profile</a></li> -->
+				</ul>
+				
+			</div>
+		</div>
+	<!-- ?: user profile post without delete -->
+			<div class="container bolgs_main">
+				<div class="container blog_container">
+					<h1>Post</h1>
+					{% for post in posts %}
+						<div class="container image_post">
+							<div class="container post_user_id">
+								<a href="{{url_for('view_user_profile', user_id=user_id, view_id= post.user_id)}}" id="post_user_id"><h3>{{post.user_name}}</h3></a>
+							</div>
+							{% if post.image_url != 'NOT_AVAILABLE' %}
+								<div class="container main_image">
+									<img class="post_image" src="{{url_for('static', filename=('resources/img/' + post.image_url)  )}}" alt="main_image" id="post_img">
+								</div>
+							{% endif %}
+							<div class="container">
+								<h3 id="title">{{post.title}}</h3>
+								<p id="post_description">{{post.caption | safe}}</p>
+							</div>
+							<div class="container like_flag_container">
+								<div class="container">
+									<div class="container" id="{{post.post_id}}_like"
+									style="display: {{'none' if post.is_already_liked else 'block' }};">
+										<a href="#" onclick="add_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" value = "Something" ><img src="{{url_for('static', filename='icons/star.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+									</div>
+									<div class="container" id="{{post.post_id}}_remove_like" style="display: {{ 'block' if post.is_already_liked else 'none' }};">
+										<a href="#" onclick="delete_like(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/star-fill.svg')}}" alt="like" id="like" class="interaction_marker"></a>
+									</div>
+									<span id="{{post.post_id}}_like_count">{{post.likes}}</span>
+								</div>
+								<div class="container">
+									<div class="contianer" id="{{post.post_id}}_flag" style="display: {{'none' if post.is_already_flagged else 'block'}};">
+										<a href= "#" onclick="add_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false" ><img src="{{url_for('static', filename='icons/flag.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+									</div>
+									<div class="contianer" id="{{post.post_id}}_remove_flag" style="display: {{'block' if post.is_already_flagged else 'none'}};">
+										<a href= "#" onclick="delete_flag(user_id= '{{user_id}}', post_id= '{{post.post_id}}'); return false"><img src="{{url_for('static', filename='icons/flag-fill.svg')}}" alt="flag" id="flag" class="interaction_marker"></a>
+									</div>
+									<span id="{{post.post_id}}_flag_count">{{post.flags}}</span>
+								</div>
+							</div>
+							<div class="container post_comment_box">
+								<div class="container header_title">
+									<h6 id="minor_heading">Comments: -</h6>
+								</div>
+								<div class="container comment_content">
+									{% for comment in post.comments %}
+										<div class="container single_comment">
+											<div class="container">
+												<strong>{{comment.commenter_name}}</strong>
+											</div>
+											<div class="container">
+												<p>
+													{{comment.comment_content}}
+												</p>
+											</div>
+										</div>
+									{% endfor %}
+									<div class="container single_comment">
+										<div class="container">
+											<strong>{{user_id}}</strong>
+										</div>
+										<div class="container">
+											<form method="post" action="{{url_for('add_post_comment', user_id=user_id, post_id= post.post_id)}}" > <!-- TODO: write here-->
+												<input type="text" placeholder="Write your comment here...." name="content" required>
+												<button type="submit">Submit</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="container like_flag_container">
+								<div class="container" id="{{post.post_id}}_like">
+			
+								</div>
+								<div class="contianer" id="{{post.post_id}}_remove_flag">
+									<form onsubmit="return confirm('Do you really want to Delete this post?');" action="{{url_for('admin_delete_post', admin_id=admin_id, user_id= user_id, post_id= post.post_id)}}" method="get">
+										<button class="btn btn-danger" action="submit">Delete Post</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			
+		
+			</div>
+	</div>
+	
+	{% endblock %}
+</body>
+</html>

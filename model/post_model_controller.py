@@ -29,13 +29,13 @@ class PostModelManager():
         # t_date = date.today()
         t_date = datetime.now()
         day = t_date.date
-        print(type(day))
+        #print(type(day))
         month = t_date.month
-        print(month)
+        #print(month)
         year = t_date.year #?: we will check wheather it is required or not
         time = t_date.strftime('%H_%M_%S')
         id = user_id +  "_" + time
-        print('final id is:', id)
+        #print('final id is:', id)
         return id
     def create_post_comment_id(self, post_id:str)->str:
         t_date = datetime.now()
@@ -44,7 +44,7 @@ class PostModelManager():
         year = t_date.year #?: we will check wheather it is required or not
         time = t_date.strftime('%H_%M_%S')
         id = post_id + "_" + time
-        print('final id is:', id)
+        #print('final id is:', id)
         return id
 
     def create_comment_id(self, post_id, commenter_id)->str:
@@ -84,7 +84,7 @@ class PostModelManager():
             db.session.rollback()
             return False
         else:
-            print('Commiting changes')
+            #print('Commiting changes')
             db.session.commit()
             return True
     
@@ -210,7 +210,7 @@ class PostModelManager():
     def get_comments_from_post_id(self, post_comment_id:str)->list:
         self.printDebug('post id receving as: ' + post_comment_id)
         comments = PostCommentTable.query.filter_by(post_comment_id = post_comment_id).all()
-        print('comments received as:', comments)
+        #print('comments received as:', comments)
         return (comments)
 
     def get_comment_from_comment_id(self, comment_id:str):
@@ -218,31 +218,31 @@ class PostModelManager():
         return comment if comment else None
 
     def get_post_id_tuple(self, post_id):
-        print('Post id recevied as:', post_id)
+        #print('Post id recevied as:', post_id)
         return PostId.query.filter_by(post_id= post_id).first()
 
     def get_post_interaction(self, post_id):
-        print('Post id recevied as:', post_id)
+        #print('Post id recevied as:', post_id)
         return PostInteraction.query.filter_by(post_id= post_id).first()
     
     def get_post_content(self, post_id):
-        print('Post id recevied as:', post_id)
+        #print('Post id recevied as:', post_id)
         return PostContent.query.filter_by(post_id= post_id).first()
     
     def get_user_post(self, user_id:str)->list:
-        print('getting user id:', user_id)
+        #print('getting user id:', user_id)
         posts = PostId().query.filter_by(user_id = user_id).all()
-        print('received posts for user:',user_id, "posts:", posts)
+        #print('received posts for user:',user_id, "posts:", posts)
         return posts
     #* Single Word query function:
     def is_user_already_liked(self, user_id, post_id):
         p_l = PostLikeTable.query.filter_by(post_id= post_id, liker_id = user_id).first()
-        print(p_l)
+        #print(p_l)
         return True if p_l else False
 
     def is_user_already_flaged(self, user_id, post_id):
         f_l = PostFlagTable.query.filter_by(post_id= post_id, flagger_id= user_id).first()
-        print(f_l)
+        #print(f_l)
         return True if f_l else False
 
     #* Remove section starting
@@ -292,11 +292,11 @@ class PostModelManager():
             db.session.add(item)
             self.printDebug('adding to db')
         except Exception as e:
-            print('excepiton arrived during comment addition', e)
+            #print('excepiton arrived during comment addition', e)
             db.session.rollback()
         else:
             self.printDebug('Comment added successfully')
-            # print('comment added successfully')
+            # #print('comment added successfully')
             db.session.commit()
     
     def remove_from_db(self, item):
@@ -304,13 +304,13 @@ class PostModelManager():
             raise Exception('None found')
         try:
             db.session.delete(item)
-            self.printDebug('adding to db')
+            self.printDebug('removing to db')
         except Exception as e:
-            print('excepiton arrived during comment addition', e)
+            #print('excepiton arrived during comment addition', e)
             db.session.rollback()
         else:
-            self.printDebug('Comment added successfully')
-            # print('comment added successfully')
+            self.printDebug('Commit successfully')
+            # #print('comment added successfully')
             db.session.commit()
     
     #* logic basically for get number of likes and dislikes

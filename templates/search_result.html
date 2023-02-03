@@ -46,14 +46,14 @@
 				</ul>
 			  </form>
 			  <ul class="nav">
-				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{user_id}}'s Profile</a></li>
+				<li class="nav-item"><a href="{{url_for('user_profile', user_id= user_id)}}" class="nav-link link-dark px-2">{{user.name}}'s Profile</a></li>
 				<li class="nav-item"><a href="{{url_for('signout', user_id = user_id)}}" class="nav-link link-dark px-2">Logout</a></li>
 			  </ul>
 			</div>
 		  </nav>
 	</div>
 	<div class="contianer search_body">
-		<h2>Serach result {{query}}</h2>
+		<h2>Search result {{query}}</h2>
 		{% if users|length == 0 %}
 		<h2>No user Found</h2>
 		{% endif%}

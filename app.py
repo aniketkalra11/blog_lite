@@ -90,15 +90,62 @@ def user_home_page(user_id):
 	if user_id in list(session.keys()):
 		print('user found logging in to home page')
 		if c_is_admin_user(user_id):
-			following_list = user_manager.get_all_uesr()
-			posts = c_get_home_page_post(user_id, following_list)
+			# following_list = user_manager.get_all_uesr()
+			# posts = c_get_home_page_post(user_id, following_list)
+			return redirect(url_for('admin_home_page', admin_id= user_id))
 		else:
 			following_list = c_get_user_following_list(user_id)
 			posts = c_get_home_page_post(user_id, following_list)
-		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts)
+			u_posts = c_get_user_post(user_id)
+			posts.extend(u_posts)
+			posts.sort(reverse=True)
+		user = create_user_container(user_id)
+		return render_template('user_home_jinja.html', user_id = user_id, fname= user_id, posts= posts, user= user)
 	else:
 		print('no current user found redirecting to login page')
 		return redirect(url_for('signin'))
+
+
+@app.route('/admin/<string:admin_id>', methods=['GET'])
+def admin_home_page(admin_id):
+	flash('welcome admin')
+	raw_users = user_manager.get_all_uesr()
+	users = []
+	for r_u in raw_users:
+		u_obj = create_user_container(r_u.user_id)
+		users.append(u_obj)
+	return render_template('admin_home_page.html', users = users, admin_id= admin_id)
+
+@app.route('/admin/delete/<string:admin_id>/<string:user_id>', methods=['GET'])
+def admin_delete_user(admin_id, user_id):
+	print('adminId:', admin_id, " user id:", user_id)
+	if c_is_admin_user(admin_id) and admin_id in list(session.keys()):
+		posts = c_get_user_post(user_id)
+		for p in posts:
+			try:
+				is_success, err = c_delete_post(user_id, p.post_id)
+				if not is_success:
+					print('unable to remove post', err)
+			except Exception as e:
+				print('exception arrived while removing posts', e)
+				print(p)
+		print('admin verification complete deleting user',)
+		print(c_delete_user(user_id), 'delete result')
+	return redirect(url_for('admin_home_page', admin_id= admin_id))
+
+@app.route('/admin/profile/view/<string:admin_id>/<string:user_id>', methods=['GET'])
+def admin_view_profile(admin_id, user_id):
+	u_d = c_get_user_details(user_id)
+	posts = c_get_user_post(user_id)
+	user = create_user_container(admin_id)
+	return render_template('admin_profile_view.html', user_id= user_id, profile = u_d, posts = posts, admin_id=admin_id, user= user)	
+
+@app.route('/admin/profile/delete/post/<string:admin_id>/<string:user_id>/<string:post_id>', methods=['GET'])
+def admin_delete_post(admin_id, user_id, post_id):
+	is_success, warn = c_delete_post(user_id, post_id)
+	if not is_success:
+		flash(warn)
+	return redirect(url_for('admin_view_profile', admin_id=admin_id, user_id=user_id))
 
 @app.route('/user/signup', methods=['GET', 'POST'])
 def user_sign_up():
@@ -137,7 +184,8 @@ def user_profile(user_id):
 	u_d = c_get_user_details(user_id)
 	posts = c_get_user_post(user_id)
 	print(u_d)
-	return render_template('user_profile.html', user_id= user_id, profile = u_d, posts = posts)
+	user = create_user_container(user_id)
+	return render_template('user_profile.html', user_id= user_id, profile = u_d, posts = posts, user = user)
 
 @app.route('/user/post/<string:user_id>/create_post', methods=['GET', 'POST'])
 def create_post(user_id):
@@ -179,7 +227,10 @@ def view_user_profile(user_id:str, view_id:str):
 	u_d = c_get_user_details(view_id)
 	posts = c_get_user_post(view_id)
 	posts = c_update_user_like_dislike_flags(user_id, posts)
-	return render_template('view_user_profile.html', user_id= user_id, profile = u_d, posts = posts, view_id = view_id)
+	user = create_user_container(user_id)
+	return render_template('view_user_profile.html', user_id= user_id, profile = u_d, posts = posts, view_id = view_id, user= user)
+
+
 
 
 @app.route('/user/search/<string:user_id>', methods=['GET'])
@@ -198,7 +249,8 @@ def search(user_id:str):
 		print('exception arrived', e)
 	# return redirect(url_for('user_home_page', user_id= user_id))
 	# return redirect(url_for('create_post', user_id=user_id))
-	return render_template('search_result.html', user_id= user_id, users= user_list, user_following_list = l_f_id)
+	user = create_user_container(user_id)
+	return render_template('search_result.html', user_id= user_id, users= user_list, user_following_list = l_f_id, user= user)
 
 
 @app.route('/user/post/<string:user_id>/edit_post', methods=['GET', 'POST'])
@@ -232,7 +284,8 @@ def follower_page(user_id):
 	f_l = c_get_user_follower_list(user_id)
 	u_f_l = c_get_raw_user_following_list(user_id)
 	l_f_id = [x.following_id for x in u_f_l]
-	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id)
+	user = create_user_container(user_id)
+	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id, user = user)
 
 @app.route('/user/profile/following/<string:user_id>', methods=['GET'])
 def following_page(user_id):
@@ -240,7 +293,8 @@ def following_page(user_id):
 	f_l = c_get_user_following_list(user_id)
 	u_f_l = c_get_raw_user_following_list(user_id)
 	l_f_id = [x.following_id for x in u_f_l]
-	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id)
+	user = create_user_container(user_id)
+	return render_template('search_result.html', user_id= user_id, users= f_l, user_following_list = l_f_id, user= user)
 
 @app.route('/update/<string:user_id>/profile', methods=['GET', 'POST'])
 def edit_user_profile(user_id:str):
@@ -285,6 +339,15 @@ api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string
 
 from Api.user_follow_api import FollowApi
 api.add_resource(FollowApi, '/api/follow', '/api/follow/<string:user_id>/<string:f_user_id>')
+
+from Api.user_control_api import UserControlApi
+api.add_resource(UserControlApi, '/api/user/make_admin', '/api/user/make_admin/<string:user_id>')
+
+from Api.user_control_api import GetUserPostList
+api.add_resource(GetUserPostList, '/api/user/get_post_list', '/api/user/get_post_list/<string:user_id>')
+
+from Api.post_api import PostCRUDApi
+api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_details/<string:user_id>/<string:post_id>')
 
 #TODO: Comment API
 
