@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from flask_restful import fields, marshal_with, reqparse
+from flask import request
 #!TODO: Add validation in the 
 # from app import session #? Do we really require this
 
@@ -37,7 +38,7 @@ class PostLikeApi(Resource):
         d['likes'] = p_m_m.get_num_likes(post_id)
         return d
     @marshal_with(liker_FB)
-    def get(self, liker_id, post_id):
+    def put(self, liker_id, post_id):
         try:
             if p_m_m.is_user_already_flaged(liker_id, post_id):
                 return 'Unable to like a page which you already flagged', 403
@@ -48,6 +49,19 @@ class PostLikeApi(Resource):
             # pass  # TODO: Raise valid http excpiton
         else:
             return self.get_num_likes(post_id), 201
+        
+    @marshal_with(liker_FB)
+    def get(self, liker_id, post_id):
+        liker_id
+        data = request.data
+        print(data)
+        try:
+            return self.get_num_likes(post_id), 201
+        except Exception as e:
+            print('unable to retrive the number of likes of user')
+            return {'likes': 0}, 500
+
+        
 
     @marshal_with(liker_FB)
     def delete(self, liker_id, post_id):
