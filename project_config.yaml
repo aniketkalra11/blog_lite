@@ -1,0 +1,4 @@
+# * All project related configration will be read from here
+db_file: app_dev_2_test_db.sqlite3
+jinja_mode : false
+api_mode: true

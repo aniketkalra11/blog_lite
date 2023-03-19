@@ -1,3 +1,5 @@
+#!/usr/bin python3
+
 import os
 from flask import Flask, request, session, flash
 from flask_session import Session
@@ -9,6 +11,20 @@ from werkzeug.utils import secure_filename
 from controller.user_controller import *
 from controller.post_controller import *
 from model.model import init_db
+
+import yaml
+
+is_jinja_mode = False
+db_file = ""
+def set_config():
+	global is_jinja_mode, db_file
+	with open('project_config.yaml') as file:
+		doc = yaml.full_load(file)
+		is_jinja_mode = doc['jinja_mode']
+		db_file = doc['db_file']
+		
+
+
 
 
 def generate_random_key():
@@ -355,6 +371,7 @@ api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_detai
 
 
 if __name__ == "__main__":
+	set_config()
 	init_db_main()
 	app.run(host="0.0.0.0")
 	print('applicatio started')
