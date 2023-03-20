@@ -119,7 +119,7 @@ class PostContent(db.Model):
 	post_id = db.Column(db.String, db.ForeignKey('post_id.post_id'), nullable= False, primary_key= True)
 	title = db.Column(db.String, nullable= False)
 	caption = db.Column(db.String(1000), nullable= False, default= NOT_AVAILABLE)
-	timestamp = db.Column(db.DateTime, nullable = False)
+	timestamp = db.Column(db.DateTime, nullable = False, default=getCurDateTime())
 	image_url = db.Column(db.String, default=NOT_AVAILABLE) # This will store location of file in resource folder
 
 class PostInteraction(db.Model):
@@ -143,21 +143,21 @@ class PostCommentTable(db.Model):
 
 	commenter_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False)
 	comment_content = db.Column(db.String(300), nullable= False)
-	time_stamp = db.Column(db.DateTime, nullable= False)
+	time_stamp = db.Column(db.DateTime, nullable= False, default= getCurDateTime())
 
 class PostLikeTable(db.Model):
 	__tablename__ = "post_likes"
 	like_counter= db.Column(db.Integer, autoincrement=True, primary_key= True)
 	post_id = db.Column(db.String, db.ForeignKey('post_interaction.post_id'), nullable= False)
 	liker_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False)
-	time_stamp = db.Column(db.DateTime, nullable=False)
+	time_stamp = db.Column(db.DateTime, nullable=False, default= getCurDateTime())
 
 class PostFlagTable(db.Model):
 	__tablename__ = "post_flags"
 	flag_counter= db.Column(db.Integer, autoincrement=True, primary_key= True)
 	post_id = db.Column(db.String, db.ForeignKey('post_interaction.post_id'), nullable= False)
 	flagger_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False)
-	time_stamp = db.Column(db.DateTime, nullable= False)
+	time_stamp = db.Column(db.DateTime, nullable= False, default= getCurDateTime())
 
 
 def init_db():
