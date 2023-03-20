@@ -114,7 +114,8 @@ def c_create_post(user_id:str, form_data:dict, file) ->list:
 		#print(file_name, 'created')
 		filedir = os.path.join(UPLOAD_FOLDER, file_name)
 		debug_print('file dir is:' + str(filedir))
-		# 
+	else:
+		return False, "Improper file format received"
 
 	is_sucess = p_m_m.add_post(user_id, title=title, caption= caption, imageurl= file_name)
 	if is_sucess:

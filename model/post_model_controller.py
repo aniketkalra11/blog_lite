@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime
 from datetime import date
 from .model import db
@@ -8,6 +9,7 @@ from .model import PostCommentTable
 from .model import PostContent
 from .model import PostFlagTable
 from .model import PostInteraction
+from .misc_utils import getCurDateTime, getTodaysDate
 
 '''
 Post Id Format strategy 
@@ -25,33 +27,23 @@ class PostModelManager():
         self.post_count = 0
         self.debug = ''
 
+    def get_hash_value(self, str2convert:str)->str:
+        return hashlib.sha256(str2convert.encode()).hexdigest()
+
     def create_post_id(self, user_id:str) -> str:
-        # t_date = date.today()
-        t_date = datetime.now()
-        day = t_date.date
-        #print(type(day))
-        month = t_date.month
-        #print(month)
-        year = t_date.year #?: we will check wheather it is required or not
-        time = t_date.strftime('%H_%M_%S')
+        time = getCurDateTime().strftime('%H_%M_%S')
         id = user_id +  "_" + time
-        #print('final id is:', id)
-        return id
+        return self.get_hash_value(id)
+
     def create_post_comment_id(self, post_id:str)->str:
-        t_date = datetime.now()
-        day = str(t_date.date)
-        month = str(t_date.month)
-        year = t_date.year #?: we will check wheather it is required or not
-        time = t_date.strftime('%H_%M_%S')
+        time = getCurDateTime().strftime('%H_%M_%S')
         id = post_id + "_" + time
-        #print('final id is:', id)
-        return id
+        return self.get_hash_value(id)
 
     def create_comment_id(self, post_id, commenter_id)->str:
         t_date = datetime.now()
         id = post_id + '_' + commenter_id + '_' + t_date.strftime('%H_%M_%S')
-        return id
-        
+        return self.get_hash_value(id)
 
     def add_post(self, user_id, title, caption = None, timestamp= datetime.now(), imageurl = None) ->bool:
         user_post_info = UserPostAndFollowerInfo.query.filter_by(user_id = user_id).first()
@@ -61,7 +53,7 @@ class PostModelManager():
         post_id = self.create_post_id(user_id)
         post_comment_id = self.create_post_comment_id(post_id)
         # print('post_id received as:', post_id)
-        self.printDebug(post_id + 'Received as')
+        self.printDebug('Post id Received as: '+ post_id)
         post_id_obj = PostId(user_id = user_id, post_id = post_id)
         post_content_obj = PostContent(post_id = post_id, title= title)
         post_interaction_obj = PostInteraction(post_id = post_id, post_comment_id = post_comment_id)
@@ -103,19 +95,7 @@ class PostModelManager():
         post_interaction.likes = post_interaction.likes + 1
         post_interaction.post_like_data.append(like_data)
         self.add_to_db(post_interaction)
-        # try:
-        #     self.debug = "Adding to data base"
-        #     self.printDebug(self.debug)
-        #     db.session.add(post_interaction)
-        #     self.debug = "Added successfully"
-        # except Exception as e:
-        #     self.debug = 'Exception arrived as:' + e.args
-        #     print(e)
-        #     self.printDebug(self.debug)
-        #     db.session.rollback()
-        # else:
-        #     db.session.commit()
-        #     print('like added successfully')
+
 
     def add_flag(self, post_id, flager_id):
         self.debug = 'getting post as:' + post_id + ', and flagger_id:' + flager_id

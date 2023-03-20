@@ -5,6 +5,7 @@
 	it will not check any input validation
 	*ASSUMING THAT ALL INPUT VALIDATION PERFORMED BY THE CONTROLLER
 '''
+import hashlib
 from datetime import date
 from .model import db 
 from .model import UserIdPassword
@@ -43,7 +44,8 @@ class UserModelManager():
 		'''
 		try:
 			print('Adding new user started')
-			hash_val = hash(password)
+			# hash_val = hash(password)
+			hash_val = hashlib.sha256(password.encode()).hexdigest()
 			print("Hash_value for given password is:", password, " is:", hash_val)
 			user = UserIdPassword(user_id = userId, hash_value = hash_val, name = fname)
 
@@ -94,7 +96,8 @@ class UserModelManager():
 	def is_user_pwd_correct(self, userId:str, password:str) -> bool:
 		#print('for password validation userId receiving as:', userId, 'password as:', password)
 		# user_data = db.session.query(UserIdPassword).filter(UserIdPassword.user_id == userId and UserIdPassword.password == password).first()
-		hash_val = hash(password)
+		# hash_val = hash(password)
+		hash_val = hashlib.sha256(password.encode()).hexdigest()
 		user_data = UserIdPassword.query.filter_by(user_id = userId, hash_value= hash_val).first()
 		#print('user data and password retrived as: ', user_data)
 		return True if user_data else False
