@@ -13,6 +13,12 @@ from .model import UserFollowing
 from .model import UserFollowers
 from .model import UserPostAndFollowerInfo
 
+from .model import LastUserLoginTime
+from .model import UserActiveTime
+
+#Misc functions
+from .misc_utils import getCurDateTime, getTodaysDate
+
 class UserModelManager():
 	'''
 	This class will manage all functionalities and user
@@ -38,6 +44,7 @@ class UserModelManager():
 		try:
 			print('Adding new user started')
 			hash_val = hash(password)
+			print("Hash_value for given password is:", password, " is:", hash_val)
 			user = UserIdPassword(user_id = userId, hash_value = hash_val, name = fname)
 
 
@@ -54,6 +61,15 @@ class UserModelManager():
 			user.user_details.append(user_details)
 			db.session.add(u_f_details)
 
+			#* Adding user last login details
+			l_u_active = LastUserLoginTime(user_id= userId)
+			user.last_user_login.append(l_u_active)
+			db.session.add(u_f_details)
+			print("Adding user last login time")
+			usr_active_time = UserActiveTime(user_id= userId, date= getTodaysDate())
+			user.user_active_time.append(usr_active_time)
+			db.session.add(usr_active_time)
+			print("user active time on website")
 			print('User creation complete')
 
 		except Exception as e:
