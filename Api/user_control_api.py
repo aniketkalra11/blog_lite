@@ -5,6 +5,12 @@ from flask_restful import reqparse
 from flask_restful import marshal
 from model.common_model_object import user_manager
 from model.common_model_object import p_m_m
+from flask import request
+from flask_jwt_extended import create_access_token
+
+#* Importing controllers
+from controller.user_controller import c_login_validation
+from controller.user_behaviour_controller import *
 create_parser = reqparse.RequestParser()
 
 create_parser.add_argument('user_id')
@@ -96,3 +102,46 @@ class GetUserPostList(Resource):
 			'post_ids': d_posts
 		}
 		return d, 201
+
+
+
+
+class CreateUser(Resource):
+	'''
+	This Api class is responsible of creating a new user
+	'''
+	def post(self):
+		pass
+
+
+user_authentication={
+	'is_login_success': fields.Boolean,
+	'token': fields.String,
+	'error': fields.String
+}
+
+class UserAuthenticationApi(Resource):
+	'''
+		This class is responsible for user login and token generation and storage of api
+	'''
+	@marshal_with(user_authentication)
+	def post(self):
+		print('api request received')
+		print('api request', request)
+		form = request.get_json()
+		user_id = form.get('user_id')
+		pwd = form.get('password')
+		print("User id received as: ", user_id)
+		print("and Password is: ", pwd)
+		result, err = c_login_validation(user_id, pwd)
+		token = ''
+		if result:
+			token = create_access_token(identity=user_id)
+			result_token, err = c_add_user_token(user_id, token)
+			if not result_token:
+				result = False
+				token = ''
+		return {'is_login_success': result, 'token': token, 'error': err}, 200
+	
+	def delete(self):
+		pass

@@ -1,6 +1,9 @@
 from flask_restful import Resource
 from flask_restful import fields, marshal_with, reqparse
 from flask import request
+
+from controller.user_behaviour_controller import c_user_token_verification
+from controller.post_controller import create_post_container_obj, UserFeedPostContainer
 #!TODO: Add validation in the 
 # from app import session #? Do we really require this
 
@@ -38,7 +41,7 @@ class PostLikeApi(Resource):
         d['likes'] = p_m_m.get_num_likes(post_id)
         return d
     @marshal_with(liker_FB)
-    def put(self, liker_id, post_id):
+    def get(self, liker_id, post_id):
         try:
             if p_m_m.is_user_already_flaged(liker_id, post_id):
                 return 'Unable to like a page which you already flagged', 403
@@ -51,7 +54,7 @@ class PostLikeApi(Resource):
             return self.get_num_likes(post_id), 201
         
     @marshal_with(liker_FB)
-    def get(self, liker_id, post_id):
+    def put(self, liker_id, post_id):
         liker_id
         data = request.data
         print(data)
@@ -117,6 +120,7 @@ details = {
     'is_success': fields.Boolean,
     'post_id': fields.String
 }
+#! Depricated 
 class PostCRUDApi(Resource):
     @marshal_with(post_details)
     def get(self, user_id, post_id):
@@ -158,3 +162,48 @@ class PostCRUDApi(Resource):
         }
         print('post removed')
         return d, 202
+    
+post_container = {
+    'post_id' : fields.String,
+    'title' : fields.String,
+    'containt' : fields.String,
+    'img_url' : fields.String, 
+    'time_stamp': fields.String,
+    'no_of_likes': fields.Integer,
+    'no_of_comments': fields.Integer,
+    'is_user_already_liked': fields.Boolean,
+    'err': fields.String
+}
+
+class PostFetchApi(Resource):
+    def create_post_dict(self, post_container:UserFeedPostContainer, is_detailed_required:bool) -> dict:
+        d = {
+            'post_id': post_container.post_id,
+            'title' : post_container.title,
+            'containt' : post_container.caption,
+            'img_url': post_container.image_url,
+            'time_stamp' : post_container.timestamp,
+            'no_likes' : post_container.likes,
+            'no_of_comments' : post_container.comment_count,
+            'is_user_already_liked' : post_container.is_already_liked,
+            'err': ""
+        }
+        return d
+    @marshal_with(post_container)
+    def post(self):
+        form = request.get_json()
+        user_id = form.get('user_id')
+        token = form.get('token')
+        post_id = form.get('post_id')
+        is_detailed_required = form.get('detail_required')
+        # result, err = c_user_token_verification(user_id, token)
+        result = True
+        if result:
+            post_container = create_post_container_obj(user_id, post_id, is_detailed_required)
+            if post_container:
+                d = self.create_post_dict(post_container, is_detailed_required)
+                return d , 200
+            err = "no container found"
+            return {'err': err}, 500
+        return {'err': err}, 500
+

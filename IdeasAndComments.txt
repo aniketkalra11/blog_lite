@@ -17,3 +17,9 @@ because this is a small scale application we can assume that it will not exceed 
 for most active user time I can store every user details in the file system where i can write every user past 10 login times for book  keepings. and analys the user behaviour accordingly.
 for ACTIVE USER RECORD I SELECTED FILE SYSTEM BASED DATABASE DESIGN.
 we will check more security features later on.
+
+// Now i need to think about likes and bookmarks in this case.
+I need to create api to get the post list
+verify token is working or not.
+get post complete details,
+and simple post details.

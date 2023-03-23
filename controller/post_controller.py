@@ -25,9 +25,26 @@ class PostCommentContainer:
 			raise Exception('No comment Found')
 	def __str__(self):
 		return str(self.comment) + " " + str(self.commenter_name) + " " + str(self.commenter_id)
-
+	
+class PostLikeContainer:
+	def __init__(self, post_like_tuple):
+		print("Post like creation: ", post_like_tuple)
+		self.post_id = ''
+		self.liker_id = ''
+		self.time_stamp = ''
+		self.liker_name = ''
+		self.time_stamp = datetime.now()
+		if post_like_tuple:
+			self.liker_name = get_user_name(post_like_tuple.liker_id)
+			self.time_stamp = post_like_tuple.time_stamp
+			self.liker_id = post_like_tuple.liker_id
+		else:
+			print('unable to detect like details')
+	
+	def __str__(self):
+		return self.liker_name + " " + self.liker_id + " " 
 class UserFeedPostContainer:
-	def __init__(self, post_id):
+	def __init__(self, post_id, is_depth_post_reqired = True):
 		sql_post_data = p_m_m.get_post_content(post_id)
 		#print('UserFeedContainer',sql_post_data)
 		self.post_id = sql_post_data.post_id
@@ -47,8 +64,14 @@ class UserFeedPostContainer:
 		#print('UserFeedContainer',sql_post_interaction)
 		self.likes = sql_post_interaction.likes
 		self.flags = sql_post_interaction.flags
+		self.comment_count = sql_post_interaction.comments
 		self.post_comment_id = sql_post_interaction.post_comment_id
-		self.comments = self.get_post_comment_container(self.post_comment_id)
+		self.comments = []
+		self.list_user_likes_list = []
+		if is_depth_post_reqired:
+			self.comments = self.get_post_comment_container(self.post_comment_id)
+			self.list_user_likes_list = self.get_post_like_container(self.post_id)
+			print(*self.list_user_likes_list)
 		#print('UserFeedContainer',self.comments)
 		#print(*self.comments)
 		self.is_already_liked = False # will update later
@@ -66,6 +89,19 @@ class UserFeedPostContainer:
 			except Exception as e:
 				print(e)
 		return l_container
+
+
+	def get_post_like_container(self, post_id:str)->list:
+		l_likes = p_m_m.get_like_user_list(post_id)
+		print("list of likes ", l_likes)
+		if not l_likes:
+			return
+		like_container = []
+		for l in l_likes:
+			print(l)
+			like_container.append(PostLikeContainer(l))
+		return like_container
+
 	def __str__(self):
 		s = self.user_id +" " + self.post_id + " " + self.title + " " + self.image_url + "\n"
 		return s
@@ -214,11 +250,11 @@ def c_edit_post(user_id:str, post_id:str, form_data, file= None)->list:
 				file.save(fildir)
 		return True, warn_str
 
-def create_post_container_obj(user_id, post_id):
+def create_post_container_obj(user_id, post_id, is_detailed_required = True):
 	obj = None
 	if len(post_id) > 4:
 		try:
-			obj = UserFeedPostContainer(post_id)
+			obj = UserFeedPostContainer(post_id, is_detailed_required)
 		except Exception as e:
 			debug_print('Unable to create post object for ' + str(post_id))
 			print(e)

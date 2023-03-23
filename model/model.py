@@ -29,6 +29,15 @@ class UserIdPassword(db.Model):
 	last_user_login = db.relationship('LastUserLoginTime', backref='last_login', cascade="all, delete-orphan", lazy=True, primaryjoin="UserIdPassword.user_id == LastUserLoginTime.user_id")
 	user_active_time = db.relationship('UserActiveTime', backref='user_active_time', cascade= "all, delete-orphan", lazy= True, primaryjoin= 'UserIdPassword.user_id == UserActiveTime.user_id')
 
+class UserToken(db.Model):
+	'''
+		This table is repsonsible for token based authentication
+		it will store flask fs-key value in its table and will be provided once user is login
+	'''
+	__tablename__= 'user_token'
+	user_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), primary_key= True)
+	fs_value= db.Column(db.String(300), unique= True)
+
 
 class UserDetails(db.Model):
 	__tablename__ = "user_details"
@@ -128,6 +137,7 @@ class PostInteraction(db.Model):
 	post_id = db.Column(db.String, db.ForeignKey('post_id.post_id'), nullable= False, primary_key= True)
 	likes = db.Column(db.Integer, default= 0)
 	flags = db.Column(db.Integer, default= 0)
+	comments = db.Column(db.Integer, default= 0)
 	post_comment_id = db.Column(db.String, unique= True, nullable= False)
 
 

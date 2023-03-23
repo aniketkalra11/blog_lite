@@ -95,6 +95,7 @@ class PostModelManager():
         post_interaction.likes = post_interaction.likes + 1
         post_interaction.post_like_data.append(like_data)
         self.add_to_db(post_interaction)
+        self.add_to_db(p_l)
 
 
     def add_flag(self, post_id, flager_id):
@@ -138,8 +139,10 @@ class PostModelManager():
         post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
         if post_interaction == None:
             self.post_content_not_found_exception(post_id)
+        post_interaction.comments += 1
         p_c_d = PostCommentTable(post_comment_id = post_interaction.post_comment_id, commenter_id = commenter_id, comment_content = comment_content, comment_id = comment_id)
         # post_interaction.post_comment_data.append(p_c_d)
+        self.add_to_db(post_interaction)
         self.add_to_db(p_c_d)
         return True, ''
         # try:
@@ -299,6 +302,13 @@ class PostModelManager():
         # assuming this always exists
         self.printDebug('num of likes' + str(post_details.likes))
         return post_details.likes
+    
+    #* introducing to get user likes in the post:
+    def get_like_user_list(self, post_id:str)->list:
+        post_likes = PostLikeTable.query.filter_by(post_id = post_id).all()
+        if post_likes:
+            return post_likes
+        return []
 
     def get_num_flags(self, post_id:str)->int:
         post_de = PostInteraction.query.filter_by(post_id = post_id).first()

@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from controller.user_controller import *
 from controller.post_controller import *
 from model.model import init_db
+from flask_jwt_extended import JWTManager
 
 import yaml
 
@@ -48,7 +49,8 @@ app = Flask(__name__)
 app.config.from_object(DevelopmentEnviroment)
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem' # neet to check wheather it is useful or not
-
+app.config['JWT_SECRET_KEY'] = 'SOMErANDOMtEXT'
+jwt =  JWTManager(app)
 Session(app)
 ran_k = generate_random_key()
 print('random key received as:', ran_k)
@@ -366,6 +368,15 @@ api.add_resource(GetUserPostList, '/api/user/get_post_list', '/api/user/get_post
 
 from Api.post_api import PostCRUDApi
 api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_details/<string:user_id>/<string:post_id>')
+
+from Api.test_api import TestApi
+api.add_resource(TestApi, '/api/test', '/api/test')
+
+from Api.user_control_api import UserAuthenticationApi
+api.add_resource(UserAuthenticationApi, '/api/user/authentication', '/api/user/authentication')
+
+from Api.post_api import PostFetchApi
+api.add_resource(PostFetchApi, '/api/fetch/post', '/api/fetch/post')
 
 #TODO: Comment API
 

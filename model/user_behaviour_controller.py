@@ -4,6 +4,7 @@ from datetime import date
 from .model import db
 from .model import UserActiveTime
 from .model import LastUserLoginTime
+from .model import UserToken
 from .misc_utils import getCurDateTime, getTodaysDate
 
 class LastLoginTimeNotFoundException(Exception):
@@ -86,3 +87,62 @@ class UserBehaviourController:
 			return True if u_active else False
 
 
+
+
+class UserTokenManager:
+	def __init__(self):
+		'''
+			This class is responsible for user token management and verification
+		'''
+		pass
+
+	def add_user_token(self, user_id:str, token:str) -> bool:
+		''' This will make a entry in the userToken class '''
+		user_token = UserToken(user_id = user_id, fs_value= token)
+		if self.is_user_exsists(user_id):
+			print("user alrady exists updating entry")
+			result = self.delete_user_token(user_id, token)
+			if not result:
+				raise Exception("unable to delete previous session")
+		try:
+			print('Adding user token')
+			db.session.add(user_token)
+		except Exception as e:
+			print('exception arrived during key registration')
+			db.session.rollback()
+			return False
+		else:
+			print('session addition complete')
+			db.session.commit()
+			return True
+		
+
+
+	def is_user_exsists(self, user_id:str) -> bool:
+		''' this will check wheather user is already present in the token list or not  '''
+		u_active = db.session.query(UserToken).filter_by(user_id = user_id).first()
+		return True if u_active else False
+	
+	def delete_user_token(self, user_id:str, token:str) -> bool:
+		''' This will remove past record of token and user '''
+		if self.is_user_exsists(user_id):
+			try:
+				print('deleting user previous session')
+				u_token = db.session.query(UserToken).filter_by(user_id = user_id).first()
+				db.session.delete(u_token)
+			except Exception as e:
+				print('Exception arrived during token deletion', e)
+				db.session.rollback()
+				return False
+			else:
+				print('Token removed successfully')
+				db.session.commit()
+				return True
+
+	def is_token_valid(self, user_id:str, token:str)->bool:
+		print('token verification started')
+		if self.is_user_exsists(user_id):
+			v = db.session.query(UserToken).filter_by(user_id = user_id, fs_value = token).first()
+			return True if v else False
+		else:
+			return False
