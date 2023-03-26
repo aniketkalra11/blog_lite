@@ -147,7 +147,30 @@ class UserAuthenticationApi(Resource):
 		return create_response({}, 200)
 
 	def delete(self):
-		pass
+		print('Logout request receiving')
+		try:
+			print(request)
+			header = request.headers
+			json = request.get_json()
+			print(json)
+			user_id = json['user_id']
+			token = header['token']
+			print('data retrival complete')
+			result , err = c_delete_user_token(user_id, token)
+			if result:
+				d = {'is_success': True, 'err': ""}
+			else:
+				d = {'is_success': True, 'err': err}
+				return create_response(d, 200, UserApiResponse.user_operation)
+			response = create_response(d, 200, UserApiResponse.user_operation)
+		except Exception as e:
+			print('error arrived during logout', e)
+			d = {'is_success': False, 'err': 'unable to create the token'}
+			response = create_response(d, 200, UserApiResponse.user_operation)
+		return response
+
+	def options(self):
+		return create_response({}, 200)
 
 
 class UserManagerApi(Resource):

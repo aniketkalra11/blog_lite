@@ -77,11 +77,16 @@ class UserApiResponse:
 		'token': fields.String,
 		'error': fields.String
 	}
+	user_operation ={
+		'is_success': fields.Boolean,
+		'err': fields.String
+	}
 
 def set_response_headers(response:Response)->Response:
 	print('appending header to response')
 	response.headers['Access-Control-Allow-Origin'] = '*'
 	response.headers['Access-Control-Allow-Headers'] = '*'
+	response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE'
 	return response
 
 
