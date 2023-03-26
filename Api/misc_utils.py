@@ -81,6 +81,20 @@ class UserApiResponse:
 		'is_success': fields.Boolean,
 		'err': fields.String
 	}
+	user_details = {
+		'user_id': fields.String,
+		'profile_photo': fields.String,
+		'name': fields.String,
+		'numFollowers': fields.Integer,
+		'numFollowing': fields.Integer,
+		'numPosts': fields.Integer,
+		'fname': fields.String,
+		'lname': fields.String,
+		'dob_d': fields.DateTime,
+		'city': fields.String,
+		'profession': fields.String
+
+	}
 
 def set_response_headers(response:Response)->Response:
 	print('appending header to response')

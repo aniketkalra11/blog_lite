@@ -12,6 +12,8 @@ from flask_jwt_extended import create_access_token
 from controller.user_controller import c_login_validation
 from controller.user_behaviour_controller import *
 
+from controller.user_controller import *
+
 from .misc_utils import UserApiResponse, create_response
 create_parser = reqparse.RequestParser()
 
@@ -106,18 +108,6 @@ class GetUserPostList(Resource):
 		return d, 201
 
 
-
-
-class CreateUser(Resource):
-	'''
-	This Api class is responsible of creating a new user
-	'''
-	def post(self):
-		pass
-
-
-
-
 class UserAuthenticationApi(Resource):
 	'''
 		This class is responsible for user login and token generation and storage of api
@@ -169,9 +159,6 @@ class UserAuthenticationApi(Resource):
 			response = create_response(d, 200, UserApiResponse.user_operation)
 		return response
 
-	def options(self):
-		return create_response({}, 200)
-
 
 class UserManagerApi(Resource):
 	def post(self):
@@ -180,4 +167,52 @@ class UserManagerApi(Resource):
 		file = request.files
 		print(file)
 		print(form_data)
-		return create_response({}, 201)
+		result, err = c_add_user(form_data=form_data, file= file, image_name='profile_photo')
+		d = {
+				'is_success': result,
+				'err': err 
+			}
+		if result:
+			return create_response(d, 201, UserApiResponse.user_operation)
+		else:
+			print('error while creating new user', err)
+			return create_response(d, 200, UserApiResponse.user_operation)
+
+	def put(self):
+		''' This is used to edit existing user '''
+		print('put request received')
+		try:
+			form_data = request.form
+			print(form_data)
+			user_id = form_data['user_id']
+			# token = request.headers['Token']
+			# print('token', token)
+			file = request.files
+			print(file)
+			print(form_data)
+			# result, err = c_user_token_verification(user_id, token)
+			result = True
+			d = {}
+			if result:
+				r, err = c_edit_user(user_id, form_data, file, profile_photo_name='profile_photo')
+				if r:
+					d= {'is_success': True, 'err': ''}
+					return create_response(d, 200, UserApiResponse.user_operation)
+				else:
+					d = {'is_success': result, 'err': err}
+			return create_response({'is_success': result, 'err': err}, 200, UserApiResponse.user_operation)
+		except Exception as e:
+			print(e)
+			return create_response({}, 500)
+
+	def options(self):
+		return create_response({}, 200)
+
+class UserDetailFetchApi(Resource):
+	'''
+	This class will fetch user details
+	'''
+	def get(self, user_id):
+		user_container = c_get_user_details(user_id)
+		return create_response(user_container, 200, UserApiResponse.user_details)
+

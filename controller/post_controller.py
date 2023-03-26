@@ -71,7 +71,7 @@ class UserFeedPostContainer:
 		if is_depth_post_reqired:
 			self.comments = self.get_post_comment_container(self.post_comment_id)
 			self.list_user_likes_list = self.get_post_like_container(self.post_id)
-			print(*self.list_user_likes_list)
+			print(self.list_user_likes_list)
 		#print('UserFeedContainer',self.comments)
 		#print(*self.comments)
 		self.is_already_liked = False # will update later
