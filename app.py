@@ -350,35 +350,52 @@ def te():
 #* Adding post Api
 
 
-#* Updating according to requirements
-from Api.post_api import PostLikeApi
-api.add_resource(PostLikeApi, "/api/like", "/api/like/<string:liker_id>/<string:post_id>")
+#* Updating according to requirements 
+#! DEPRICATED
+# from Api.post_api import PostLikeApi
+# api.add_resource(PostLikeApi, "/api/like", "/api/like/<string:liker_id>/<string:post_id>")
 
-from Api.post_api import PostFlagApi
-api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string:post_id>")
+# from Api.post_api import PostFlagApi
+# api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string:post_id>")
 
-from Api.user_follow_api import FollowApi
-api.add_resource(FollowApi, '/api/follow', '/api/follow/<string:user_id>/<string:f_user_id>')
+# from Api.user_follow_api import FollowApi
+# api.add_resource(FollowApi, '/api/follow', '/api/follow/<string:user_id>/<string:f_user_id>')
 
-from Api.user_control_api import UserControlApi
-api.add_resource(UserControlApi, '/api/user/make_admin', '/api/user/make_admin/<string:user_id>')
+# from Api.user_control_api import UserControlApi
+# api.add_resource(UserControlApi, '/api/user/make_admin', '/api/user/make_admin/<string:user_id>')
 
-from Api.user_control_api import GetUserPostList
-api.add_resource(GetUserPostList, '/api/user/get_post_list', '/api/user/get_post_list/<string:user_id>')
+# from Api.user_control_api import GetUserPostList
+# api.add_resource(GetUserPostList, '/api/user/get_post_list', '/api/user/get_post_list/<string:user_id>')
 
-from Api.post_api import PostCRUDApi
-api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_details/<string:user_id>/<string:post_id>')
+# from Api.post_api import PostCRUDApi
+# api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_details/<string:user_id>/<string:post_id>')
+
+
+#! Depricated
+#* API v2 starting from here
+#TODO: Comment API
+#* POST API version V2 starting from here
 
 from Api.test_api import TestApi
 api.add_resource(TestApi, '/api/test', '/api/test')
-
+#USER API
 from Api.user_control_api import UserAuthenticationApi
-api.add_resource(UserAuthenticationApi, '/api/user/authentication', '/api/user/authentication')
+api.add_resource(UserAuthenticationApi, '/api/v2/user/authentication/', '/api/v2/user/authentication')
+
+from Api.user_control_api import UserManagerApi
+api.add_resource(UserManagerApi, '/api/v2/user/create', '/api/v2/user/create')
 
 from Api.post_api import PostFetchApi
 api.add_resource(PostFetchApi, '/api/fetch/post', '/api/fetch/post')
 
-#TODO: Comment API
+
+#POST API
+from Api.post_api import PostApiV2
+api.add_resource(PostApiV2, '/api/v2/post/', '/api/v2/post/<string:user_id>/<string:post_id>')
+
+from Api.post_api import PostLikeApiV2
+api.add_resource(PostLikeApiV2, '/api/v2/like/post', '/api/v2/like/post/<string:user_id>/<string:post_id>')
+
 
 
 if __name__ == "__main__":

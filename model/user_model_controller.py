@@ -33,7 +33,7 @@ class UserModelManager():
 		# for x in self.user_list:
 		# 	print(x, type(x))
 
-	def add_user(self, userId, password, fname, lname, dob, city, profession= None, member_type= 'user') -> bool:
+	def add_user(self, userId, password, fname, lname, dob, city, profession= None, member_type= 'user', profile_photo = 'profile/default_profile.png') -> bool:
 		'''
 			This function will create the user and intialize all necessary database with respect to user
 			intializing databases are
@@ -52,10 +52,10 @@ class UserModelManager():
 
 			if profession:
 				print('profession is available ', profession)
-				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profession= profession)
+				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profession= profession, profile_photo= profile_photo)
 			else:
 				print('profession is not available skipping it')
-				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city)
+				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profile_photo= profile_photo)
 			db.session.add(user_details)
 			print('adding user details')
 

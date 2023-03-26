@@ -1,6 +1,7 @@
 from flask_restful import Resource
 from flask_restful import fields, marshal_with, reqparse
 from flask import request
+from flask import Response, make_response
 
 from controller.user_behaviour_controller import c_user_token_verification
 from controller.post_controller import create_post_container_obj, UserFeedPostContainer
@@ -13,6 +14,7 @@ from model.common_model_object import p_m_m
 # p_m_m = PostModelManager() #? Check wheather i can create shared object or not
 # print('session receiving as:', session)
 
+from .misc_utils import *
 
 create_parser = reqparse.RequestParser()
 
@@ -163,17 +165,6 @@ class PostCRUDApi(Resource):
         print('post removed')
         return d, 202
     
-post_container = {
-    'post_id' : fields.String,
-    'title' : fields.String,
-    'containt' : fields.String,
-    'img_url' : fields.String, 
-    'time_stamp': fields.String,
-    'no_of_likes': fields.Integer,
-    'no_of_comments': fields.Integer,
-    'is_user_already_liked': fields.Boolean,
-    'err': fields.String
-}
 
 class PostFetchApi(Resource):
     def create_post_dict(self, post_container:UserFeedPostContainer, is_detailed_required:bool) -> dict:
@@ -189,7 +180,7 @@ class PostFetchApi(Resource):
             'err': ""
         }
         return d
-    @marshal_with(post_container)
+    # @marshal_with(post_container)
     def post(self):
         form = request.get_json()
         user_id = form.get('user_id')
@@ -202,8 +193,80 @@ class PostFetchApi(Resource):
             post_container = create_post_container_obj(user_id, post_id, is_detailed_required)
             if post_container:
                 d = self.create_post_dict(post_container, is_detailed_required)
-                return d , 200
+                return create_response(d, 200, PostApiResponse.post_container)
             err = "no container found"
             return {'err': err}, 500
         return {'err': err}, 500
 
+
+class PostApiV2(Resource):
+    '''
+        This class is responsible for fetching post, creating post, and deleting an
+        existing post.
+        This will provide post as prescribed format defined in *post_container* dict
+    '''
+    def print_details(self, u_id, post_id, operation):
+        print("PostApiV2: ", operation, " request received for user_id: ", u_id, " on post_id: ", post_id)
+
+
+    def get(self, user_id, post_id):
+        ''' This will provide post details on given post id,
+            Token will be verified in case of private post, 
+            For performance reasons we are ignoring token checks for public posts
+        '''
+        self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.FETCH))
+        pass
+    
+    def post(self, user_id, post_id=""):
+        ''' this is responsible for post_id creation and making entry in database '''
+        self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.CREATE))
+        print(request.files)
+        return create_response({}, 200, PostApiResponse.post_container)
+
+
+    def delete(self, user_id, post_id):
+        ''' this is responsible for post to delete from the database and provide proper response in this regard '''
+        self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.DELETE))
+        pass
+
+    def options(self, user_id, post_id):
+        print('option receiving')
+        d = {}
+        return create_response({}, 200)
+
+
+
+
+
+class PostLikeApiV2(Resource):
+    '''
+        This class is responsible for post like operations 
+        Post like operations are :
+        1. get list of likers
+        2. like given post
+        3. remove like from given post 
+        ***TOKEN verification is mendatory for these classes
+    '''
+
+    def print_details(self, user_id, post_id, operation):
+        print("PostLikeApiV2 ", operation, " request received for user_id: ", user_id , " on post_id: ", post_id)
+    # @marshal_with(post_like_details)
+    def get(self, user_id, post_id):
+        ''' This will return number of likes and list of likers '''
+        self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.FETCH))
+        likers = [{'user_id': '123', 'user_name': 'some_name'}]
+        likes_count = 123
+        d = {'likes_count': likes_count, 'likers': likers} #* Sample test complete
+        return create_response(d, 200, PostApiResponse.post_like_details)
+
+    # @marshal_with(post_like_operation)
+    def put(self, user_id, post_id):
+        ''' This will add like in give list '''
+        self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.ADD, OperationStrings.LIKE))
+        pass
+
+    # @marshal_with(post_like_operation)
+    def delete(self, user_id, post_id):
+        ''' This will remove post in given list '''
+        self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.DELETE, OperationStrings.LIKE))
+        pass

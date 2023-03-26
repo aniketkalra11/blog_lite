@@ -11,6 +11,8 @@ from flask_jwt_extended import create_access_token
 #* Importing controllers
 from controller.user_controller import c_login_validation
 from controller.user_behaviour_controller import *
+
+from .misc_utils import UserApiResponse, create_response
 create_parser = reqparse.RequestParser()
 
 create_parser.add_argument('user_id')
@@ -114,17 +116,12 @@ class CreateUser(Resource):
 		pass
 
 
-user_authentication={
-	'is_login_success': fields.Boolean,
-	'token': fields.String,
-	'error': fields.String
-}
+
 
 class UserAuthenticationApi(Resource):
 	'''
 		This class is responsible for user login and token generation and storage of api
 	'''
-	@marshal_with(user_authentication)
 	def post(self):
 		print('api request received')
 		print('api request', request)
@@ -141,7 +138,23 @@ class UserAuthenticationApi(Resource):
 			if not result_token:
 				result = False
 				token = ''
-		return {'is_login_success': result, 'token': token, 'error': err}, 200
-	
+		d = {'is_login_success': result, 'token': token, 'error': err}
+		print(d)
+		return create_response(d, 200, response_type= UserApiResponse.user_authentication)
+
+	def options(self):
+		print("receiving options")
+		return create_response({}, 200)
+
 	def delete(self):
 		pass
+
+
+class UserManagerApi(Resource):
+	def post(self):
+		''' this will create a new user in the data base '''
+		form_data = request.form
+		file = request.files
+		print(file)
+		print(form_data)
+		return create_response({}, 201)
