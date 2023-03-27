@@ -136,24 +136,33 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 
 
-def c_create_post(user_id:str, form_data:dict, file) ->list:
+def c_create_post(user_id:str, form_data:dict, file = None) ->list:
 	debug_print('crating_post')
 	debug_print('form_received as:' + str(form_data))
 	title = form_data['title']
 	caption = form_data['caption']
+	post_type = None
+	try:
+		post_type = form_data['type']
+	except Exception as e:
+		print('e: ', e)
+		print('skipping type of post')
 	#print('title as ', title, 'caption as:', caption)
 	# file = form_data.files['image']
 	filedir = None
 	file_name = None
-	if file.filename != '' and allowed_file(file.filename):
-		file_name = create_file_name(user_id, file.filename)
-		#print(file_name, 'created')
-		filedir = os.path.join(UPLOAD_FOLDER, file_name)
-		debug_print('file dir is:' + str(filedir))
+	if file and file.filename != '' :
+		if allowed_file(file.filename):
+			file_name = create_file_name(user_id, file.filename)
+			#print(file_name, 'created')
+			filedir = os.path.join(UPLOAD_FOLDER, file_name)
+			debug_print('file dir is:' + str(filedir))
+		else:
+			return False, "Improper file format received"
 	else:
-		return False, "Improper file format received"
+		print('no file detected continuing')
 
-	is_sucess = p_m_m.add_post(user_id, title=title, caption= caption, imageurl= file_name)
+	is_sucess = p_m_m.add_post(user_id, title=title, caption= caption, imageurl= file_name, post_type= post_type)
 	if is_sucess:
 		if file_name:
 			file.save(filedir)

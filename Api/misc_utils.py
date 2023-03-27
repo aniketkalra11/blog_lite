@@ -65,19 +65,24 @@ class ContainerOfPostComments(fields.Raw):
 class ContainerofPostIds(fields.Raw):
 		def output(self, key, obj):
 				''' This will contain commenter name commenter_id and comment_containt'''
-				d = []
 				print(key, obj)
 				print('obj', obj, ' type', type(obj))
 				try:
-					for x in obj:
-						temp = {
-							'post_id' : x.post_id,
-							'timestamp': x.timestamp
-						}
-						d.append(temp)
+					x = obj[key]
+					temp = {
+						'post_id' : x.post_id,
+						'timestamp': x.timestamp,
+						'is_text_only': True if x.image_url == 'NOT_AVAILABLE' else False
+					}
+						# d.append(temp)
+					return temp 
 				except Exception as e:
 					print('exception ', e)
-				return d
+				return {
+					'post_id': '',
+					'timestamp': '',
+					'is_text_only': False
+				}
 
 class PostApiResponse:
 

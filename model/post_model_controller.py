@@ -45,7 +45,7 @@ class PostModelManager():
         id = post_id + '_' + commenter_id + '_' + t_date.strftime('%H_%M_%S')
         return self.get_hash_value(id)
 
-    def add_post(self, user_id, title, caption = None, timestamp= datetime.now(), imageurl = None) ->bool:
+    def add_post(self, user_id, title, caption = None, timestamp= datetime.now(), imageurl = None, post_type = None) ->bool:
         user_post_info = UserPostAndFollowerInfo.query.filter_by(user_id = user_id).first()
         if user_post_info == None:
             raise Exception('User not found in info table')
@@ -54,7 +54,10 @@ class PostModelManager():
         post_comment_id = self.create_post_comment_id(post_id)
         # print('post_id received as:', post_id)
         self.printDebug('Post id Received as: '+ post_id)
-        post_id_obj = PostId(user_id = user_id, post_id = post_id)
+        if post_type:
+            post_id_obj = PostId(user_id = user_id, post_id = post_id, post_type = post_type)
+        else:
+            post_id_obj = PostId(user_id = user_id, post_id = post_id)
         post_content_obj = PostContent(post_id = post_id, title= title)
         post_interaction_obj = PostInteraction(post_id = post_id, post_comment_id = post_comment_id)
         

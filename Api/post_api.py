@@ -10,7 +10,7 @@ from controller.post_controller import create_post_container_obj, UserFeedPostCo
 
 # from model.post_model_controller import PostModelManager
 from model.common_model_object import p_m_m
-
+from controller.post_controller import *
 # p_m_m = PostModelManager() #? Check wheather i can create shared object or not
 # print('session receiving as:', session)
 
@@ -220,7 +220,7 @@ class PostApiV2(Resource):
         '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.FETCH))
         ''' already did in post fetch api '''
-        post_container = post_container = create_post_container_obj(user_id, post_id, False)
+        post_container = create_post_container_obj(user_id, post_id, False)
         if post_container:
             return create_response(post_container, 200, PostApiResponse.post_container)
         else:
@@ -230,8 +230,14 @@ class PostApiV2(Resource):
     def post(self, user_id, post_id=""):
         ''' this is responsible for post_id creation and making entry in database '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.CREATE))
+        form_data = request.form
+        print(len(form_data))
+        # print(len(file))
         print(request.files)
-        return create_response({}, 200, PostApiResponse.post_container)
+        result_file = request.files['image'] if len(request.files) else None
+        result, err = c_create_post(user_id, form_data, result_file)
+        return create_response({'is_success': result, 'err': err}, 200, PostApiResponse.post_operation_result)
+
 
 
     def delete(self, user_id, post_id):
