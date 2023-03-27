@@ -22,9 +22,13 @@ class UserContainer():
 		self.user_id = user_id
 		user_details = user_manager.get_user_details(user_id)
 		self.user_details = user_details
+		self.fname = user_details.fname
+		self.lname = user_details.lname
+		
 		self.name = user_details.fname + ' ' + user_details.lname
 		# datetime.strftime()
-		self.dob = user_details.dob.strftime('%d/%m/%Y')
+		self.dob_d = user_details.dob
+		self.dob = self.dob_d.strftime('%d/%m/%Y')
 		#print('dob', self.dob)
 		self.city = user_details.city
 		self.profession = user_details.profession
@@ -34,6 +38,10 @@ class UserContainer():
 		self.num_flwr, self.num_flwing, self.num_post = user_manager.get_user_post_flr_flwing_count(user_id)
 		self.follwers = user_manager.get_user_follower_list(user_id)
 		self.followings = user_manager.get_user_following_list(user_id)
+		#!duplicating code
+		self.numFollowers = self.num_flwr
+		self.numFollowing = self.num_flwing
+		self.numPosts = self.num_post
 	def __str__(self):
 		s = self.user_id + ' ' + self.name + ' ' + self.dob + ' ' + self.city + ' ' + self.profession
 		return s
@@ -81,8 +89,37 @@ def c_no_user_found():
 
 def name_validation(s:str)->bool:
 	return s.isalpha()
+def save_profile_photo(image, user_id:str, image_name = 'image') -> str:
+		profile_photo= None
+		file = image[image_name]
+		#print(file)
+		if file.filename == '':
+			print('no profile photo provided continuing with older one')
+		else: 
+			if allowed_file(file.filename):
+				f_name = create_file_name(user_id, file.filename)
+				file_dir = os.path.join('profile/',  f_name)
+				#print('updated file dir: ',file_dir)
+				profile_photo = file_dir
+			else:
+				print('invalid profile photo received')
+				return False, "invalid profile photo received"
+		#print('profile photo is:', profile_photo)
+			if profile_photo:
+				file_dir = os.path.join(UPLOAD_FOLDER, profile_photo)
+				#print('updating profile photo', file_dir)
+				#print(file)
+				try:
+					file.save(file_dir)
+				except Exception as e:
+					print(e)
+					os.remove(os.path.join(UPLOAD_FOLDER, profile_photo))
+					os.save(file_dir)
+				print('profile_photo save success')
+				return profile_photo
+		return ''
 
-def c_add_user(form_data) -> list:
+def c_add_user(form_data, file=None, image_name = 'image') -> list:
 	'''
 		This function will add user return true if successfully executed
 	'''
@@ -113,12 +150,22 @@ def c_add_user(form_data) -> list:
 		profession = form_data['profession']
 		if not name_validation(city):
 			return False, 'Profession should not contain any special characters'
-		if profession != "":
-			db_result = user_manager.add_user(userId= user_id, password= password, 
-											fname= fname, lname= lname, dob= d_dob, city= city, profession= profession)
+		profession_test = lambda prof : prof if prof != "" else None
+		if(file and file[image_name] != ''):
+			profile_photo = save_profile_photo(file, user_id, image_name= image_name)
+			if profile_photo == '':
+				return False, 'Unable to save profile photo'
+			db_result = user_manager.add_user(userId= user_id,password= password, dob=d_dob, fname= fname, lname =lname, city=city, profession= profession_test(profession), profile_photo= profile_photo)
 		else:
-			db_result = user_manager.add_user(userId= user_id, password= password, 
-											fname= fname, lname= lname, dob= d_dob, city= city)
+			db_result = user_manager.add_user(userId= user_id,password= password, fname= fname, lname =lname, city=city, dob=d_dob, profession= profession_test(profession))
+			print('no photo received')
+		# if profession != "":
+		# 	db_result = user_manager.add_user(userId= user_id, password= password, 
+		# 									fname= fname, lname= lname, dob= d_dob, city= city, profession= profession)
+		# else:
+		# 	db_result = user_manager.add_user(userId= user_id, password= password, 
+		# 									fname= fname, lname= lname, dob= d_dob, city= city)
+		
 		log = "Addtion result "+ str(db_result)
 		if not db_result:
 			raise Exception('unable added into database error from model')
@@ -131,7 +178,9 @@ def c_add_user(form_data) -> list:
 		printDebug('Successfully added into the database')
 		return db_result, ''
 
-def c_edit_user(user_id,form_data, files) ->list:
+
+
+def c_edit_user(user_id,form_data, files, profile_photo_name= 'image') ->list:
 		old_details = user_manager.get_user_details(user_id)
 		old_image_url = old_details.profile_photo
 		# password = form_data['password']
@@ -146,16 +195,22 @@ def c_edit_user(user_id,form_data, files) ->list:
 		if not name_validation(city):
 			return False, 'Profession should not contain any special characters'
 		profile_photo = None
-		file = files['image']
-		#print(file)
-		if file.filename == '':
-			print('no profile photo provided continuing with older one')
-		else: 
-			if allowed_file(file.filename):
-				f_name = create_file_name(user_id, file.filename)
-				file_dir = os.path.join('profile/',  f_name)
-				#print('updated file dir: ',file_dir)
-				profile_photo = file_dir
+		try:
+			file = files[profile_photo_name]
+			#print(file)
+			if file.filename == '':
+				print('no profile photo provided continuing with older one')
+			else: 
+				if allowed_file(file.filename):
+					f_name = create_file_name(user_id, file.filename)
+					file_dir = os.path.join('profile/',  f_name)
+					#print('updated file dir: ',file_dir)
+					profile_photo = file_dir
+				else:
+					print('invalid profile photo received')
+					return False, "invalid profile photo received"
+		except Exception as e:
+			print('error arrived during image process', e)
 		#print('profile photo is:', profile_photo)
 		is_success, reason = user_manager.edit_profile_details(user_id, fname, lname, city, profession, profile_photo= profile_photo)
 		if is_success:

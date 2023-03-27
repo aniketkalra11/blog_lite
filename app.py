@@ -1,3 +1,5 @@
+#!/usr/bin python3
+
 import os
 from flask import Flask, request, session, flash
 from flask_session import Session
@@ -9,6 +11,21 @@ from werkzeug.utils import secure_filename
 from controller.user_controller import *
 from controller.post_controller import *
 from model.model import init_db
+from flask_jwt_extended import JWTManager
+
+import yaml
+
+is_jinja_mode = False
+db_file = ""
+def set_config():
+	global is_jinja_mode, db_file
+	with open('project_config.yaml') as file:
+		doc = yaml.full_load(file)
+		is_jinja_mode = doc['jinja_mode']
+		db_file = doc['db_file']
+		
+
+
 
 
 def generate_random_key():
@@ -32,7 +49,8 @@ app = Flask(__name__)
 app.config.from_object(DevelopmentEnviroment)
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem' # neet to check wheather it is useful or not
-
+app.config['JWT_SECRET_KEY'] = 'SOMErANDOMtEXT'
+jwt =  JWTManager(app)
 Session(app)
 ran_k = generate_random_key()
 print('random key received as:', ran_k)
@@ -331,28 +349,71 @@ def te():
 #* API Work starting here
 #* Adding post Api
 
-from Api.post_api import PostLikeApi
-api.add_resource(PostLikeApi, "/api/like", "/api/like/<string:liker_id>/<string:post_id>")
 
-from Api.post_api import PostFlagApi
-api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string:post_id>")
+#* Updating according to requirements 
+#! DEPRICATED
+# from Api.post_api import PostLikeApi
+# api.add_resource(PostLikeApi, "/api/like", "/api/like/<string:liker_id>/<string:post_id>")
 
-from Api.user_follow_api import FollowApi
-api.add_resource(FollowApi, '/api/follow', '/api/follow/<string:user_id>/<string:f_user_id>')
+# from Api.post_api import PostFlagApi
+# api.add_resource(PostFlagApi, "/api/flag", "/api/flag/<string:flager_id>/<string:post_id>")
 
-from Api.user_control_api import UserControlApi
-api.add_resource(UserControlApi, '/api/user/make_admin', '/api/user/make_admin/<string:user_id>')
+# from Api.user_follow_api import FollowApi
+# api.add_resource(FollowApi, '/api/follow', '/api/follow/<string:user_id>/<string:f_user_id>')
 
-from Api.user_control_api import GetUserPostList
-api.add_resource(GetUserPostList, '/api/user/get_post_list', '/api/user/get_post_list/<string:user_id>')
+# from Api.user_control_api import UserControlApi
+# api.add_resource(UserControlApi, '/api/user/make_admin', '/api/user/make_admin/<string:user_id>')
 
-from Api.post_api import PostCRUDApi
-api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_details/<string:user_id>/<string:post_id>')
+# from Api.user_control_api import GetUserPostList
+# api.add_resource(GetUserPostList, '/api/user/get_post_list', '/api/user/get_post_list/<string:user_id>')
 
+# from Api.post_api import PostCRUDApi
+# api.add_resource(PostCRUDApi, '/api/get_post_details', '/api/user/get_post_details/<string:user_id>/<string:post_id>')
+
+
+#! Depricated
+#* API v2 starting from here
 #TODO: Comment API
+#* POST API version V2 starting from here
+
+from Api.test_api import TestApi
+api.add_resource(TestApi, '/api/test', '/api/test')
+#USER API
+from Api.user_control_api import UserAuthenticationApi
+api.add_resource(UserAuthenticationApi, '/api/v2/user/authentication/', '/api/v2/user/authentication')
+
+from Api.user_control_api import UserManagerApi
+api.add_resource(UserManagerApi, '/api/v2/user/create', '/api/v2/user/create')
+
+
+from Api.user_control_api import UserDetailFetchApi
+api.add_resource(UserDetailFetchApi, '/api/v2/user/fetch', '/api/v2/user/fetch/<string:user_id>')
+
+from Api.user_control_api import FetchUserPostList
+api.add_resource(FetchUserPostList, '/api/v2/user/dashboard', '/api/v2/user/dashboard/<string:user_id>')
+
+#POST API
+from Api.post_api import PostApiV2
+api.add_resource(PostApiV2, '/api/v2/post/', '/api/v2/post/<string:user_id>/<string:post_id>')
+
+from Api.post_api import PostLikeApiV2
+api.add_resource(PostLikeApiV2, '/api/v2/like/post', '/api/v2/like/post/<string:user_id>/<string:post_id>')
+
+from Api.post_api import PostFetchApi
+api.add_resource(PostFetchApi, '/api/v2/fetch/post', '/api/v2/fetch/post')
+
+from Api.post_api import PostCommentApiV2
+api.add_resource(PostCommentApiV2, '/api/v2/comment/post', '/api/v2/comment/post/<string:user_id>/<string:post_id>')
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
+	set_config()
 	init_db_main()
 	app.run(host="0.0.0.0")
 	print('applicatio started')
