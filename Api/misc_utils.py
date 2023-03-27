@@ -17,56 +17,50 @@ class OperationStrings:
 
 class ContainerOfLiker(fields.Raw):
 		def output(self, key, obj):
-				''' This will contain user_id and user_name '''
-				d = []
-				for x in obj:
-					temp = {
-						'liker_name': x.liker_name,
-						'time_stamp' : x.time_stamp,
-						'liker_id': x.liker_id
-					}
-					d.append(temp)
-				# try:
-				# 		d['user_id']= obj['user_id']
-				# 		d['user_name'] = obj['user_name']
-				# except Exception as e:
-				# 		print('exception arrived during Container of user Api creation', e)
-				# 		return d
-				return d
-				# return super().output(key, obj)
+			''' This will contain user_id and user_name '''
+			try:
+				x = obj[key]
+				return {
+					'liker_name': x.liker_name,
+					'time_stamp' : x.time_stamp,
+					'liker_id': x.liker_id
+				}
+			except Exception as e:
+				print('exception in like continer', e)
+				return {
+					'liker_name': '',
+					'time_stamp' : '',
+					'liker_id': ''
+				}
 
 
 class ContainerOfPostComments(fields.Raw):
 		def output(self, key, obj):
 				''' This will contain commenter name commenter_id and comment_containt'''
-				d = []
-				print(key, obj)
-				print('obj', obj, ' type', type(obj))
+
 				try:
-					for x in obj:
-						temp = {
-							'commenter_name' : x.commenter_name,
-							'comment_content' : x.comment_content,
-							'commenter_id' : x.commenter_id
-						}
-						d.append(temp)
+					x = obj[key]
+					temp = {
+						'commenter_name' : x.commenter_name,
+						'comment_content' : x.comment_content,
+						'commenter_id' : x.commenter_id
+					}
+					return temp
 				except Exception as e:
 					print('exception ', e)
-				return d
-				# try:
-				# 		d['commenter_name']= obj['commenter_name']
-				# 		d['comment_content'] = obj['comment_content']
-				# 		d['commenter_id'] = obj['commenter_id']
-				# except Exception as e:
-				# 		print('exception arrived during Container of post comment Api creation', e)
-				# 		return d
+				return {
+						'commenter_name' : '',
+						'comment_content' : '',
+						'commenter_id' : ''
+				}
+
 
 
 class ContainerofPostIds(fields.Raw):
 		def output(self, key, obj):
 				''' This will contain commenter name commenter_id and comment_containt'''
-				print(key, obj)
-				print('obj', obj, ' type', type(obj))
+				# print(key, obj)
+				# print('obj', obj, ' type', type(obj))
 				try:
 					x = obj[key]
 					temp = {
