@@ -67,11 +67,11 @@ class UserFeedPostContainer:
 		self.comment_count = sql_post_interaction.comments
 		self.post_comment_id = sql_post_interaction.post_comment_id
 		self.comments = []
-		self.list_user_likes_list = []
+		self.list_user_likes = []
 		if is_depth_post_reqired:
 			self.comments = self.get_post_comment_container(self.post_comment_id)
-			self.list_user_likes_list = self.get_post_like_container(self.post_id)
-			print(self.list_user_likes_list)
+			self.list_user_likes = self.get_post_like_container(self.post_id)
+			print(self.list_user_likes)
 		#print('UserFeedContainer',self.comments)
 		#print(*self.comments)
 		self.is_already_liked = False # will update later
@@ -250,7 +250,7 @@ def c_edit_post(user_id:str, post_id:str, form_data, file= None)->list:
 				file.save(fildir)
 		return True, warn_str
 
-def create_post_container_obj(user_id, post_id, is_detailed_required = True):
+def create_post_container_obj(user_id, post_id, is_detailed_required = True) -> UserFeedPostContainer:
 	obj = None
 	if len(post_id) > 4:
 		try:

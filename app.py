@@ -385,11 +385,12 @@ api.add_resource(UserAuthenticationApi, '/api/v2/user/authentication/', '/api/v2
 from Api.user_control_api import UserManagerApi
 api.add_resource(UserManagerApi, '/api/v2/user/create', '/api/v2/user/create')
 
-from Api.post_api import PostFetchApi
-api.add_resource(PostFetchApi, '/api/fetch/post', '/api/fetch/post')
 
 from Api.user_control_api import UserDetailFetchApi
 api.add_resource(UserDetailFetchApi, '/api/v2/user/fetch', '/api/v2/user/fetch/<string:user_id>')
+
+from Api.user_control_api import FetchUserPostList
+api.add_resource(FetchUserPostList, '/api/v2/user/dashboard', '/api/v2/user/dashboard/<string:user_id>')
 
 #POST API
 from Api.post_api import PostApiV2
@@ -397,6 +398,15 @@ api.add_resource(PostApiV2, '/api/v2/post/', '/api/v2/post/<string:user_id>/<str
 
 from Api.post_api import PostLikeApiV2
 api.add_resource(PostLikeApiV2, '/api/v2/like/post', '/api/v2/like/post/<string:user_id>/<string:post_id>')
+
+from Api.post_api import PostFetchApi
+api.add_resource(PostFetchApi, '/api/v2/fetch/post', '/api/v2/fetch/post')
+
+from Api.post_api import PostCommentApiV2
+api.add_resource(PostCommentApiV2, '/api/v2/comment/post', '/api/v2/comment/post/<string:user_id>/<string:post_id>')
+
+
+
 
 
 

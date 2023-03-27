@@ -195,8 +195,12 @@ class PostFetchApi(Resource):
                 d = self.create_post_dict(post_container, is_detailed_required)
                 return create_response(d, 200, PostApiResponse.post_container)
             err = "no container found"
-            return {'err': err}, 500
-        return {'err': err}, 500
+            return create_response({'is_success': False,'err': err}, 500, UserApiResponse.user_operation)
+        return create_response({'is_success': False,'err': err}, 500, UserApiResponse.user_operation)
+
+    def options(self):
+        return create_response({}, 200)
+
 
 
 class PostApiV2(Resource):
@@ -215,7 +219,13 @@ class PostApiV2(Resource):
             For performance reasons we are ignoring token checks for public posts
         '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.FETCH))
-        pass
+        ''' already did in post fetch api '''
+        post_container = post_container = create_post_container_obj(user_id, post_id, False)
+        if post_container:
+            return create_response(post_container, 200, PostApiResponse.post_container)
+        else:
+            return create_response({}, 500)
+        
     
     def post(self, user_id, post_id=""):
         ''' this is responsible for post_id creation and making entry in database '''
@@ -254,10 +264,11 @@ class PostLikeApiV2(Resource):
     def get(self, user_id, post_id):
         ''' This will return number of likes and list of likers '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.FETCH))
-        likers = [{'user_id': '123', 'user_name': 'some_name'}]
-        likes_count = 123
-        d = {'likes_count': likes_count, 'likers': likers} #* Sample test complete
-        return create_response(d, 200, PostApiResponse.post_like_details)
+        post_container = create_post_container_obj(user_id, post_id=post_id, is_detailed_required= True)
+        if post_container:
+            return create_response(post_container, 200, PostApiResponse.post_like_details)
+        else:
+            return ({}, 500)
 
     # @marshal_with(post_like_operation)
     def put(self, user_id, post_id):
@@ -270,3 +281,13 @@ class PostLikeApiV2(Resource):
         ''' This will remove post in given list '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.DELETE, OperationStrings.LIKE))
         pass
+
+
+class PostCommentApiV2(Resource):
+    ''' This will provide post comment details '''
+    def get(self, user_id, post_id):
+        print('Post comment Api', user_id, ' post_id:', post_id)
+        post_container = create_post_container_obj(user_id, post_id, True)
+        if post_container:
+            print(post_container.comments)
+        return create_response(post_container, 200, PostApiResponse.post_comments_list)

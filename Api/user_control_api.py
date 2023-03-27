@@ -13,7 +13,7 @@ from controller.user_controller import c_login_validation
 from controller.user_behaviour_controller import *
 
 from controller.user_controller import *
-
+from controller.post_controller import c_get_home_page_post, c_get_user_post
 from .misc_utils import UserApiResponse, create_response
 create_parser = reqparse.RequestParser()
 
@@ -216,3 +216,19 @@ class UserDetailFetchApi(Resource):
 		user_container = c_get_user_details(user_id)
 		return create_response(user_container, 200, UserApiResponse.user_details)
 
+class FetchUserPostList(Resource):
+	'''
+		This class will return number the post of user
+		Get:- will return dashboard posts,
+		Put:- will return profile posts,
+	'''
+	def get(self, user_id):
+		following_list = c_get_user_following_list(user_id)
+		posts = c_get_home_page_post(user_id, following_list)
+		u_post = c_get_user_post(user_id)
+		final_posts = posts + u_post
+		final_posts.sort(reverse= True)
+		d = {'user_id': user_id, 'list_post': final_posts}
+		return create_response(d, 200, UserApiResponse.user_dashboard_post_list)
+	def options(self, user_id):
+		return create_response({}, 200)
