@@ -1,0 +1,25 @@
+// Time based backend user management
+//TODO: I will maintain per user active time on daily basis
+//
+
+
+// Internally store most recent public post details on the
+// server and keep updating when ever a new post being added
+// while intializing the server compute most recent public posts
+// and store then in time based management system.
+
+// I will assume user is active if logined and inactive if 
+// user didn't do any activity within 10mins.
+
+And regarding analysis of post creation. I think, we don't need to maintain a seprate table for that
+because we can run through all the posts which are available and plot the graph accordingly 
+because this is a small scale application we can assume that it will not exceed much if exceeds then we will move to new approach
+for most active user time I can store every user details in the file system where i can write every user past 10 login times for book  keepings. and analys the user behaviour accordingly.
+for ACTIVE USER RECORD I SELECTED FILE SYSTEM BASED DATABASE DESIGN.
+we will check more security features later on.
+
+// Now i need to think about likes and bookmarks in this case.
+I need to create api to get the post list
+verify token is working or not.
+get post complete details,
+and simple post details.

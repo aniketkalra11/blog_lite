@@ -5,6 +5,7 @@
 	it will not check any input validation
 	*ASSUMING THAT ALL INPUT VALIDATION PERFORMED BY THE CONTROLLER
 '''
+import hashlib
 from datetime import date
 from .model import db 
 from .model import UserIdPassword
@@ -12,6 +13,12 @@ from .model import UserDetails
 from .model import UserFollowing
 from .model import UserFollowers
 from .model import UserPostAndFollowerInfo
+
+from .model import LastUserLoginTime
+from .model import UserActiveTime
+
+#Misc functions
+from .misc_utils import getCurDateTime, getTodaysDate
 
 class UserModelManager():
 	'''
@@ -26,38 +33,56 @@ class UserModelManager():
 		# for x in self.user_list:
 		# 	print(x, type(x))
 
-	def add_user(self, userId, password, fname, lname, dob, city, profession= None, member_type= 'user') -> bool:
+	def add_user(self, userId, password, fname, lname, dob, city, profession= None, member_type= 'user', profile_photo = 'profile/default_profile.png') -> bool:
+		'''
+			This function will create the user and intialize all necessary database with respect to user
+			intializing databases are
+			1. UserPostAndFollowerInfo
+			2. UserDetails
+			3. LastUserLoginTime #! This will be maintained by another class
+			TODO: Check what else i can update in this file
+		'''
 		try:
-			#print('adding user to Database:', userId)
-			user = UserIdPassword(user_id = userId, password = password)
-			
-			# db.session.add(user)
-			#print('adding user to session')
+			print('Adding new user started')
+			# hash_val = hash(password)
+			hash_val = hashlib.sha256(password.encode()).hexdigest()
+			print("Hash_value for given password is:", password, " is:", hash_val)
+			user = UserIdPassword(user_id = userId, hash_value = hash_val, name = fname)
+
 
 			if profession:
-				#print('profession is available ', profession)
-				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profession= profession)
+				print('profession is available ', profession)
+				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profession= profession, profile_photo= profile_photo)
 			else:
-				#print('profession is not available skipping it')
-				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city)
+				print('profession is not available skipping it')
+				user_details = UserDetails(fname=fname, lname= lname, dob= dob, city=city, profile_photo= profile_photo)
 			db.session.add(user_details)
-			#print('adding user details')
+			print('adding user details')
 
 			u_f_details = UserPostAndFollowerInfo(user_id = userId)
 			user.user_details.append(user_details)
 			db.session.add(u_f_details)
-			#print('user additional details')
+
+			#* Adding user last login details
+			l_u_active = LastUserLoginTime(user_id= userId)
+			user.last_user_login.append(l_u_active)
+			db.session.add(u_f_details)
+			print("Adding user last login time")
+			usr_active_time = UserActiveTime(user_id= userId, date= getTodaysDate())
+			user.user_active_time.append(usr_active_time)
+			db.session.add(usr_active_time)
+			print("user active time on website")
+			print('User creation complete')
 
 		except Exception as e:
-			#print('exception is:', e)
+			print('exception is:', e)
 			db.session.rollback()
-			#print('rollbacking everything')
+			print('rollbacking everything')
 			return False
 		else:
-			#print('commiting changes')
+			print('User creation commiting changes')
 			db.session.commit()
 			self.total_user += 1
-			#print('total user increased ', self.total_user)
 			return True
 
 	def is_user_exists(self, userId:str) -> bool:
@@ -65,13 +90,15 @@ class UserModelManager():
 			this Function will check and tell wheather user exists or not
 		'''
 		user_data = db.session.query(UserDetails).filter_by(user_id = userId).first()
-		#print(user_data, "user data retrived from userId", userId)
+		print(user_data, "user data retrived from userId", userId)
 		return True if user_data  else False
 
 	def is_user_pwd_correct(self, userId:str, password:str) -> bool:
 		#print('for password validation userId receiving as:', userId, 'password as:', password)
 		# user_data = db.session.query(UserIdPassword).filter(UserIdPassword.user_id == userId and UserIdPassword.password == password).first()
-		user_data = UserIdPassword.query.filter_by(user_id = userId, password= password).first()
+		# hash_val = hash(password)
+		hash_val = hashlib.sha256(password.encode()).hexdigest()
+		user_data = UserIdPassword.query.filter_by(user_id = userId, hash_value= hash_val).first()
 		#print('user data and password retrived as: ', user_data)
 		return True if user_data else False
 
