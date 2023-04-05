@@ -128,7 +128,9 @@ class UserAuthenticationApi(Resource):
 			if not result_token:
 				result = False
 				token = ''
-		d = {'is_login_success': result, 'token': token, 'error': err}
+			else:
+				user_container = create_user_container(user_id)
+		d = {'is_login_success': result, 'token': token, 'error': err, 'user_name': user_container.name}
 		print(d)
 		return create_response(d, 200, response_type= UserApiResponse.user_authentication)
 
@@ -230,5 +232,44 @@ class FetchUserPostList(Resource):
 		final_posts.sort(reverse= True)
 		d = {'user_id': user_id, 'list_post': final_posts}
 		return create_response(d, 200, UserApiResponse.user_dashboard_post_list)
+
 	def options(self, user_id):
+		return create_response({}, 200)
+
+	def put(self, user_id):
+		print('user_id: ', user_id)
+		user_posts = c_get_user_post(user_id)
+		user_posts.sort(reverse= True)
+		try:
+			print('Header containt')
+			# print(request.headers)
+		except Exception as e:
+			print('exception arrived', e)
+		d= { 'user_id': user_id, 'list_post': user_posts}
+		return create_response(d, 200, UserApiResponse.user_dashboard_post_list)
+
+
+class UserSearchList(Resource):
+	''' This Api is responsible for search user and fetch user detials '''
+	def post(self):
+		''' This will search result and send to the user '''
+		try:
+			json_obj = request.get_json()
+			user_id = json_obj['user_id']
+			search_keyword = json_obj['keyword']
+		except Exception as e:
+			print(json_obj)
+			print('exception arrived', e)
+			return create_response({}, 500)
+		user_list = get_user_list_by_name(search_keyword)
+		user_following_list = c_get_user_following_list(user_id)
+		c_update_user_container_following_status(user_id, user_list, user_following_list)
+		d = {'user_id': user_id, 'search_keyword': search_keyword, 'list_user_container': user_list}
+		for x in user_list:
+			print(x)
+		return create_response(d, 200, UserApiResponse.user_search_result)
+
+
+
+	def options(self):
 		return create_response({}, 200)

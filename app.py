@@ -10,6 +10,7 @@ from database.database import db
 from werkzeug.utils import secure_filename
 from controller.user_controller import *
 from controller.post_controller import *
+from controller.misc_funtionalities import *
 from model.model import init_db
 from flask_jwt_extended import JWTManager
 
@@ -65,6 +66,7 @@ def init_db_main():
 	with app.app_context():
 		print('calling init db')
 		init_db()
+		initialize_list_recent_post()
 
 def is_user_in_session(user_id:str)->bool:
 	print('sesssion is:', session)
@@ -390,7 +392,10 @@ from Api.user_control_api import UserDetailFetchApi
 api.add_resource(UserDetailFetchApi, '/api/v2/user/fetch', '/api/v2/user/fetch/<string:user_id>')
 
 from Api.user_control_api import FetchUserPostList
-api.add_resource(FetchUserPostList, '/api/v2/user/dashboard', '/api/v2/user/dashboard/<string:user_id>')
+api.add_resource(FetchUserPostList, '/api/v2/user/post', '/api/v2/user/post/<string:user_id>')
+
+from Api.user_control_api import UserSearchList
+api.add_resource(UserSearchList, '/api/v2/user/search', '/api/v2/user/search')
 
 #POST API
 from Api.post_api import PostApiV2
@@ -405,6 +410,8 @@ api.add_resource(PostFetchApi, '/api/v2/fetch/post', '/api/v2/fetch/post')
 from Api.post_api import PostCommentApiV2
 api.add_resource(PostCommentApiV2, '/api/v2/comment/post', '/api/v2/comment/post/<string:user_id>/<string:post_id>')
 
+from Api.post_api import PostCarouselApi
+api.add_resource(PostCarouselApi, '/api/v2/carousel', '/api/v2/carousel')
 
 
 
@@ -415,5 +422,6 @@ api.add_resource(PostCommentApiV2, '/api/v2/comment/post', '/api/v2/comment/post
 if __name__ == "__main__":
 	set_config()
 	init_db_main()
+	# initialize_list_recent_post()
 	app.run(host="0.0.0.0")
 	print('applicatio started')

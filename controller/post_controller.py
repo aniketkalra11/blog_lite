@@ -93,7 +93,7 @@ class UserFeedPostContainer:
 
 	def get_post_like_container(self, post_id:str)->list:
 		l_likes = p_m_m.get_like_user_list(post_id)
-		print("list of likes ", l_likes)
+		# print("list of likes ", l_likes)
 		if not l_likes:
 			return
 		like_container = []

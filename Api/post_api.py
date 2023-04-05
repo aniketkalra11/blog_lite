@@ -15,6 +15,8 @@ from controller.post_controller import *
 # print('session receiving as:', session)
 
 from .misc_utils import *
+from controller.misc_funtionalities import get_latest_posts
+from controller.misc_funtionalities import update_recent_posts
 
 create_parser = reqparse.RequestParser()
 
@@ -42,6 +44,7 @@ class PostLikeApi(Resource):
         print('num of likes is', p_m_m.get_num_likes(post_id))
         d['likes'] = p_m_m.get_num_likes(post_id)
         return d
+
     @marshal_with(liker_FB)
     def get(self, liker_id, post_id):
         try:
@@ -66,7 +69,6 @@ class PostLikeApi(Resource):
             print('unable to retrive the number of likes of user')
             return {'likes': 0}, 500
 
-        
 
     @marshal_with(liker_FB)
     def delete(self, liker_id, post_id):
@@ -236,6 +238,8 @@ class PostApiV2(Resource):
         print(request.files)
         result_file = request.files['image'] if len(request.files) else None
         result, err = c_create_post(user_id, form_data, result_file)
+        if result:
+            update_recent_posts(user_id)
         return create_response({'is_success': result, 'err': err}, 200, PostApiResponse.post_operation_result)
 
 
@@ -263,6 +267,12 @@ class PostLikeApiV2(Resource):
         3. remove like from given post 
         ***TOKEN verification is mendatory for these classes
     '''
+    def get_num_likes(self, post_id)->int:
+        ''' Get number of likes '''
+        d = {}
+        print('num of likes of is:', p_m_m.get_num_likes(post_id))
+        d['likes'] = p_m_m.get_num_likes(post_id)
+        return p_m_m.get_num_likes(post_id)
 
     def print_details(self, user_id, post_id, operation):
         print("PostLikeApiV2 ", operation, " request received for user_id: ", user_id , " on post_id: ", post_id)
@@ -274,19 +284,51 @@ class PostLikeApiV2(Resource):
         if post_container:
             return create_response(post_container, 200, PostApiResponse.post_like_details)
         else:
-            return ({}, 500)
+            return create_response({}, 500)
 
     # @marshal_with(post_like_operation)
     def put(self, user_id, post_id):
         ''' This will add like in give list '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.ADD, OperationStrings.LIKE))
-        pass
+        err = ''
+        is_succes = True
+        try:
+            if not p_m_m.is_user_already_liked(user_id, post_id):
+                p_m_m.add_like(post_id, user_id)
+            else:
+                err= 'already liked by user'
+            is_succes = True
+        except Exception as e:
+            print('exception ', e)
+            err = str(e)
+            is_succes = True
+        
+        d ={'like_count': self.get_num_likes(post_id), 'is_success':  is_succes, 'err': err}
+        return create_response(d, 200, PostApiResponse.post_like_operation)
 
     # @marshal_with(post_like_operation)
     def delete(self, user_id, post_id):
         ''' This will remove post in given list '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.DELETE, OperationStrings.LIKE))
-        pass
+        d = {}
+        is_success = False
+        err = ''
+        try:
+            if p_m_m.is_user_already_liked(user_id, post_id):
+                p_m_m.remove_like(post_id, user_id)
+            else:
+                print('no likes deteceted')
+            is_success = True
+        except Exception as e:
+            is_success = False
+            err = "unable to delete like "
+            print(e)
+        d = {'is_success': is_success, 'like_count': p_m_m.get_num_likes(post_id), err: err}
+        return create_response(d, 200, PostApiResponse.post_like_operation)
+
+    def options(self, user_id, post_id):
+        return create_response({}, 200)
+
 
 
 class PostCommentApiV2(Resource):
@@ -297,3 +339,45 @@ class PostCommentApiV2(Resource):
         if post_container:
             print(post_container.comments)
         return create_response(post_container, 200, PostApiResponse.post_comments_list)
+
+    def post(self, user_id, post_id):
+        ''' This is responsible for adding new post into a given post '''
+        print("Creating new commet for post_id:", post_id, " by the user: ", user_id)
+        form_data = request.get_json()
+        print("Form data receiving", form_data)
+        containt = form_data['containt']
+        post_operation = {}
+        post_operation['post_id'] = post_id
+        if containt == '':
+            post_operation['is_success'] = False
+            
+            post_operation['err'] = "Post Containt can't be empty"
+            return create_response(post_operation, 200, PostApiResponse.post_operation_result)
+        else:
+            result, err = c_add_comment(user_id, post_id, containt)
+            post_operation['err'] = err
+            post_operation['is_success'] = result
+            return create_response(post_operation, 200, PostApiResponse.post_operation_result)
+
+
+    def delete(self, user_id, post_id):
+        ''' This is responsible deleting given post '''
+        print("Deleting given post for post_id:", post_id, " by the user:", user_id)
+        #! Currently under development
+        return ({}, 500)
+
+
+    def options(self, user_id, post_id):
+        return create_response({}, 200)
+
+class PostCarouselApi(Resource):
+    ''' This will provide post latest posts by users '''
+    def get(self):
+        print('get request for carousel received')
+        list_post = get_latest_posts()
+        d = {'list_post': list_post}
+        return create_response( d, 200, PostApiResponse.carousel_container)
+
+
+    def options(self, user_id, post_id):
+        return create_response({}, 200)

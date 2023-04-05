@@ -42,12 +42,15 @@ class UserContainer():
 		self.numFollowers = self.num_flwr
 		self.numFollowing = self.num_flwing
 		self.numPosts = self.num_post
+		#*latest introduced as per requirements
+		self.is_user_already_following = False
 	def __str__(self):
 		s = self.user_id + ' ' + self.name + ' ' + self.dob + ' ' + self.city + ' ' + self.profession
 		return s
 	def __eq__(self, a):
 		try:
-			return True if self.name == a.name else False
+			# return True if self.name == a.name else False
+			return True if self.user_id == a.user_id else False
 		except:
 			return False
 	
@@ -300,6 +303,17 @@ def c_get_user_following_list(user_id:str)->list:
 		r_l.append(obj)
 	r_l.sort()
 	return r_l
+
+def c_update_user_container_following_status(user_id:str, list_users:list, list_followers:list = [] ):
+	''' this will update the user follower and following status '''
+	''' As per python documentation list_user and list_following are passed by ref then their results are replicated here also '''
+	if (list_followers == []):
+		list_followers = c_get_user_following_list(user_id)
+	for x in list_users:
+		for y in list_followers:
+			if x == y:
+				x.is_user_already_following = True
+
 
 def c_delete_user(user_id:str)->bool:
 	user_details = user_manager.get_user_details(user_id)
