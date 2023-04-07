@@ -242,6 +242,18 @@ class PostApiV2(Resource):
             update_recent_posts(user_id)
         return create_response({'is_success': result, 'err': err}, 200, PostApiResponse.post_operation_result)
 
+    def put(self, user_id, post_id):
+        ''' This will edit given post '''
+        self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, "EDIT"))
+        form_data = request.form
+        result_file = request.file['image'] if (request.files) else None
+        print(form_data)
+        result, err = c_edit_post(user_id, post_id, form_data, result_file)
+        if result:
+            update_recent_posts(user_id)
+        return create_response({'is_success': result, 'err': err}, 200, PostApiResponse.post_operation_result)
+
+
 
 
     def delete(self, user_id, post_id):

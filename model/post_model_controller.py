@@ -190,14 +190,17 @@ class PostModelManager():
         post_comment.comment_contend = content
         self.add_to_db(post_comment)
 
-    def edit_post(self, post_id, title, caption, image_url = None ):
+    def edit_post(self, post_id, title, caption, image_url = None, post_type = None ):
         #TODO: need to decide what we need to edit in this section
+        post_id_details = self.get_post_id_tuple(post_id)
+        if post_type:
+            post_id_details.post_type = post_type
         old_post = self.get_post_content(post_id)
         old_post.title = title
         old_post.caption = caption
-        
         old_post.image_url = image_url if image_url else old_post.image_url
         self.add_to_db(old_post)
+        self.add_to_db(post_type)
         self.printDebug('Under construction')
         pass
        

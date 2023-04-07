@@ -53,7 +53,11 @@ class UserFeedPostContainer:
 		#print(s_t)
 		self.caption = sql_post_data.caption
 		# self.caption = str(s_t)
-		self.timestamp = sql_post_data.timestamp
+		self.time_stamp_dt = sql_post_data.timestamp
+		# print(self.time_stamp_dt)
+		self.timestamp = sql_post_data.timestamp.strftime("%b %d, %Y %I:%M %p")
+		# print('type of time stamp', type(self.timestamp))
+		
 		self.image_url = str(sql_post_data.image_url)
 		#print(self.image_url)
 		sql_post_id = p_m_m.get_post_id_tuple(post_id)
@@ -108,19 +112,19 @@ class UserFeedPostContainer:
 		return s
 	
 	def __eq__(self, a):
-		return True if self.timestamp == a.timestamp else False
+		return True if self.time_stamp_dt == a.time_stamp_dt else False
 	
 	def __gt__(self, a):
-		return True if self.timestamp > a.timestamp else False
+		return True if self.time_stamp_dt > a.time_stamp_dt else False
 
 	def __lt__(self, a):
-		return True if self.timestamp < a.timestamp else False
+		return True if self.time_stamp_dt < a.time_stamp_dt else False
 	
 	def __ge__(self, a):
-		return True if self.timestamp >= a.timestamp else False
+		return True if self.time_stamp_dt >= a.time_stamp_dt else False
 	
 	def __le__(self, a):
-		return True if self.timestamp <= a.timestamp else False
+		return True if self.time_stamp_dt <= a.time_stamp_dt else False
 	#implemented for sorting implementation
 
 
@@ -235,6 +239,11 @@ def c_edit_post(user_id:str, post_id:str, form_data, file= None)->list:
 		title = form_data['title']
 		caption = form_data['caption']
 		photo_d = form_data['photo_d']
+		post_type = None
+		try:
+			post_type = form_data['type']
+		except:
+			pass
 		img_url = file.filename
 		if img_url == '' :
 			img_url = 'NOT_AVAILABLE' if photo_d == 'remove_photo' else None
@@ -244,7 +253,7 @@ def c_edit_post(user_id:str, post_id:str, form_data, file= None)->list:
 				img_url = create_file_name(user_id, file.filename)
 			else:
 				return False, 'Unknown File received'
-		p_m_m.edit_post(post_id, title, caption, img_url)
+		p_m_m.edit_post(post_id, title, caption, img_url, post_type)
 	except Exception as e:
 		debug_print('Exception arrived during post edit' + str(e))
 		warn_str = 'Unable to edit post' + str(e)
@@ -295,7 +304,8 @@ def c_delete_post(user_id, post_id)-> list:
 def c_add_bookmark(user_id:str, post_id:str)->list:
 	''' This will add bookmark to table '''
 	try:
-		p_m_m.add_bookmark(user_id, post_id)
+		if not p_m_m.is_user_already_bookmarked(user_id, post_id):
+			p_m_m.add_bookmark(user_id, post_id)
 		return True , ''
 	except Exception as e:
 		debug_print("unable to add bookmar", e)
@@ -304,7 +314,8 @@ def c_add_bookmark(user_id:str, post_id:str)->list:
 def c_remove_bookmark(user_id:str, post_id:str) ->list:
 	''' This will remove bookmark '''
 	try:
-		p_m_m.remove_bookmark(user_id, post_id)
+		if p_m_m.is_user_already_bookmarked(user_id, post_id):
+			p_m_m.remove_bookmark(user_id, post_id)
 		return True , ''
 	except Exception as e:
 		debug_print("unable to add bookmar", e)

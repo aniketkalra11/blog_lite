@@ -400,6 +400,13 @@ api.add_resource(UserSearchList, '/api/v2/user/search', '/api/v2/user/search')
 from Api.user_follow_api import FollowUserApi2
 api.add_resource(FollowUserApi2, '/api/v2/user/follow', '/api/v2/user/follow')
 
+#getting follow following list
+from Api.user_follow_api import GetUserFollowerList
+api.add_resource(GetUserFollowerList, '/api/v2/follower/user', '/api/v2/follower/user/<string:user_id>')
+
+from Api.user_follow_api import GetUserFollowingList
+api.add_resource(GetUserFollowingList, '/api/v2/following/user', '/api/v2/following/user/<string:user_id>')
+
 #POST API
 from Api.post_api import PostApiV2
 api.add_resource(PostApiV2, '/api/v2/post/', '/api/v2/post/<string:user_id>/<string:post_id>')

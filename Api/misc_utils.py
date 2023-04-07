@@ -129,6 +129,7 @@ class PostApiResponse:
 	post_container = {
 		#post.date = datetime.strptime(post.date,"%Y_%m_%d_%H_%M_%S").strftime("%b %d, %Y %I:%M %p")
 		'user_id': fields.String,
+		'user_name': fields.String,
 		'post_id' : fields.String,
 		'title' : fields.String,
 		'caption' : fields.String,

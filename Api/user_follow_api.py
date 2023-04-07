@@ -4,6 +4,7 @@ from flask_restful import fields, marshal_with, reqparse
 from flask import request
 from model.common_model_object import user_manager
 from .misc_utils import *
+from controller.user_controller import *
 # user_manager = UserModelManager()
 
 
@@ -93,4 +94,34 @@ class FollowUserApi2(Resource):
         return final_res
 
     def options(self):
+        return create_response({}, 200)
+    
+
+class GetUserFollowingList(Resource):
+    '''
+        This will return user following list
+    '''
+    def get(self, user_id):
+        '''return list ids'''
+        list_following = c_get_user_following_list(user_id)
+        d = {'user_id' : user_id, 'list_user_container': list_following}
+        return create_response(d, 200, UserApiResponse.user_search_result)
+
+
+    def options(self, user_id):
+        return create_response({}, 200)
+
+
+class GetUserFollowerList(Resource):
+    '''
+    This will return user follower list
+    '''
+    def get(self, user_id):
+        '''return list ids'''
+        list_follower = c_get_user_follower_list(user_id)
+        d = {'user_id' : user_id, 'list_user_container': list_follower}
+        return create_response(d, 200, UserApiResponse.user_search_result)
+
+
+    def options(self, user_id):
         return create_response({}, 200)
