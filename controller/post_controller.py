@@ -325,7 +325,7 @@ def c_get_user_bookmark_post(user_id:str)->list:
 	list_raw_post = p_m_m.get_post_bookmark_list_by_user_id(user_id)
 	list_post_container = []
 	for x in list_raw_post:
-		temp_container = create_post_container_obj(x.post_id)
+		temp_container = create_post_container_obj(user_id, x.post_id)
 		list_post_container.append(temp_container)
 	return list_post_container
 

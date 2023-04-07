@@ -424,7 +424,7 @@ from Api.post_api import PostCarouselApi
 api.add_resource(PostCarouselApi, '/api/v2/carousel', '/api/v2/carousel')
 
 from Api.post_api import PostBookmarkApi
-api.add_resource(PostBookmarkApi, '/api/v2/bookmark', '/api/v2/bookmark/post/<string:user_id>')
+api.add_resource(PostBookmarkApi, '/api/v2/bookmark/post', '/api/v2/bookmark/post/<string:user_id>')
 
 
 

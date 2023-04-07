@@ -246,7 +246,7 @@ class PostApiV2(Resource):
         ''' This will edit given post '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, "EDIT"))
         form_data = request.form
-        result_file = request.file['image'] if (request.files) else None
+        result_file = request.files['image'] if len(request.files) else None
         print(form_data)
         result, err = c_edit_post(user_id, post_id, form_data, result_file)
         if result:
@@ -376,7 +376,12 @@ class PostCommentApiV2(Resource):
         ''' This is responsible deleting given post '''
         print("Deleting given post for post_id:", post_id, " by the user:", user_id)
         #! Currently under development
-        return ({}, 500)
+        result, err = c_delete_post(user_id, post_id)
+        d = {'result': result, 'err': err}
+        if result:
+            return create_response(d, 200, PostApiResponse.post_operation_result)
+        else:
+            return create_response(d, 500)
 
 
     def options(self, user_id, post_id):
@@ -399,7 +404,7 @@ class PostBookmarkApi(Resource):
     def get(self, user_id):
         ''' Return list of bookmark posts '''
         list_user_bookmark_post = c_get_user_bookmark_post(user_id)
-        list_user_bookmark_post.sort()
+        list_user_bookmark_post.sort(reverse=True)
         d = {'user_id': user_id, 'list_post' : list_user_bookmark_post}
         return create_response(d, 200, UserApiResponse.user_dashboard_post_list)
 
