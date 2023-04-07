@@ -289,6 +289,31 @@ def c_delete_post(user_id, post_id)-> list:
 		print('image removed')
 		return True, ''
 
+def c_add_bookmark(user_id:str, post_id:str)->list:
+	''' This will add bookmark to table '''
+	try:
+		p_m_m.add_bookmark(user_id, post_id)
+		return True , ''
+	except Exception as e:
+		debug_print("unable to add bookmar", e)
+		return False, 'Database entry failed'
+
+def c_remove_bookmark(user_id:str, post_id:str) ->list:
+	''' This will remove bookmark '''
+	try:
+		p_m_m.remove_bookmark(user_id, post_id)
+		return True , ''
+	except Exception as e:
+		debug_print("unable to add bookmar", e)
+		return False, 'Database entry failed'
+
+def c_get_user_bookmark_post(user_id:str)->list:
+	list_raw_post = p_m_m.get_post_bookmark_list_by_user_id(user_id)
+	list_post_container = []
+	for x in list_raw_post:
+		temp_container = create_post_container_obj(x.post_id)
+		list_post_container.append(temp_container)
+	return list_post_container
 
 def debug_print(s:str):
     print('post_controller:', s)

@@ -159,7 +159,6 @@ class PostApiResponse:
 	# }
 	post_bookmark_operation= {
 			'is_success': fields.Boolean,
-			'like_count': fields.Integer,
 			'err': fields.String
 	}
 	post_comments_list = {
@@ -207,6 +206,10 @@ class UserApiResponse:
 		'search_keyword': fields.String,
 		'list_user_container': fields.List(UserSearchContainer)
 	}
+	follower_count = {
+		'num_followers': fields.Integer,
+		'num_of_following': fields.Integer
+	}
 
 def set_response_headers(response:Response)->Response:
 	print('appending header to response')
@@ -218,7 +221,7 @@ def set_response_headers(response:Response)->Response:
 
 
 def create_response(response_data:dict, return_code:int, response_type:PostApiResponse = PostApiResponse.empty)->Response:
-	print("We have a universal function for everyone")
+	# print("We have a universal function for everyone")
 	@marshal_with(response_type)
 	def generate_reponse_data(response_dict:dict):
 		return response_dict
@@ -232,7 +235,9 @@ def create_response(response_data:dict, return_code:int, response_type:PostApiRe
 	# 	print(e)
 	# 	response = make_response()
 	response.status = return_code
-	return set_response_headers(response)
+	final_res = set_response_headers(response)
+	print(final_res.headers)
+	return final_res
 
 
 

@@ -217,6 +217,8 @@ class UserDetailFetchApi(Resource):
 	def get(self, user_id):
 		user_container = c_get_user_details(user_id)
 		return create_response(user_container, 200, UserApiResponse.user_details)
+	def options(self, user_id):
+		return create_response({}, 200)
 
 class FetchUserPostList(Resource):
 	'''

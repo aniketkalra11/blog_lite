@@ -397,6 +397,9 @@ api.add_resource(FetchUserPostList, '/api/v2/user/post', '/api/v2/user/post/<str
 from Api.user_control_api import UserSearchList
 api.add_resource(UserSearchList, '/api/v2/user/search', '/api/v2/user/search')
 
+from Api.user_follow_api import FollowUserApi2
+api.add_resource(FollowUserApi2, '/api/v2/user/follow', '/api/v2/user/follow')
+
 #POST API
 from Api.post_api import PostApiV2
 api.add_resource(PostApiV2, '/api/v2/post/', '/api/v2/post/<string:user_id>/<string:post_id>')
@@ -413,6 +416,8 @@ api.add_resource(PostCommentApiV2, '/api/v2/comment/post', '/api/v2/comment/post
 from Api.post_api import PostCarouselApi
 api.add_resource(PostCarouselApi, '/api/v2/carousel', '/api/v2/carousel')
 
+from Api.post_api import PostBookmarkApi
+api.add_resource(PostBookmarkApi, '/api/v2/bookmark', '/api/v2/bookmark/post/<string:user_id>')
 
 
 

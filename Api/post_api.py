@@ -378,6 +378,44 @@ class PostCarouselApi(Resource):
         d = {'list_post': list_post}
         return create_response( d, 200, PostApiResponse.carousel_container)
 
+    def options(self):
+        return create_response({}, 200)
 
-    def options(self, user_id, post_id):
+class PostBookmarkApi(Resource):
+    ''' This api will add bookmark remove bookmark and get list of post which user is saved '''
+
+    def get(self, user_id):
+        ''' Return list of bookmark posts '''
+        list_user_bookmark_post = c_get_user_bookmark_post(user_id)
+        list_user_bookmark_post.sort()
+        d = {'user_id': user_id, 'list_post' : list_user_bookmark_post}
+        return create_response(d, 200, UserApiResponse.user_dashboard_post_list)
+
+    def post(self, user_id):
+        ''' bookmark Remove post '''
+        try:
+            json = request.get_json()
+            post_id = json['post_id']
+            result , err = c_remove_bookmark(user_id, post_id)
+            if not result:
+              raise Exception(err)
+        except Exception  as e:
+            return create_response({}, 500)
+        d = {'is_success': result, 'err': err}
+        return create_response(d, 200, PostApiResponse.post_bookmark_operation)
+
+    def put(self, user_id):
+        ''' add bookmark '''
+        try:
+            json = request.get_json()
+            post_id = json['post_id']
+            result , err = c_add_bookmark(user_id, post_id)
+            if not result:
+              raise Exception(err)
+        except Exception  as e:
+            return create_response({}, 500)
+        d = {'is_success': result, 'err': err}
+        return create_response(d, 200, PostApiResponse.post_bookmark_operation)
+
+    def options(self, user_id):
         return create_response({}, 200)

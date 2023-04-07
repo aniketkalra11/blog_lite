@@ -9,6 +9,7 @@ from .model import PostCommentTable
 from .model import PostContent
 from .model import PostFlagTable
 from .model import PostInteraction
+from .model import PostBookmarkTable
 from .misc_utils import getCurDateTime, getTodaysDate
 
 '''
@@ -159,6 +160,16 @@ class PostModelManager():
         #     # print('comment added successfully')
         #     db.session.commit()
 
+
+    def add_bookmark(self, user_id:str, post_id:str):
+        '''
+            This will make an entry of user bookmark
+        '''
+        self.printDebug("Adding bookmark for user " + user_id + "  post_id:" + post_id)
+        post_bookmark = PostBookmarkTable(user_id= user_id, post_id = post_id)
+        self.add_to_db(post_bookmark)
+        self.printDebug("Addition of bookmark complete")
+
     # addition work complete
     #*starting edit work
     #? We will check what we can edit in senario
@@ -230,6 +241,20 @@ class PostModelManager():
         f_l = PostFlagTable.query.filter_by(post_id= post_id, flagger_id= user_id).first()
         #print(f_l)
         return True if f_l else False
+    
+    def get_post_bookmark_list_by_post_id(self, post_id):
+        ''' This will return all user which is bookmarked by user '''
+        list_post_bookmark = PostBookmarkTable.query.filter_by(post_id=post_id).all()
+        print(*list_post_bookmark)
+        print('list of book marks is')
+        return list_post_bookmark
+
+    def get_post_bookmark_list_by_user_id(self, user_id:str):
+        ''' This will return num of post followed by user '''
+        list_post_bookmark = PostBookmarkTable.query.filter_by(user_id=user_id).all()
+        print(*list_post_bookmark)
+        print(' list of user bookmarks')
+        return list_post_bookmark
 
     #* Remove section starting
     def remove_like(self, post_id, liker_id):
@@ -258,10 +283,25 @@ class PostModelManager():
         post_interaction.post_comment_data.remove(post_comment)
         self.remove_from_db(post_interaction)
     
+    def remove_bookmark(self, user_id, post_id):
+        ''' Removing bookmark from db '''
+        try:
+            post_bookmark = PostBookmarkTable.query.filter_by(user_id = user_id, post_id = post_id).first()
+            if post_bookmark:
+                self.remove_from_db(post_bookmark)
+                print('post bookmark deletion complete')
+            else:
+                print("Post not found continuouing with action")
+        except Exception as e:
+            self.printDebug("Exception arrived during post bookmark", e)
+    
     def remove_post(self, user_id:str, post_id:str):
         post_id_t = PostId.query.filter_by(post_id = post_id).first()
         post_interaction = PostInteraction.query.filter_by(post_id = post_id).first()
         user_post_count = UserPostAndFollowerInfo.query.filter_by(user_id = user_id).first()
+        list_post_bookmarks = self.get_post_bookmark_list_by_post_id(post_id)
+        for x in list_post_bookmarks:
+            self.remove_from_db(x)
         user_post_count.num_of_post = user_post_count.num_of_post - 1
         if not post_id_t or not post_interaction:
             self.post_content_not_found_exception(post_id)

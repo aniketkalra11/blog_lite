@@ -170,5 +170,15 @@ class PostFlagTable(db.Model):
 	time_stamp = db.Column(db.DateTime, nullable= False, default= getCurDateTime())
 
 
+#*Additional features of Mad2 Project
+
+class PostBookmarkTable(db.Model):
+	__tablename__ = "post_bookmark"
+	seq_no = db.Column(db.Integer, primary_key= True, autoincrement= True) #! For sql error bypass
+	user_id = db.Column(db.String, db.ForeignKey('user_id_password.user_id'), nullable= False)
+	post_id = db.Column(db.String, db.ForeignKey('post_interaction.post_id'), nullable= False)
+	time_stamp = db.Column(db.DateTime, nullable=False, default= getCurDateTime())
+
+
 def init_db():
 	db.create_all()
