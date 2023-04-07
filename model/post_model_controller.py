@@ -241,6 +241,9 @@ class PostModelManager():
         f_l = PostFlagTable.query.filter_by(post_id= post_id, flagger_id= user_id).first()
         #print(f_l)
         return True if f_l else False
+    def is_user_already_bookmarked(self, user_id, post_id) ->bool:
+        f_l = PostBookmarkTable.query.filter_by(post_id=post_id, user_id=user_id).first()
+        return True if f_l else False
     
     def get_post_bookmark_list_by_post_id(self, post_id):
         ''' This will return all user which is bookmarked by user '''

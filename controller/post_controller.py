@@ -76,6 +76,7 @@ class UserFeedPostContainer:
 		#print(*self.comments)
 		self.is_already_liked = False # will update later
 		self.is_already_flagged = False # will update later
+		self.is_already_bookmarked = False
 		#print('UserFeedPostContainer construction complete')
 
 	def get_post_comment_container(self, post_comment_id):
@@ -199,6 +200,7 @@ def c_update_user_like_dislike_flags(user_id:str, posts:list) -> list:
 	for p in posts:
 		p.is_already_liked = p_m_m.is_user_already_liked(user_id, p.post_id)
 		p.is_already_flagged = p_m_m.is_user_already_flaged(user_id, p.post_id)
+		p.is_already_bookmarked = p_m_m.is_user_already_bookmarked(user_id, p.post_id)
 	return posts
 
 def c_get_home_page_post(user_id:str, user_following_list:list):
@@ -270,6 +272,7 @@ def create_post_container_obj(user_id, post_id, is_detailed_required = True) -> 
 		else:
 			obj.is_already_flagged = p_m_m.is_user_already_flaged(user_id, post_id)
 			obj.is_already_liked = p_m_m.is_user_already_liked(user_id, post_id)
+			obj.is_already_bookmarked = p_m_m.is_user_already_bookmarked(user_id, post_id)
 	return obj
 
 def c_get_post_by_post_id(post_id:str)->UserFeedPostContainer:

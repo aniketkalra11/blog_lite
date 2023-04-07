@@ -127,6 +127,7 @@ class ContainerofPostIds(fields.Raw):
 class PostApiResponse:
 
 	post_container = {
+		#post.date = datetime.strptime(post.date,"%Y_%m_%d_%H_%M_%S").strftime("%b %d, %Y %I:%M %p")
 		'user_id': fields.String,
 		'post_id' : fields.String,
 		'title' : fields.String,
@@ -136,6 +137,7 @@ class PostApiResponse:
 		'likes': fields.Integer,
 		'comment_count': fields.Integer,
 		'is_already_liked': fields.Boolean,
+		'is_already_bookmarked' : fields.Boolean,
 		'err': fields.String
 	}
 	post_operation_result = {
