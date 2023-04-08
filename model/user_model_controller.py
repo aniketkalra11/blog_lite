@@ -195,6 +195,11 @@ class UserModelManager():
 		user_list = UserDetails.query.all()
 		#print(user_list)
 		return user_list
+
+	def get_all_user_last_login_time(self)->list:
+		user_list = LastUserLoginTime.query.all()
+		return user_list
+
 	def get_user_by_name(self, name:str)->list:
 		user_list = []
 		l1 = (UserDetails.query.filter(UserDetails.fname.like(name)).all())
@@ -206,6 +211,8 @@ class UserModelManager():
 		#print('receving name as:', l2)
 		user_list = l1 + l2
 		return user_list
+	
+
 
 	#* edit section starting
 	def edit_profile_details(self, user_id:str, fname:str, lname:str, city:str, profession:str, profile_photo:str = None, password:str = None)->list:

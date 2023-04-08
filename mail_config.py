@@ -21,11 +21,13 @@ def send_email(to, subject, msg, attachment=None):
 
     if attachment is not None:
         # adding attachment file to mail body
-        with open(attachment, "rb") as attachment_file:
-            part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment_file.read())
-            encode_base64(part)
-
+        try:
+            with open(attachment, "rb") as attachment_file:
+                part = MIMEBase("application", "octet-stream")
+                part.set_payload(attachment_file.read())
+                encode_base64(part)
+        except Exception as e:
+            print('error',e)
         part.add_header("Content-Disposition",
                         f"attachment; filename={attachment}")
         mail.attach(part)

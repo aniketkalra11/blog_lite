@@ -19,8 +19,11 @@ from .misc_utils import *
 from controller.misc_funtionalities import get_latest_posts
 from controller.misc_funtionalities import update_recent_posts, initialize_list_recent_post
 
+# from celery_tasks import create_user_csv_file
+
 #perf time and caching
 from app import perf_counter_ns
+from data_access import *
 create_parser = reqparse.RequestParser()
 
 create_parser.add_argument('user_id')
@@ -196,7 +199,14 @@ class PostFetchApi(Resource):
         # result, err = c_user_token_verification(user_id, token)
         result = True
         if result:
+            start = perf_counter_ns()
             post_container = create_post_container_obj(user_id, post_id, is_detailed_required)
+            stop = perf_counter_ns()
+            print('Raw time is:', stop-start)
+            start = perf_counter_ns()
+            post_container = cache_get_post_by_post_id(user_id, post_id)
+            end = perf_counter_ns()
+            print("Caching time is:", end-start)
             if post_container:
                 d = self.create_post_dict(post_container, is_detailed_required)
                 return create_response(d, 200, PostApiResponse.post_container)
@@ -229,6 +239,16 @@ class PostApiV2(Resource):
         start = perf_counter_ns()
         post_container = create_post_container_obj(user_id, post_id, False)
         end = perf_counter_ns()
+        post_container = create_post_container_obj(user_id, post_id)
+        stop = perf_counter_ns()
+        print('Raw time is:', stop-start)
+        start = perf_counter_ns()
+        try:
+            ost_container = cache_get_post_by_post_id(user_id, post_id)
+        except Exception as e:
+            print('error is:', e)
+        end = perf_counter_ns()
+        print("Caching time is:", end-start)
         print("time taken for container creation", end-start)
         if post_container:
             return create_response(post_container, 200, PostApiResponse.post_container)
@@ -446,3 +466,9 @@ class PostBookmarkApi(Resource):
 
     def options(self, user_id):
         return create_response({}, 200)
+    
+
+class ExportPost(Resource):
+    def get(self, user_id):
+        ''' async start of export job '''
+        print('statring async job for export post')

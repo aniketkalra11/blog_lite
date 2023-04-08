@@ -4,11 +4,12 @@ from datetime import date, datetime
 
 from celery.schedules import crontab
 from jinja2 import Template
-# from weasyprint import HTML
+from weasyprint import HTML
 
 from mail_config import send_email
 from app import celery, cache
-from model import Posts, Follow, User
+
+from controller import user_controller, post_controller
 
 @celery.on_after_finalize.connect
 def setup_intervalTASK(sender, **kwargs):

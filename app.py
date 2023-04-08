@@ -16,10 +16,12 @@ from flask_jwt_extended import JWTManager
 
 import worker
 import celery_job_demo
+# import celery_tasks
 
 from time import perf_counter_ns
 #caching function
-from cache_config import make_cache
+
+from flask_caching import Cache
 
 import yaml
 celery = None
@@ -65,14 +67,30 @@ app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/2"
 app.config["REDIS_URL"] = "redis://localhost:6379"
 app.config["CACHE_TYPE"] = "RedisCache"
 app.config["CACHE_REDIS_HOST"] = "localhost"
-app.config["CACHE_REDIS_POST"] = "6379"
+app.config["CACHE_REDIS_POST"] = 6379
+app.config["cache"] = "RedisCache"
+'''
+CACHE_REDIS_DB=0
+CACHE_REDIS_URL=redis://redis:6379/0
+CACHE_DEFAULT_TIMEOUT=500
+'''
+app.config["CACHE_REDIS_DB"]=0
+app.config["CACHE_REDIS_URL"]="redis://localhost:6379/0"
+app.config["CACHE_DEFAULT_TIMEOUT"]=500
+
 celery = worker.celery
 celery.conf.update(
 	broker_url = app.config["CELERY_BROKER_URL"],
 	result_backend = app.config["CELERY_RESULT_BACKEND"] 
 )
+celery.conf.timezone= 'Asia/Kolkata'
+celery.Task = worker.ContextTask
+app.app_context().push()
 #*caching
-cache = make_cache(app)
+cache = Cache(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': 'redis://localhost:6379/0'})
+app.app_context().push()
+# with app.app_context():
+# 	cache.set(cKey, data)
 jwt =  JWTManager(app)
 Session(app)
 ran_k = generate_random_key()
@@ -94,7 +112,7 @@ def is_user_in_session(user_id:str)->bool:
 	print('sesssion is:', session)
 	print('user_id receving as:', user_id)
 	return user_id in session.keys()
-
+@cache.cached(timeout=2000)
 @app.route('/', methods=['GET', 'POST'])
 def signin():
 	set_upload_folder()
@@ -367,14 +385,19 @@ def ji():
 	print('receving posts as' + str(posts))
 	return render_template('user_home_jinja.html', input_data= dict_data, user_id = user_id, posts= posts)
 
-@app.route('/test/search')
-def te():
-	job= celery_job_demo.just_say_hello.delay("hi")
-	print(str(job))
-	return str(job), 200
+# @app.route('/test/search')
+# @cache.cached(timeout=3000)
+# def te():
+# 	job= celery_job_demo.just_say_hello.delay("hi")
+# 	print(str(job))
+# 	return str(job), 200
 	# return render_template('search_result.html')
 #* API Work starting here
 #* Adding post Api
+
+# @app.route('/something')
+# def celery():
+# 	job = celery_tasks.setup_periodic_tasks.delay()
 
 
 #* Updating according to requirements 

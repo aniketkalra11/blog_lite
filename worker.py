@@ -5,4 +5,5 @@ celery = Celery("Application Job")
 
 class ContextTask(celery.Task):
     def __call__(self, *args, **kwargs):
-        return self.run(*args, **kwargs)
+        with app.app_context():
+            return self.run(*args, **kwargs)
