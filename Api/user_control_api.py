@@ -6,8 +6,9 @@ from flask_restful import marshal
 from model.common_model_object import user_manager
 from model.common_model_object import p_m_m
 from flask import request
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required
 
+from datetime import timedelta
 #* Importing controllers
 from controller.user_controller import c_login_validation
 from controller.user_behaviour_controller import *
@@ -100,7 +101,7 @@ class GetUserPostList(Resource):
 		if not user_manager.is_user_exists(user_id):
 			return 'no user found', 404
 		d_posts = self.get_post_list(user_id)
-		print(d_posts)
+		# print(d_posts)
 		d = {
 			'user_id': user_id,
 			'post_ids': d_posts
@@ -121,9 +122,10 @@ class UserAuthenticationApi(Resource):
 		print("User id received as: ", user_id)
 		print("and Password is: ", pwd)
 		result, err = c_login_validation(user_id, pwd)
+		expires = timedelta(7)
 		token = ''
 		if result:
-			token = create_access_token(identity=user_id)
+			token = create_access_token(identity=user_id, expires_delta=expires)
 			result_token, err = c_add_user_token(user_id, token)
 			if not result_token:
 				result = False
@@ -226,18 +228,25 @@ class FetchUserPostList(Resource):
 		Get:- will return dashboard posts,
 		Put:- will return profile posts,
 	'''
+	@jwt_required()
 	def get(self, user_id):
 		following_list = c_get_user_following_list(user_id)
 		posts = c_get_home_page_post(user_id, following_list)
 		u_post = c_get_user_post(user_id)
 		final_posts = posts + u_post
-		final_posts.sort(reverse= True)
-		d = {'user_id': user_id, 'list_post': final_posts}
+		final_req_post = []
+		for x in final_posts:
+			if x.post_type == "public":
+				final_req_post.append(x)
+		# final_posts.sort(reverse= True)
+		final_req_post.sort(reverse=True)
+		d = {'user_id': user_id, 'list_post': final_req_post}
 		return create_response(d, 200, UserApiResponse.user_dashboard_post_list)
 
 	def options(self, user_id):
 		return create_response({}, 200)
-
+	
+	@jwt_required()
 	def put(self, user_id):
 		print('user_id: ', user_id)
 		user_posts = c_get_user_post(user_id)

@@ -28,7 +28,7 @@ class PostCommentContainer:
 	
 class PostLikeContainer:
 	def __init__(self, post_like_tuple):
-		print("Post like creation: ", post_like_tuple)
+		# print("Post like creation: ", post_like_tuple)
 		self.post_id = ''
 		self.liker_id = ''
 		self.time_stamp = ''
@@ -64,6 +64,8 @@ class UserFeedPostContainer:
 		#print('UserFeedContainer',sql_post_id)
 		self.user_id = sql_post_id.user_id
 		self.user_name = get_user_name(self.user_id)
+		self.post_type = sql_post_id.post_type
+		# print('post type is:', self.post_type)
 		sql_post_interaction = p_m_m.get_post_interaction(post_id)
 		#print('UserFeedContainer',sql_post_interaction)
 		self.likes = sql_post_interaction.likes
@@ -75,7 +77,7 @@ class UserFeedPostContainer:
 		if is_depth_post_reqired:
 			self.comments = self.get_post_comment_container(self.post_comment_id)
 			self.list_user_likes = self.get_post_like_container(self.post_id)
-			print(self.list_user_likes)
+			# print(self.list_user_likes)
 		#print('UserFeedContainer',self.comments)
 		#print(*self.comments)
 		self.is_already_liked = False # will update later
@@ -92,7 +94,8 @@ class UserFeedPostContainer:
 				con = PostCommentContainer(c.comment_id)
 				l_container.append(con)
 			except Exception as e:
-				print(e)
+				pass
+				# print(e)
 		return l_container
 
 
@@ -103,7 +106,7 @@ class UserFeedPostContainer:
 			return
 		like_container = []
 		for l in l_likes:
-			print(l)
+			# print(l)
 			like_container.append(PostLikeContainer(l))
 		return like_container
 
@@ -244,10 +247,11 @@ def c_edit_post(user_id:str, post_id:str, form_data, file= None)->list:
 			post_type = form_data['type']
 		except:
 			pass
-		img_url = file.filename
-		if img_url == '' :
+		img_url = ''
+		if file == None:
 			img_url = 'NOT_AVAILABLE' if photo_d == 'remove_photo' else None
 		else:
+			img_url = file.filename
 			if allowed_file(img_url):
 				warn_str = 'updating photo'
 				img_url = create_file_name(user_id, file.filename)

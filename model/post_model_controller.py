@@ -208,7 +208,7 @@ class PostModelManager():
     #* Edit section complete adding remove section
     #* get section starting here
     def get_comments_from_post_id(self, post_comment_id:str)->list:
-        self.printDebug('post id receving as: ' + post_comment_id)
+        # self.printDebug('post id receving as: ' + post_comment_id)
         comments = PostCommentTable.query.filter_by(post_comment_id = post_comment_id).all()
         #print('comments received as:', comments)
         return (comments)

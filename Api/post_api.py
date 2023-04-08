@@ -2,6 +2,7 @@ from flask_restful import Resource
 from flask_restful import fields, marshal_with, reqparse
 from flask import request
 from flask import Response, make_response
+from flask_jwt_extended import create_access_token, jwt_required
 
 from controller.user_behaviour_controller import c_user_token_verification
 from controller.post_controller import create_post_container_obj, UserFeedPostContainer
@@ -16,7 +17,7 @@ from controller.post_controller import *
 
 from .misc_utils import *
 from controller.misc_funtionalities import get_latest_posts
-from controller.misc_funtionalities import update_recent_posts
+from controller.misc_funtionalities import update_recent_posts, initialize_list_recent_post
 
 create_parser = reqparse.RequestParser()
 
@@ -134,7 +135,7 @@ class PostCRUDApi(Resource):
             if p_id.user_id != user_id:
                 return '', 404
             p = p_m_m.get_post_content(post_id)
-            print(p)
+            # print(p)
             d = {
                 'user_id': user_id,
                 'post_id': p.post_id,
@@ -183,6 +184,7 @@ class PostFetchApi(Resource):
         }
         return d
     # @marshal_with(post_container)
+    @jwt_required()
     def post(self):
         form = request.get_json()
         user_id = form.get('user_id')
@@ -214,7 +216,7 @@ class PostApiV2(Resource):
     def print_details(self, u_id, post_id, operation):
         print("PostApiV2: ", operation, " request received for user_id: ", u_id, " on post_id: ", post_id)
 
-
+    @jwt_required()
     def get(self, user_id, post_id):
         ''' This will provide post details on given post id,
             Token will be verified in case of private post, 
@@ -228,7 +230,7 @@ class PostApiV2(Resource):
         else:
             return create_response({}, 500)
         
-    
+    @jwt_required()
     def post(self, user_id, post_id=""):
         ''' this is responsible for post_id creation and making entry in database '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.CREATE))
@@ -242,6 +244,7 @@ class PostApiV2(Resource):
             update_recent_posts(user_id)
         return create_response({'is_success': result, 'err': err}, 200, PostApiResponse.post_operation_result)
 
+    @jwt_required()
     def put(self, user_id, post_id):
         ''' This will edit given post '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, "EDIT"))
@@ -255,12 +258,18 @@ class PostApiV2(Resource):
 
 
 
-
+    @jwt_required()
     def delete(self, user_id, post_id):
         ''' this is responsible for post to delete from the database and provide proper response in this regard '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.DELETE))
-        pass
-
+        result, err = c_delete_post(user_id, post_id)
+        d = {'result': result, 'err': err}
+        if result:
+            initialize_list_recent_post()
+            return create_response(d, 200, PostApiResponse.post_operation_result)
+        else:
+            return create_response(d, 500)
+    @jwt_required()
     def options(self, user_id, post_id):
         print('option receiving')
         d = {}
@@ -319,6 +328,7 @@ class PostLikeApiV2(Resource):
         return create_response(d, 200, PostApiResponse.post_like_operation)
 
     # @marshal_with(post_like_operation)
+    @jwt_required()
     def delete(self, user_id, post_id):
         ''' This will remove post in given list '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.DELETE, OperationStrings.LIKE))
@@ -376,12 +386,7 @@ class PostCommentApiV2(Resource):
         ''' This is responsible deleting given post '''
         print("Deleting given post for post_id:", post_id, " by the user:", user_id)
         #! Currently under development
-        result, err = c_delete_post(user_id, post_id)
-        d = {'result': result, 'err': err}
-        if result:
-            return create_response(d, 200, PostApiResponse.post_operation_result)
-        else:
-            return create_response(d, 500)
+        return create_response({}, 500)
 
 
     def options(self, user_id, post_id):

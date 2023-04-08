@@ -239,7 +239,7 @@ def create_response(response_data:dict, return_code:int, response_type:PostApiRe
 	# 	response = make_response()
 	response.status = return_code
 	final_res = set_response_headers(response)
-	print(final_res.headers)
+	# print(final_res.headers)
 	return final_res
 
 
