@@ -19,6 +19,8 @@ from .misc_utils import *
 from controller.misc_funtionalities import get_latest_posts
 from controller.misc_funtionalities import update_recent_posts, initialize_list_recent_post
 
+#perf time and caching
+from app import perf_counter_ns
 create_parser = reqparse.RequestParser()
 
 create_parser.add_argument('user_id')
@@ -224,7 +226,10 @@ class PostApiV2(Resource):
         '''
         self.print_details(user_id, post_id, OperationStrings.combine(OperationStrings.POST, OperationStrings.FETCH))
         ''' already did in post fetch api '''
+        start = perf_counter_ns()
         post_container = create_post_container_obj(user_id, post_id, False)
+        end = perf_counter_ns()
+        print("time taken for container creation", end-start)
         if post_container:
             return create_response(post_container, 200, PostApiResponse.post_container)
         else:

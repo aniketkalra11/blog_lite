@@ -14,8 +14,16 @@ from controller.misc_funtionalities import *
 from model.model import init_db
 from flask_jwt_extended import JWTManager
 
-import yaml
+import worker
+import celery_job_demo
 
+from time import perf_counter_ns
+#caching function
+from cache_config import make_cache
+
+import yaml
+celery = None
+cache = None
 is_jinja_mode = False
 db_file = ""
 def set_config():
@@ -50,7 +58,21 @@ app = Flask(__name__)
 app.config.from_object(DevelopmentEnviroment)
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem' # neet to check wheather it is useful or not
-app.config['JWT_SECRET_KEY'] = 'SOMErANDOMtEXT'
+app.config['JWT_SECRET_KEY'] = generate_random_key()
+#*Celery worker
+app.config["CELERY_BROKER_URL"] = "redis://localhost:6379/1"
+app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/2"
+app.config["REDIS_URL"] = "redis://localhost:6379"
+app.config["CACHE_TYPE"] = "RedisCache"
+app.config["CACHE_REDIS_HOST"] = "localhost"
+app.config["CACHE_REDIS_POST"] = "6379"
+celery = worker.celery
+celery.conf.update(
+	broker_url = app.config["CELERY_BROKER_URL"],
+	result_backend = app.config["CELERY_RESULT_BACKEND"] 
+)
+#*caching
+cache = make_cache(app)
 jwt =  JWTManager(app)
 Session(app)
 ran_k = generate_random_key()
@@ -347,7 +369,10 @@ def ji():
 
 @app.route('/test/search')
 def te():
-	return render_template('search_result.html')
+	job= celery_job_demo.just_say_hello.delay("hi")
+	print(str(job))
+	return str(job), 200
+	# return render_template('search_result.html')
 #* API Work starting here
 #* Adding post Api
 
