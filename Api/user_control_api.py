@@ -16,6 +16,7 @@ from controller.user_behaviour_controller import *
 from controller.user_controller import *
 from controller.post_controller import c_get_home_page_post, c_get_user_post
 from .misc_utils import UserApiResponse, create_response
+from model.common_model_object import user_behaviour_manager, user_manager
 create_parser = reqparse.RequestParser()
 
 create_parser.add_argument('user_id')
@@ -132,6 +133,7 @@ class UserAuthenticationApi(Resource):
 				token = ''
 			else:
 				user_container = create_user_container(user_id)
+				user_behaviour_manager.update_last_user_login_time(user_id)
 		d = {'is_login_success': result, 'token': token, 'error': err, 'user_name': user_container.name}
 		print(d)
 		return create_response(d, 200, response_type= UserApiResponse.user_authentication)
@@ -209,6 +211,7 @@ class UserManagerApi(Resource):
 			print(e)
 			return create_response({}, 500)
 
+
 	def options(self):
 		return create_response({}, 200)
 
@@ -283,4 +286,16 @@ class UserSearchList(Resource):
 
 
 	def options(self):
+		return create_response({}, 200)
+	
+
+
+class DeleteUser(Resource):
+	@jwt_required()
+	def post(self, user_id):
+		result = user_manager.delete_user(user_id)
+		d = {'is_success': True, 'err': ''}
+		return create_response(d, 200, UserApiResponse.user_operation)
+
+	def options(self, user_id):
 		return create_response({}, 200)
