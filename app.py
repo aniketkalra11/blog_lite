@@ -15,7 +15,7 @@ from model.model import init_db
 from flask_jwt_extended import JWTManager
 
 import worker
-import celery_job_demo
+# import celery_job_demo
 # import celery_tasks
 
 from time import perf_counter_ns
@@ -474,7 +474,8 @@ api.add_resource(PostCarouselApi, '/api/v2/carousel', '/api/v2/carousel')
 from Api.post_api import PostBookmarkApi
 api.add_resource(PostBookmarkApi, '/api/v2/bookmark/post', '/api/v2/bookmark/post/<string:user_id>')
 
-
+from Api.export_api import ExportApi
+api.add_resource(ExportApi, '/api/v2/export', '/api/v2/export/<string:user_id>')
 
 
 

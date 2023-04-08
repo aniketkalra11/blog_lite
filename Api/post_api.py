@@ -22,8 +22,8 @@ from controller.misc_funtionalities import update_recent_posts, initialize_list_
 # from celery_tasks import create_user_csv_file
 
 #perf time and caching
-from app import perf_counter_ns
-from data_access import *
+from time import perf_counter_ns
+# from data_access import *
 create_parser = reqparse.RequestParser()
 
 create_parser.add_argument('user_id')
@@ -204,7 +204,7 @@ class PostFetchApi(Resource):
             stop = perf_counter_ns()
             print('Raw time is:', stop-start)
             start = perf_counter_ns()
-            post_container = cache_get_post_by_post_id(user_id, post_id)
+            # post_container = cache_get_post_by_post_id(user_id, post_id)
             end = perf_counter_ns()
             print("Caching time is:", end-start)
             if post_container:
@@ -243,10 +243,10 @@ class PostApiV2(Resource):
         stop = perf_counter_ns()
         print('Raw time is:', stop-start)
         start = perf_counter_ns()
-        try:
-            ost_container = cache_get_post_by_post_id(user_id, post_id)
-        except Exception as e:
-            print('error is:', e)
+        # try:
+        #     ost_container = cache_get_post_by_post_id(user_id, post_id)
+        # except Exception as e:
+        #     print('error is:', e)
         end = perf_counter_ns()
         print("Caching time is:", end-start)
         print("time taken for container creation", end-start)

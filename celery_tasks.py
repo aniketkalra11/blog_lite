@@ -17,7 +17,7 @@ from base64 import b64encode
 from weasyprint import HTML
 
 
-from celery_job_demo import celery
+# from celery_job_demo import celery
 celery = worker.celery
 #for csv file
 import csv
@@ -38,7 +38,7 @@ def daily_reminders():
 
 		yesterday = datetime.now() - timedelta(days=1)
 		for user in list_users:
-			create_user_csv_file(user.user_id)
+			# create_user_csv_file(user.user_id)
 			last_login_time = user.last_login_time
 			if last_login_time < yesterday:
 				user_container = create_user_container(user.user_id)
@@ -115,44 +115,26 @@ def monthly_pdf_report():
 		except Exception as e:
 			print('exception arrived in pdf gen', e)
 
-# @celery.task()
-def create_user_csv_file(user_id:str):
-	''' return csv file on demand '''
-	csv_filds = ['user_name', 'Post_title', 'Post_containt', 'timestamp', 'image_url']
-	csv_data = []
-	list_posts = c_get_user_post(user_id)
-	# user_conatiner = create_user_container(user_id)
-
-	# csv_data.append(list_posts)
-	for post in list_posts:
-		l = [post.user_name, post.title, post.caption, post.timestamp, post.image_url]
-		csv_data.append(l)
-
-	file_name = user_id + ".csv"
-	file_path = os.path.join(os.curdir, 'static', 'download', file_name)
-	print(file_path)
-	with open(file_path, 'w') as csvfile:
-		csvwriter = csv.writer(csvfile)
-		csvwriter.writerow(csv_filds)
-		csvwriter.writerows(csv_data)
-	msg = '''
-	Dear {}, <br>
-	Please, Find attachment of  your post list <br>
-	<br><br>
-	Thank you
-	Team Blog Lite
-	'''.format(	user_manager.get_user_details(user_id).fname)
-	send_email(to=user_id, subject="Custom import Job", msg=msg, attachment=file_path)
 
 
 
+# from flask_restful import Resource
+# from Api.misc_utils import create_response
 
+# class ExportApi(Resource):
+# 	def get(self, user_id):
+# 		create_user_csv_file.delay(user_id)
+# 		return create_response({}, 200)
+# 	def options(self, user_id):
+# 		return create_response({}, 200)
+# # from app import api
+# # api.add_resource(ExportApi, '/api/v2/ex/test')
 
 @celery.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
 	# sender.add_periodic_task(1.0, just_say_hello.s('hi'), name='kuch bhi')
 	# sender.add_periodic_task(crontab(minute=28, hour=23), daily_reminders.s(), name='daily_reminders')
-	sender.add_periodic_task(1, daily_reminders.s(), name='daily_reminders')
+	# sender.add_periodic_task(1, daily_reminders.s(), name='daily_reminders')
 
 	print('changed')
 	sender.add_periodic_task(crontab(minute=00, hour=7), monthly_html_report.s(), name='monthly_html_repost')
