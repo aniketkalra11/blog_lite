@@ -19,6 +19,7 @@ from .model import UserActiveTime
 
 #Misc functions
 from .misc_utils import getCurDateTime, getTodaysDate
+# from app import cache
 
 class UserModelManager():
 	'''
@@ -232,7 +233,19 @@ class UserModelManager():
 		else:
 			db.session.commit()
 			return True, ''
-
+	def update_user_password(self, user_id:str, new_password:str)->bool:
+		try:
+			u_d = db.session.query(UserIdPassword).filter_by(user_id = user_id).first()
+			print('User password update received for:' , u_d.name)
+			hash_val  = hashlib.sha256(new_password.encode()).hexdigest()
+			u_d.hash_value = hash_val
+			db.session.add(u_d)
+			db.session.commit()
+			return True
+		except Exception as e:
+			print('exeception arrived during password updation', e)
+			return False
+		
 	#* REMOVE SECTION STARTING HERE
 
 	def remove_user_follower(self, userId:str, followerId:str)->bool:

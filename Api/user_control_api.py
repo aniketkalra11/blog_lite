@@ -304,3 +304,21 @@ class DeleteUser(Resource):
 
 	def options(self, user_id):
 		return create_response({}, 200)
+	
+
+class UpdateUserPassword(Resource):
+	@jwt_required()
+	def post(self, user_id):
+		# result = user_manager.delete_user(user_id)
+		password = request.form['password']
+		new_password = request.form['new_password']
+		result, err = c_login_validation(user_id, password)
+		if result:
+			is_pwd_updated = user_manager.update_user_password(user_id, new_password)
+			d = {'is_success': is_pwd_updated, 'err': ''}
+		else:
+			d = {'is_success': False, 'err': err}
+		return create_response(d, 200, UserApiResponse.user_operation)
+
+	def options(self, user_id):
+		return create_response({}, 200)
