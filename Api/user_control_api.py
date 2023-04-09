@@ -121,20 +121,25 @@ class UserAuthenticationApi(Resource):
 		user_id = form.get('user_id')
 		pwd = form.get('password')
 		print("User id received as: ", user_id)
-		print("and Password is: ", pwd)
-		result, err = c_login_validation(user_id, pwd)
-		expires = timedelta(7)
-		token = ''
-		if result:
-			token = create_access_token(identity=user_id, expires_delta=expires)
-			result_token, err = c_add_user_token(user_id, token)
-			if not result_token:
-				result = False
-				token = ''
-			else:
-				user_container = create_user_container(user_id)
-				user_behaviour_manager.update_last_user_login_time(user_id)
-		d = {'is_login_success': result, 'token': token, 'error': err, 'user_name': user_container.name}
+		try:
+			print("and Password is: ", pwd)
+			result, err = c_login_validation(user_id, pwd)
+			expires = timedelta(7)
+			token = ''
+			if result:
+				token = create_access_token(identity=user_id, expires_delta=expires)
+				result_token, err = c_add_user_token(user_id, token)
+				if not result_token:
+					result = False
+					token = ''
+				else:
+					user_container = create_user_container(user_id)
+					user_behaviour_manager.update_last_user_login_time(user_id)
+			d = {'is_login_success': result, 'token': token, 'error': err, 'user_name': user_container.name}
+		except Exception as e:
+			print('exception arrived in authentication', e)
+			d = {'is_login_success': result, 'token': token, 'error': err}
+			return create_response(d, 200, response_type= UserApiResponse.user_authentication)
 		print(d)
 		return create_response(d, 200, response_type= UserApiResponse.user_authentication)
 

@@ -42,15 +42,24 @@ class UserBehaviourController:
 		def update_last_user_login_time(self, user_id:str, time_stamp:datetime= getCurDateTime()) -> bool:
 			print('updating usre last logintime')
 			last_time = db.session.query(LastUserLoginTime).filter_by(user_id = user_id).first()
-			if last_time:
-				last_time.time_stamp = time_stamp
-			else:
+			try:
+				if last_time:
+					db.session.delete(last_time)
+					db.session.commit()
+					# last_time.time_stamp = time_stamp
+					# db.session.add(last_time)
+				user_log = LastUserLoginTime(user_id=user_id )
+				db.session.add(user_log)
+				# else:
+				# 	db.session.rollback()
+				# 	print("ERROR: unable to fetch the user id from the current user")
+				# 	return False
+				db.session.commit()
+				print("last login details update complete")
+				return True
+			except Exception as e:
 				db.session.rollback()
-				print("ERROR: unable to fetch the user id from the current user")
-				return False
-			db.session.commit()
-			print("last login details update complete")
-			return True
+				print('error arrived during last login time updation', e)
 
 		def update_user_active_time(self, user_id:str, active_time:int, date:date = getTodaysDate()) -> bool:
 			print("UserBehvaiourController: " + "updating user", user_id, " with time:", active_time)

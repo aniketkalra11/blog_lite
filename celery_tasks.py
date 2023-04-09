@@ -98,6 +98,11 @@ def monthly_html_report():
 		print('html report ready')
 		# print(message)
 		print ('monthly html report ready')
+		file_name = user.user_id + '.html'
+		file_path = os.path.join(os.curdir, 'static', 'download', file_name)
+		html_f = open(file_path, 'w')
+		html_f.writelines(message)
+		send_email(to=user.user_id, subject='Monthly Html report', msg=message, attachment=file_path)
 
 ##########################################################################
 
@@ -134,9 +139,13 @@ def monthly_pdf_report():
 def setup_periodic_tasks(sender, **kwargs):
 	# sender.add_periodic_task(1.0, just_say_hello.s('hi'), name='kuch bhi')
 	# sender.add_periodic_task(crontab(minute=28, hour=23), daily_reminders.s(), name='daily_reminders')
-	# sender.add_periodic_task(1, daily_reminders.s(), name='daily_reminders')
+	# sender.add_periodic_task(30, daily_reminders.s(), name='daily_reminders')
+	sender.add_periodic_task(crontab(minute=15, hour=7), daily_reminders.s(), name='daily_reminders')
 
 	print('changed')
 	sender.add_periodic_task(crontab(minute=00, hour=7), monthly_html_report.s(), name='monthly_html_repost')
 	sender.add_periodic_task(crontab(minute=00, hous=2), monthly_pdf_report.s(), name='monthly_pdf_report')
+	# #testing 
+	# sender.add_periodic_task(20, monthly_html_report.s(), name='monthly_html_repost')
+	# sender.add_periodic_task(20, monthly_pdf_report.s(), name='monthly_pdf_report')
 
